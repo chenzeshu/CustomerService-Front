@@ -11,7 +11,6 @@ import 'iview/dist/styles/iview.css';
 import "common/stylus/index.styl"
 Vue.use(iView)
 
-
 //functions
 import {loadFromLocal, saveToLocal} from 'common/js/local'
 
@@ -40,7 +39,6 @@ axios.interceptors.response.use(function (res) {
   // Do something with response error
   return Promise.reject(error);
 });
-
 
 Vue.prototype.$http = axios
 
