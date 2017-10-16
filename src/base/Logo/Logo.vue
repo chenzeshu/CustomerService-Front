@@ -42,7 +42,7 @@
           }
         },
         mounted(){
-            console.log(`mounted:${this.logined}`)
+
         },
         methods:{
           enter(el, done){

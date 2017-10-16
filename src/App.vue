@@ -55,15 +55,13 @@
     text-align: center;
     color: #2c3e50;
     height 100%
-
-  .layout{
+  .layout
     border: 1px solid #d7dde4;
     background: #f5f7f9;
     position: relative;
     border-radius: 4px;
     overflow: hidden;
     height 100%
-  }
   /*
   .layout-logo{
     width: 100px;
@@ -76,63 +74,49 @@
     left: 20px;
   }
   */
-  .layout-ceiling{
+  .layout-ceiling
     background: #464c5b;
     padding: 10px 0;
     overflow: hidden;
-  }
-  .layout-ceiling-main{
+  .layout-ceiling-main
     float: right;
     margin-right: 15px;
-  }
-  .layout-ceiling-main a{
+  .layout-ceiling-main a
     color: #9ba7b5;
-  }
-
-  .layout-breadcrumb{
+  .layout-breadcrumb
     position relative
     padding: 10px 15px 0;
     height 20px
-  }
-  .layout-content{
+  .layout-content
     min-height: 200px;
     margin: 15px;
     overflow: hidden;
     background: #fff;
     border-radius: 4px;
-  }
-  .layout-content-main{
+  .layout-content-main
     padding: 10px;
-  }
-  .layout-copy{
+  .layout-copy
     display block
     position fixed
     bottom:20px
     left 38vw
     text-align: center;
     color: #9ea7b4;
-  }
-  .layout-menu-left{
+  .layout-menu-left
     background: #464c5b;
-  }
-  .layout-header{
+  .layout-header
     position relative
     height: 60px;
     background: #fff;
     box-shadow: 0 1px 1px rgba(0,0,0,.1);
-  }
-  .show-left{
+  .show-left
     display block
     position absolute
     left 20px
-  }
-  .layout-ceiling-main a{
+  .layout-ceiling-main a
     color: #9ba7b5;
-  }
-  .layout-hide-text .layout-text{
+  .layout-hide-text .layout-text
     display: none;
-  }
-  .ivu-col{
+  .ivu-col
     transition: width .2s ease-in-out;
-  }
 </style>

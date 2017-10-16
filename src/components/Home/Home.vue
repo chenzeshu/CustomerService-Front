@@ -10,15 +10,15 @@
           </div>
         </div>
         <Row type="flex" >
-          <!---->
+          <!--左边-->
           <Col :span="spanLeft" class="layout-menu-left">
             <Menu :active-name="curMenuName" :theme="theme2" width="auto" @on-select="getCurMenuName">
-              <Submenu v-for="module in modules" name="module.name">
+              <Submenu v-for="(module,mk) in modules" :key="mk" name="module.name">
                 <template slot="title">
                   <Icon type="ios-paper" :size="iconSize"></Icon>
                   <span class="layout-text">{{ module.title }}</span>
                 </template>
-                  <router-link v-for="child in module.children" :to="child.path">
+                  <router-link v-for="(child, ck) in module.children" :key="ck" :to="child.path">
                     <MenuItem :name="child.name">{{ child.title }}</MenuItem>
                   </router-link>
               </Submenu>
@@ -38,7 +38,7 @@
               <Breadcrumb>
                 <BreadcrumbItem href="#">首页</BreadcrumbItem>
                 <BreadcrumbItem href="#">应用中心</BreadcrumbItem>
-                <BreadcrumbItem>某应用</BreadcrumbItem>
+                <BreadcrumbItem>{{ curMenuName }}</BreadcrumbItem>
               </Breadcrumb>
             </div>
           </div>
@@ -53,8 +53,6 @@
           </Col>
         </Row>
       </div>
-
-
     </div>
 </template>
 
@@ -67,18 +65,6 @@
     overflow: hidden;
     height 100%
   }
-  /*
-  .layout-logo{
-    width: 100px;
-    height: 30px;
-    background: #5b6270;
-    border-radius: 3px;
-    float: left;
-    position: relative;
-    top: 15px;
-    left: 20px;
-  }
-  */
   .layout-ceiling{
     background: #464c5b;
     padding: 10px 0;
@@ -98,7 +84,7 @@
     height 20px
   }
   .layout-content{
-    min-height: 200px;
+    min-height: 85vh;
     margin: 15px;
     overflow: hidden;
     background: #fff;
@@ -151,35 +137,35 @@
           spanLeft: 5,
           spanRight: 19,
           theme2:'dark',
-          curMenuName:"1",
+          curMenuName:"单位列表",
           //这个modules可以单独做一个js文件
           modules:[
             {
                 title:"单位管理",
                 name:"1",
                 children:[
-                  {title:"单位列表", path:'/home/customer', name:"1-1"}
+                  {title:"单位列表", path:'/home/company', name:"单位列表"}
                 ]
             },
             {
               title:"用户管理",
               name:"2",
               children:[
-                {title:"用户列表", path:'/home/emp', name:"2-1"}
+                {title:"用户列表", path:'/home/emp', name:"用户列表"}
               ]
             },
             {
               title:"普通合同",
               name:"3",
               children:[
-                {title:"合同列表", path:'/home/contract', name:"3-1"}
+                {title:"合同列表", path:'/home/contract', name:"合同列表"}
               ]
             },
             {
               title:"信道合同",
               name:"4",
               children:[
-                {title:"合同列表", path:'/home/contractc', name:"4-1"}
+                {title:"合同列表", path:'/home/contractc', name:"合同列表"}
               ]
             },
           ]
@@ -202,11 +188,11 @@
            ])
        },
        mounted(){
-          console.log(this.logined)
+
        },
        methods:{
          getCurMenuName(curName){
-             this.CurMenuName = curName
+             this.curMenuName = curName
          },
          toggleClick () {
            if (this.spanLeft === 5) {

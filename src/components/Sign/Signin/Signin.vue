@@ -121,7 +121,7 @@
       _checkToken(){
         this.$http.get(url.url + "/check").then(res=>{
           if(res.data.code === 1000){
-            alert(res.data.msg)
+//            alert(res.data.msg)
             this.setLogined(true)
           }
         } ,err=>{
@@ -140,7 +140,7 @@
           if(parseInt(res.code) === 1000){
               //todo 将token存入localStorage
               saveToLocal('token', res.data.token)
-              alert(res.msg)
+//              alert(res.msg)
               this.setLogined(true)
           }else {
               alert(res.msg)

@@ -4,7 +4,7 @@ import Router from 'vue-router'
 
 import Signin from 'comp/Sign/Signin/Signin'
 import Home from 'comp/Home/Home'
-import Customer from 'comp/Home/Customer/Customer'
+import Company from 'comp/Home/Company/Company'
 import Emp from 'comp/Home/Emp/Emp'
 import Contract from 'comp/Home/Contract/Contract'
 import Contractc from 'comp/Home/Contractc/Contractc'
@@ -22,7 +22,7 @@ export default new Router({
       path: '/home',
       component: Home,
       children:[
-        {path:'customer', component: Customer},
+        {path:'company', component: Company},
         {path:'emp', component: Emp},
         {path:'contract', component: Contract},
         {path:'contractc', component: Contractc},

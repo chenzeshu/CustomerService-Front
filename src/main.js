@@ -6,7 +6,7 @@ import router from './router'
 import axios from 'axios'
 import iView from 'iview'
 import store from './store'
-
+import url from 'common/js/url'
 import 'iview/dist/styles/iview.css';
 import "common/stylus/index.styl"
 Vue.use(iView)
@@ -14,6 +14,9 @@ Vue.use(iView)
 
 //functions
 import {loadFromLocal, saveToLocal} from 'common/js/local'
+
+axios.defaults.baseURL = url.url;
+// axios.defaults.headers.post['Content-Type'] = 'json/application'
 //axios 请求拦截器
 axios.interceptors.request.use(
   config => {
@@ -51,3 +54,4 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
+
