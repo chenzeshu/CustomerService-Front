@@ -1,21 +1,22 @@
-# customerservice
+# CRM前端
 
-> a Vue.js project used to offer online customer service
+组件树
 
-## Build Setup
+App
+ - Signin
+ - Home
 
-``` bash
-# install dependencies
-npm install
+    ~~- Company~~
 
-# serve with hot reload at localhost:8080
-npm run dev
+    ~~- Employee~~
+    - Contract
 
-# build for production with minification
-npm run build
+    ...
+ - Utils
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+    ~~- SearchCompany~~
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+    - SearchEmp
+
+    ...
+ ...
