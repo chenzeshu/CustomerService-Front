@@ -8,8 +8,8 @@
 </template>
 
 <script>
-  import {loadJWTfromLocal} from 'common/js/jwt'
-  import {mapGetters} from 'vuex'
+  import {mapGetters, mapMutations} from 'vuex'
+  import {saveToLocal, loadFromLocal} from 'common/js/local'
   import Logo from 'base/Logo/Logo.vue'
 
   export default {
@@ -19,24 +19,29 @@
         }
     },
     created(){
-      this._pushToSignIn()
+        if(loadFromLocal('loginFlag')){
+            this.setLogined(true)
+        }
     },
     computed:{
       ...mapGetters([
         'logined'
       ])
     },
-    methods:{
-      _pushToSignIn(){
-          //调取jwt
-        let jwt = loadJWTfromLocal()
-          //假如jwt验证失败
-          if(!jwt && !this.logined){
-            this.$router.push({path:'/signin'})
-            return
-          }
-          this.$router.push({path:'/home'})
+    watch:{
+      logined(newLogined){
+        if(newLogined){
+          this.$Message.success('登陆成功')
+          this.$router.push('/home/company')
+        }else{
+          this.$router.push('/signin')
+        }
       },
+    },
+    methods:{
+      ...mapMutations({
+        setLogined:'SET_LOGINED'
+      })
     },
     components:{
         Logo

@@ -8,7 +8,7 @@
         <span class="search-icon">
           <Icon type="search"></Icon>
         </span>
-        <input type="text" v-model.trim="searchWord" placeholder="人员名称" class="search">
+        <input type="text" v-model="searchWord" placeholder="人员名称" class="search">
       </div>
 
       <Table border :columns="columns" :data="dataArr" :width="curWidth"></Table>
@@ -24,82 +24,55 @@
       <!--create-->
       <Modal
         v-model="createFlag"
-        title="创建"
+        title="创建单位"
         width="400"
         @on-ok="_create">
         <!--@on-cancel="cancel"-->
-        <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
-          <FormItem label="人员名称" prop="name">
-            <Input v-model.trim="createModel.name" placeholder="人员名称"></Input>
+        <Form :model="createModel" :label-width="80">
+          <FormItem label="人员名称">
+            <Input v-model="createModel.name" placeholder="输入公司名后, 下方会显示公司列表"></Input>
           </FormItem>
-          <FormItem label="状态" prop="status">
+          <FormItem label="状态">
             <RadioGroup v-model="createModel.status" type="button">
               <Radio label="offline"></Radio>
               <Radio label="online"></Radio>
             </RadioGroup>
           </FormItem>
-          <SearchCompany @selectCompany="selectCompanyIdForC"></SearchCompany>
-          <FormItem label="openid" prop="openid">
-            <Input v-model.trim="createModel.openid" placeholder="请输入"></Input>
+          <FormItem label="所属公司">
+            <Input v-model="companyWord" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="联系手机" prop="phone">
-            <Input v-model.trim="createModel.phone" placeholder="请输入"></Input>
+          <FormItem label="公司列表" v-if="!companies.length && companyWord !==null">
+            <h3 :class="{'no-result':sTotal===0, 'waiting' : sTotal !==0}">{{ companySearchResult }}</h3>
           </FormItem>
-          <FormItem label="邮箱地址" prop="email">
-            <Input v-model.trim="createModel.email" placeholder="请输入"></Input>
+          <FormItem label="公司列表" v-if="companies.length && companyWord !== null">
+            <Select v-model="createModel.company" placeholder="请选择公司">
+              <Option :value="cv.name" v-for="(cv, ck) in companies" :key="ck">{{cv.name}}</Option>
+            </Select>
           </FormItem>
-        </Form>
-      </Modal>
-
-      <!--update-->
-      <Modal
-        v-model="updateFlag"
-        title="编辑"
-        width="400"
-        @on-ok="update">
-        <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
-          <FormItem label="人员名称" prop="name">
-            <Input v-model.trim="updateModel.name" placeholder="输入公司名后, 下方会显示公司列表"></Input>
+          <FormItem label="联系手机">
+            <Input v-model="createModel.phone" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="状态" prop="status">
-            <RadioGroup v-model.trim="updateModel.status" type="button">
-              <Radio label="offline"></Radio>
-              <Radio label="online"></Radio>
-            </RadioGroup>
-          </FormItem>
-          <SearchCompany :index="updateIndex" @selectCompany="selectCompanyIdForU"></SearchCompany>
-          <FormItem label="openid" prop="openid">
-            <Input v-model.trim="updateModel.openid" placeholder="请输入"></Input>
-          </FormItem>
-          <FormItem label="联系手机" prop="phone">
-            <Input v-model.trim="updateModel.phone" placeholder="请输入"></Input>
-          </FormItem>
-          <FormItem label="邮箱地址" prop="email">
-            <Input v-model.trim="updateModel.email" placeholder="请输入"></Input>
+          <FormItem label="邮箱地址">
+            <Input v-model="createModel.email" placeholder="请输入"></Input>
           </FormItem>
         </Form>
-      </Modal>
-
-      <!--delete-->
-      <Modal
-        v-model.trim="deleteFlag"
-        title="删除"
-        @on-ok="_delete">
-        <p>确定要删除人员?</p>
       </Modal>
     </div>
 </template>
 
 <script>
-    import Loading from 'base/Loading/Loading'
-    import SearchCompany from 'base/SearchCompany/SearchCompany'
     import {curdMixin, pageMixin} from 'common/js/mixin'
-    import Validator from 'common/js/validator'
+    import {debounce} from 'common/js/utils'
+    import Loading from 'base/Loading/Loading'
+
     export default {
       mixins:[curdMixin, pageMixin],
       data(){
           return {
+              companySearchResult:"检索中......",
+              sTotal:null,
               url:'employees',
+              dataArr:[],
               columns:[
                 {
                   title: ' ',
@@ -115,22 +88,20 @@
                 },
                 {
                   title: '所属公司',
-                  width: this.curWidth < 1200 ? 200 : 350,
+                  width: 300,
                   render: (h, params) => {
-                        if(this.dataArr[params.index].company){
-                          return `${this.dataArr[params.index].company.name}`
-                        }
+                      return `${this.dataArr[params.index].company.name}`
                   }
                 },
                 {
                   title: '手机',
                   key: 'phone',
-                  width: this.curWidth < 1200 ? 100 : 150,
+                  width: 100
                 },
                 {
                   title: '邮箱',
                   key: 'email',
-                  width: this.curWidth < 1200 ? 100 : 150,
+                  width: 100
                 },
                 {
                   title: '状态',
@@ -178,72 +149,67 @@
                   }
                 }
               ],
+              companyWord:null,
+              companies:[],
               createModel:{
                   name:null,
-                  company_id:null,
+                  company:null,
                   email:null,
                   phone:null,
-                  openid:null,
-                  status:null
+                status:null
               },
               updateModel:{
                 name:null,
-                company_id:null,
+                company:null,
                 email:null,
                 phone:null,
-                openid:null,
                 status:null
               },
-              ruleValidate: {
-                name: [
-                  { required: true, message: '姓名不能为空', trigger: 'blur' }
-                ],
-                status: [
-                  { required: true, message: '请选择状态', trigger: 'blur' }
-                ],
-                company_id: [
-                  { type:'number', required: true, message: '请选择公司', trigger: 'blur' }
-                ],
-                email: [
-                  { required: true, message: '邮箱不能为空', trigger: 'blur' },
-                  { validator: Validator.validateEmail, message: '邮箱格式不正确', trigger: 'change' }
-                ],
-                phone: [
-                  { required: true, message: '必须填写手机号码', trigger: 'blur' },
-                  { validator:Validator.validatePhone, trigger: 'change' }
-                ],
-                openid: [
-                  { required: true, message: '请填写openid', trigger: 'blur' },
-                ]
-              },
-            }
+          }
       },
       mounted(){
           this._getEmp()
+          this._searchCompany()
       },
       methods:{
-          selectCompanyIdForC(v){
-            this.createModel.company_id = v
-          },
-          selectCompanyIdForU(v){
-            this.updateModel.company_id = v
-          },
-          _getEmp(){
-              this._setLoading()
-              this.$http
-                  .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
-                  .then( res => {
-                      res = res.data.data
-                      this.$nextTick(()=>{
+        _getEmp(){
+            this.$http
+                .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+                .then( res => {
+                        res = res.data.data
+                        console.log(res.data)
+                        this.dataArr = res.data
                         this.total = res.total
-                        this.setDataArr(res.data)
-                        this.loading = false
-                      })
-                  })
-          },
+                        this._setLoading()
+                })
+        },
+        _searchCompany(){
+          this.$watch('companyWord', debounce((newC)=>{
+            if(!this.companyWord){
+              this.companies = []
+              this.companyWord = null
+              return
+            }
+
+            //todo 情况列表, 触发`等待中`提示语显示
+            this.companies = []
+
+            this.$http
+              .get(`/${this.url}/sc/${newC}`)
+              .then(res=>{
+                res = res.data.data
+                this.$Message.info({
+                  content:`共检索到${parseInt(res.sTotal)}个相似公司, 仅展示最前10个数据`,
+                  duration:3
+                })
+                this.companySearchResult = res.sTotal === 0 ? `暂无数据, 请重新搜索` : `检索中......`
+                this.companies = res.data
+              })
+          }, 1000))
+        }
       },
       components:{
-          Loading, SearchCompany
+          Loading
       }
     }
 </script>
@@ -253,6 +219,10 @@
     width: 90%;
   .employee
     width 100%
+    .no-result
+      color #ff9900!important
+    .waiting
+      color #ed3f14!important
     .page-wrapper
       margin 10px auto
     .employee-plus

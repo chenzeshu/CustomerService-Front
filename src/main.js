@@ -37,6 +37,14 @@ axios.interceptors.response.use(function (res) {
   return res;
 }, function (error) {
   // Do something with response error
+  switch (error.response.status){
+    case 401:
+      //如果是401权限问题, 就将本地loginFlag设false并返回登陆
+      saveToLocal('loginFlag', false)
+      store.commit('SET_LOGINED', false)
+    default:
+      break
+  }
   return Promise.reject(error);
 });
 
@@ -52,4 +60,17 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
+
+router.push('/signin')
+// router.beforeEach((to, from, next) => {
+//   if (loadFromLocal('loginFlag') && store.state.logined){
+//     next()
+//   }
+//   else {
+//     next({
+//       path:'/signin'
+//     })
+//   }
+// })
+
 

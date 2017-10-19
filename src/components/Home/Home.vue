@@ -1,12 +1,12 @@
 <template>
     <div class="home">
       <div class="layout" :class="{'layout-hide-text': spanLeft < 5}">
-        <Logo :logined="logined"></Logo>
+        <Logo :logined="!logined"></Logo>
 
         <div class="layout-ceiling" >
-          <div class="layout-ceiling-main" @click="test">
+          <div class="layout-ceiling-main">
             <a href="#" v-show="!logined">登陆平台</a>
-            <a href="#" v-show="logined">注销账户</a>
+            <a href="#" v-show="logined" @click.prevent="logout">注销账户</a>
           </div>
         </div>
         <Row type="flex" >
@@ -158,27 +158,26 @@
               title:"普通合同",
               name:"3",
               children:[
-                {title:"合同列表", path:'/home/contract', name:"合同列表"}
+                {title:"普合列表", path:'/home/contract', name:"普合列表"}
               ]
             },
             {
               title:"信道合同",
               name:"4",
               children:[
-                {title:"合同列表", path:'/home/contractc', name:"合同列表"}
+                {title:"信合列表", path:'/home/contractc', name:"信合列表"}
               ]
             },
           ]
         }
       },
-      watch:{
-          logined(newV){
-              if(!newV){
-                  console.log('注销了')
-                  this.$router.push('/signin')
-              }
-          }
-      },
+//      watch:{
+//          logined(newV){
+//              if(!newV){
+//                  this.$router.push('/signin')
+//              }
+//          }
+//      },
        computed:{
          iconSize () {
            return this.spanLeft === 5 ? 14 : 24;
@@ -204,15 +203,17 @@
            }
          },
          logout(){
+           saveToLocal('loginFlag', false)
            this.setLogined(false)
-           saveToLocal('myJWT', null)
+           this.setDataArr([])
          },
          test(){
               console.log(12313)
                this.$router.push('/home/test')
          },
          ...mapMutations({
-           setLogined:'SET_LOGINED'
+           setLogined:'SET_LOGINED',
+           setDataArr:'SET_DATAARR'
          })
        },
       components:{

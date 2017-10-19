@@ -17,7 +17,7 @@
 <script>
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
-  import {mapMutations} from 'vuex'
+  import {mapGetters, mapMutations} from 'vuex'
 
   const transform = prefixStyle('transform');
   const transitionDuration = prefixStyle('transitionDuration');
@@ -27,19 +27,10 @@
                 name : "中网客服管理后台"
             }
         },
-        props:{
-          logined:{
-              type:Boolean,
-              default:false
-          }
-        },
-        watch:{
-          logined(newV){
-            if(!newV){
-              console.log('注销了')
-              this.$router.push('/signin')
-            }
-          }
+        computed:{
+          ...mapGetters([
+              'logined'
+          ])
         },
         mounted(){
 

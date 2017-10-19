@@ -29,7 +29,7 @@
           <div slot="title">{{ codePlcehd }}不能为空</div>
         </Poptip>
       </div>
-      <!--记住我(一周) 不选这个,JWT 2小时失效-->
+      <!--记住我(一周) 不选这个,登出后loginFlag与JWT就被抹除, 否则JWT按后台设置 2小时/天/周失效-->
       <div class="options">
         <i-switch size="large" v-model="remember_me">
           <span slot="open">开启</span>
@@ -73,11 +73,6 @@
     }
   },
   watch:{
-    logined(newLog){
-        if(newLog){
-            this.$router.push('/home')
-        }
-    },
     loginFalse(newLoginFalse){
         if(newLoginFalse){
             this.$refs.signinWrapper.style.height=`427px`
@@ -108,9 +103,6 @@
   },
   created(){
       this._checkToken()
-//      if(this.logined){
-//        this.$router.push({path:'/home'})
-//      }
   },
   computed:{
     ...mapGetters([
@@ -119,15 +111,19 @@
   },
   methods:{
       _checkToken(){
-        this.$http.get(url.url + "/check").then(res=>{
-          if(res.data.code === 1000){
-//            alert(res.data.msg)
-            this.setLogined(true)
+          //todo 第一步检查本地flag, 为真时跳转到home页面的主页开始访问
+          let loginFlag = loadFromLocal('loginFlag')
+          if(loginFlag){
+                this.setLogined(true)
+                return
           }
-        } ,err=>{
-            alert("登陆过期, 请重新登陆")
+          else{
+            //todo 若flag为false, 则返回登陆页面
+            this.$Message.warning('登陆过期')
             this.$router.push('/signin')
-        })
+
+          }
+
       },
       login(){
         this._checkInput()
@@ -137,19 +133,19 @@
         }
         this.$http.post(url.url + "/login", postData).then(res=>{
             res = res.data
-          if(parseInt(res.code) === 1000){
-              //todo 将token存入localStorage
-              saveToLocal('token', res.data.token)
-//              alert(res.msg)
-              this.setLogined(true)
-          }else {
-              alert(res.msg)
-          }
+            if(parseInt(res.code) === 1000){
+                //todo 将token存入localStorage
+                saveToLocal('token', res.data.token)
+                saveToLocal('loginFlag', true)
+                this.setLogined(true)
+            }else {
+                alert(res.msg)
+            }
         })
       },
       _checkInput(){
         if(this.logined){
-          this.$router.push('/home')
+          this.$router.push('/home/company')
           return
         }
         if(!this.username){

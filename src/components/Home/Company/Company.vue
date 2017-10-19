@@ -8,7 +8,7 @@
         <span class="search-icon">
           <Icon type="search"></Icon>
         </span>
-        <input type="text" v-model="cusSearch" placeholder="单位名称" class="search">
+        <input type="text" v-model.trim="searchWord" placeholder="单位名称" class="search">
       </div>
 
       <Table border :columns="columns" :data="dataArr" :width="curWidth"></Table>
@@ -19,33 +19,32 @@
         </div>
       </div>
 
-
       <Loading :loading="loading"></Loading>
 
       <!--create-->
       <Modal
         v-model="createFlag"
-        title="创建单位"
+        title="创建"
         width="400"
         @on-ok="_create">
         <!--@on-cancel="cancel"-->
-        <Form :model="createModel" :label-width="80">
-          <FormItem label="单位名称">
-            <Input v-model="createModel.name" placeholder="请输入"></Input>
+        <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
+          <FormItem label="单位名称" prop="name">
+            <Input v-model.trim="createModel.name" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="是否签约">
+          <FormItem label="是否签约" prop="type">
             <RadioGroup v-model="createModel.type" type="button">
               <Radio label="未签约"></Radio>
               <Radio label="已签约"></Radio>
             </RadioGroup>
           </FormItem>
-          <FormItem label="所属行业">
-            <Select v-model="createModel.profession" placeholder="请选择">
+          <FormItem label="所属行业" prop="profession">
+            <Select v-model.trim="createModel.profession" placeholder="请选择">
               <Option :value="pro.name" v-for="(pro, pk) in professions" :key="pk">{{pro.name}}</Option>
             </Select>
           </FormItem>
-          <FormItem label="单位地址">
-            <Input v-model="createModel.address" placeholder="请输入"></Input>
+          <FormItem label="单位地址" prop="address">
+            <Input v-model.trim="createModel.address" placeholder="请输入"></Input>
           </FormItem>
         </Form>
       </Modal>
@@ -53,27 +52,27 @@
       <!--update-->
       <Modal
         v-model="updateFlag"
-        title="编辑单位"
+        title="编辑"
         width="400"
         @on-ok="update">
         <!--@on-cancel="cancel"-->
-        <Form :model="updateModel" :label-width="80">
-          <FormItem label="单位名称">
-            <Input v-model="updateModel.name" placeholder="请输入"></Input>
+        <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
+          <FormItem label="单位名称" prop="name">
+            <Input v-model.trim="updateModel.name" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="是否签约">
+          <FormItem label="是否签约" prop="type">
             <RadioGroup v-model="updateModel.type" type="button">
               <Radio label="未签约"></Radio>
               <Radio label="已签约"></Radio>
             </RadioGroup>
           </FormItem>
-          <FormItem label="所属行业">
-            <Select v-model="updateModel.profession" placeholder="请选择">
+          <FormItem label="所属行业" prop="profession">
+            <Select v-model.trim="updateModel.profession" placeholder="请选择">
               <Option :value="pro.name" v-for="(pro, pk) in professions" :key="pk">{{pro.name}}</Option>
             </Select>
           </FormItem>
-          <FormItem label="单位地址">
-            <Input v-model="updateModel.address" placeholder="请输入"></Input>
+          <FormItem label="单位地址" prop="address">
+            <Input v-model.trim="updateModel.address" placeholder="请输入"></Input>
           </FormItem>
         </Form>
       </Modal>
@@ -97,7 +96,6 @@
     data () {
       return {
         url:"company",
-        dataArr:[],  //为了mixin公用, 将组件命名的companies数组改名为dataArr
         columns: [
           {
             title: ' ',
@@ -108,23 +106,23 @@
           {
             title: ' ',
             key: 'name',
-            width: 200,
+            width: this.curWidth < 1200 ? 200 : 250,
             fixed:'left'
           },
           {
             title: '地址',
-            key: 'address',
-            width: 400
+            key : 'address',
+            width: this.curWidth < 1200 ? 400 : 600,
           },
           {
             title: '行业',
             key: 'profession',
-            width: 100
+            width: this.curWidth < 1200 ? 100 : 120
           },
           {
             title: '签约类型',
             key: 'type',
-            width: 100
+            width: this.curWidth < 1200 ? 100 : 130
           },
           {
             title:"操作",
@@ -175,32 +173,40 @@
             profession:null,
             type:null,
         },
+        ruleValidate: {
+          name: [
+            { required: true, message: '单位名不能为空', trigger: 'blur' }
+          ],
+          address: [
+            { required: true, message: '请填写地址', trigger: 'blur' }
+          ],
+          profession: [
+            { required: true, message: '请选择行业', trigger: 'blur' }
+          ],
+          type: [
+            { required: true, message: '请选择状态', trigger: 'blur' }
+          ]
+        },
       }
     },
     mounted(){
       this._getCompanies()
-      this._search()
-    },
-    computed:{
-      curWidth(){
-          let w = document.documentElement.clientWidth
-          return w >1200 ? 1103: 800
-      },
     },
     methods:{
         _getCompanies(){
-            let _url = `/company/page/${this.page}/${this.pageSize}`
-            this.$http.get(_url).then(res=>{
-               if(parseInt(res.data.code) === 2000){
-                 res = res.data.data
-                  this.$nextTick(()=>{
-                    this.total = res.total
-                    this.professions = res.pros
-                    this.dataArr = res.data
-                    this.loading = false
-                  })
-               }
-            })
+            this.$http
+                .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+                .then(res=>{
+                  if(parseInt(res.data.code) === 2000){
+                    res = res.data.data
+                    this.$nextTick(()=>{
+                      this.total = res.total
+                      this.professions = res.pros
+                      this.setDataArr(res.data)
+                      this.loading = false
+                    })
+                  }
+                })
         },
     },
     components:{

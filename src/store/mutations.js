@@ -6,5 +6,16 @@ export default {
   },
   [types.SET_LOGINED](state, status){
     state.logined = status
-  }
+  },
+  [types.SET_DATAARR](state, dataArr){
+    state.dataArr = dataArr
+  },
+  [types.SPLICE_DATAARR](state, {index, item}){
+    if(item){
+      state.dataArr.splice(index, 1, item)
+    }else{
+      state.dataArr.splice(index, 1)
+    }
+
+  },
 }
