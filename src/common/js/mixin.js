@@ -10,14 +10,14 @@ export const curdMixin = {
       createFlag:false,
       updateFlag:false,
       deleteFlag:false,
-      updateIndex:null,
+      // updateIndex:null, 放进vuex了
       deleteIndex:null,
       searchWord:null,
     }
   },
   computed:{
     ...mapGetters([
-      'dataArr'
+      'dataArr', 'updateIndex'
     ])
   },
   mounted(){
@@ -39,6 +39,7 @@ export const curdMixin = {
   methods:{
     _toggleCreate(){
       this.createFlag = ! this.createFlag
+      this.setUpdateIndex(null)
     },
     _create(){
       this.$refs.createForm.validate((valid) => {
@@ -49,7 +50,8 @@ export const curdMixin = {
           }, 500)
           return
         }
-
+        // console.log(this.createModel)
+        // return
         this.$http
             .post(`/${this.url}`, this.createModel)
             .then(res=>{
@@ -58,14 +60,25 @@ export const curdMixin = {
               if(parseInt(res.code) === 2002){
                 this.$Message.success(res.msg);
                 //并更新dom
-                this.spliceDataArr({index:0, item:res.data})
+                this._getData()
               }
+            }).catch(error=>{
+              let text = error.response.data.errors
+              let content = ''
+              for ( let key in text){
+                content += `${key} : ${text[key]}<br>`
+              }
+              this.$Notice.error({
+                title: '错误通知',
+                desc: content,
+                duration:999
+              });
             })
       })
     },
     _toggleUpdate(index){
       this.updateFlag = !this.updateFlag
-      this.updateIndex = index
+      this.setUpdateIndex(index)
       this.updateModel = Object.assign({}, this.dataArr[index])
     },
     update(){
@@ -77,7 +90,9 @@ export const curdMixin = {
           }, 500)
           return
         }
-
+        //
+        console.log(this.updateModel)
+        // return
         let _url = `/${this.url}/update/${this.updateModel.id}`
         this.$http.post(_url, this.updateModel)
           .then(res => {
@@ -85,8 +100,8 @@ export const curdMixin = {
             if (parseInt(res.code) === 2003) {
               //由于vue无法监听数组dom更新, 所以需要使用变异方法
               //删除数组中index元素, 然后重新插入
-              this.spliceDataArr({index: this.updateIndex, item: this.updateModel})
               this.$Message.success(res.msg);
+              this._getData()
             }
           }, err => {
             this.$Message.error('修改失败');
@@ -127,7 +142,7 @@ export const curdMixin = {
               })
               // this.total = res.total
               this.total = null  //仅展示前10个搜索结果, 因为如果要展示所有, 需要做2个分页, 不好做啊!
-              this.dataArr = res.data
+              this.setDataArr(res.data)
               this.loading = false
             })
         }, 1000)
@@ -138,6 +153,7 @@ export const curdMixin = {
     },
     ...mapMutations({
       setDataArr:'SET_DATAARR',
+      setUpdateIndex:'SET_UPDATEINDEX',
       spliceDataArr:'SPLICE_DATAARR',
     }),
   },
@@ -161,8 +177,9 @@ export const pageMixin = {
   },
   methods:{
     onChange(curPage){
+      this.page = curPage
       this._setLoading()
-      let _url = `/${this.url}/page/${curPage}/${this.pageSize}`
+      let _url = `/${this.url}/page/${this.page}/${this.pageSize}`
       this.$http
         .get(_url)
         .then(res=>{

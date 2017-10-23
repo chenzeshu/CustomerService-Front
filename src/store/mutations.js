@@ -16,6 +16,8 @@ export default {
     }else{
       state.dataArr.splice(index, 1)
     }
-
   },
+  [types.SET_UPDATEINDEX](state, index){
+    state.updateIndex = index
+  }
 }

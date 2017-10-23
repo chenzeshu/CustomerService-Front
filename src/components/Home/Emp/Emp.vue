@@ -11,7 +11,7 @@
         <input type="text" v-model.trim="searchWord" placeholder="人员名称" class="search">
       </div>
 
-      <Table border :columns="columns" :data="dataArr" :width="curWidth"></Table>
+      <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length"></i-table>
 
       <div class="page-wrapper">
         <div class="page">
@@ -38,7 +38,7 @@
               <Radio label="online"></Radio>
             </RadioGroup>
           </FormItem>
-          <SearchCompany @selectCompany="selectCompanyIdForC"></SearchCompany>
+          <SearchCompany @selectCompany="selectCompanyIdForC" v-if="dataArr.length"></SearchCompany>
           <FormItem label="openid" prop="openid">
             <Input v-model.trim="createModel.openid" placeholder="请输入"></Input>
           </FormItem>
@@ -67,7 +67,7 @@
               <Radio label="online"></Radio>
             </RadioGroup>
           </FormItem>
-          <SearchCompany :index="updateIndex" @selectCompany="selectCompanyIdForU"></SearchCompany>
+          <SearchCompany @selectCompany="selectCompanyIdForU" v-if="dataArr.length"></SearchCompany>
           <FormItem label="openid" prop="openid">
             <Input v-model.trim="updateModel.openid" placeholder="请输入"></Input>
           </FormItem>
@@ -219,7 +219,7 @@
             }
       },
       mounted(){
-          this._getEmp()
+          this._getData()
       },
       methods:{
           selectCompanyIdForC(v){
@@ -228,7 +228,7 @@
           selectCompanyIdForU(v){
             this.updateModel.company_id = v
           },
-          _getEmp(){
+          _getData(){
               this._setLoading()
               this.$http
                   .get(`/${this.url}/page/${this.page}/${this.pageSize}`)

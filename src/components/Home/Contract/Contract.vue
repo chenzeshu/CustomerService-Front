@@ -11,7 +11,7 @@
         <input type="text" v-model.trim="searchWord" placeholder="合同名称" class="search">
       </div>
 
-      <Table border :columns="columns" :data="dataArr" :width="curWidth"></Table>
+      <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length"></i-table>
 
       <div class="page-wrapper">
         <div class="page">
@@ -38,9 +38,9 @@
           </FormItem>
           <SearchCompany @selectCompany="selectCompanyIdForC"></SearchCompany>
           <FormItem label="合同类型" prop="type1">
-            <Select v-model.trim="createModel.type1" placeholder="请选择">
-              <Option :value="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Option>
-            </Select>
+            <RadioGroup v-model="createModel.type1" type="button">
+              <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
+            </RadioGroup>
           </FormItem>
           <FormItem label="签约类型" prop="type2">
             <RadioGroup v-model="createModel.type2" type="button">
@@ -49,24 +49,20 @@
               <Radio label="临时"></Radio>
             </RadioGroup>
           </FormItem>
-          <FormItem label="项目经理" prop="PM">
-            <Input v-model.trim="createModel.address" placeholder="请输入"></Input>
-          </FormItem>
-          <FormItem label="技术经理" prop="address">
-            <Input v-model.trim="createModel.address" placeholder="请输入"></Input>
-          </FormItem>
+          <SearchEmps @selectEmp="selectEmpForPM" v-if="dataArr.length"></SearchEmps>
+          <SearchEmps @selectEmp="selectEmpForTM" type="TM" v-if="dataArr.length"></SearchEmps>
           <FormItem label="签订日期" prop="time1">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="createModel.time2"></DatePicker>
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
           </FormItem>
           <FormItem label="验收日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="createModel.time1"></DatePicker>
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime2"></DatePicker>
           </FormItem>
           <FormItem label="质保截止">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="createModel.time3"></DatePicker>
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime3"></DatePicker>
           </FormItem>
-          <FormItem label="上传文件">
-            <Input v-model.trim="createModel.address" placeholder="请输入"></Input>
-          </FormItem>
+          <!--<FormItem label="上传文件">-->
+            <!--<Input v-model.trim="createModel.document" placeholder="请输入"></Input>-->
+          <!--</FormItem>-->
           <FormItem label="协作单位">
             <Select v-model.trim="createModel.coor" placeholder="请选择">
               <Option :value="c.id" v-for="(c, ck) in coors" :key="ck">{{c.name}}</Option>
@@ -75,8 +71,54 @@
         </Form>
       </Modal>
       <!--update-->
-
-
+      <Modal
+        v-model="updateFlag"
+        title="修改"
+        width="400"
+        @on-ok="update">
+        <!--@on-cancel="cancel"-->
+        <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
+          <!--自动生成 + 手工填写-->
+          <FormItem label="合同编号" prop="contract_id">
+            <Input v-model.trim="updateModel.contract_id" placeholder="请输入"></Input>
+          </FormItem>
+          <FormItem label="合同名称" prop="name">
+            <Input v-model.trim="updateModel.name" placeholder="请输入"></Input>
+          </FormItem>
+          <SearchCompany @selectCompany="selectCompanyIdForU" v-if="dataArr.length"></SearchCompany>
+          <FormItem label="合同类型" prop="type1">
+            <RadioGroup v-model="updateModel.type1" type="button">
+              <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
+            </RadioGroup>
+          </FormItem>
+          <FormItem label="签约类型" prop="type2">
+            <RadioGroup v-model="updateModel.type2" type="button">
+              <Radio label="销售"></Radio>
+              <Radio label="客服"></Radio>
+              <Radio label="临时"></Radio>
+            </RadioGroup>
+          </FormItem>
+          <SearchEmps @selectEmp="selectEmpForPMU" v-if="dataArr.length"></SearchEmps>
+          <SearchEmps @selectEmp="selectEmpForTMU" type="TM" v-if="dataArr.length"></SearchEmps>
+          <FormItem label="签订日期" prop="time1">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="updateModel.time1" @on-change="setUTime1"></DatePicker>
+          </FormItem>
+          <FormItem label="验收日期">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="updateModel.time2" @on-change="setUTime2"></DatePicker>
+          </FormItem>
+          <FormItem label="质保截止">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="updateModel.time3" @on-change="setUTime3"></DatePicker>
+          </FormItem>
+          <!--<FormItem label="上传文件">-->
+            <!--<Input v-model.trim="updateModel.document" placeholder="请输入"></Input>-->
+          <!--</FormItem>-->
+          <FormItem label="协作单位">
+            <Select v-model.trim="updateModel.coor" placeholder="请选择">
+              <Option :value="c.id" v-for="(c, ck) in coors" :key="ck">{{c.name}}</Option>
+            </Select>
+          </FormItem>
+        </Form>
+      </Modal>
       <!--delete-->
       <Modal
         v-model="deleteFlag"
@@ -90,7 +132,9 @@
 <script>
   import Loading from 'base/Loading/Loading'
   import SearchCompany from 'base/SearchCompany/SearchCompany'
+  import SearchEmps from 'base/SearchEmps/SearchEmps'
   import {curdMixin, pageMixin} from 'common/js/mixin'
+//  import {formatDate} from 'common/js/date'
     export default {
       mixins:[curdMixin, pageMixin],
       data(){
@@ -123,7 +167,22 @@
               {
                 title: '合同类型',
                 key: 'type1',
-                width: 100
+                width: 100,
+                render: (h, params) => {
+                    switch (this.dataArr[params.index].type1){
+                      case "1":
+                          return `集成`
+                          break
+                      case "2":
+                          return `服务`
+                          break
+                      case "3":
+                          return `综合`
+                          break
+                      default:
+                          break
+                    }
+                }
               },
               {
                 title: '签订类型',
@@ -271,58 +330,96 @@
               coor : null,
             },
             ruleValidate: {
-              contract_id: [
-                { required: true, message: '合同编号不能为空', trigger: 'blur' }
-              ],
-              PM: [
-                { required: true, message: '项目经理不能为空', trigger: 'blur' }
-              ],
-              company_id: [
-                { type:'number', required: true, message:'请选择单位', trigger: 'blur' }
-              ],
-              name: [
-                { required: true, message: '合同名不能为空', trigger: 'blur' }
-              ],
-              type1: [
-                { required: true, message: '请选择合同类型', trigger: 'blur' }
-              ],
-              type2: [
-                { required: true, message: '请选择签订类型', trigger: 'blur' }
-              ],
-              time1: [
-                { required: true, message: '请填写签订日期', trigger: 'blur' }
-              ],
+//              contract_id: [
+//                { required: true, message: '合同编号不能为空', trigger: 'blur' }
+//              ],
+//              PM: [
+//                { required: true, message: '项目经理不能为空', trigger: 'blur' }
+//              ],
+//              company_id: [
+//                { type:'number', required: true, message:'请选择单位', trigger: 'blur' }
+//              ],
+//              name: [
+//                { required: true, message: '合同名不能为空', trigger: 'blur' }
+//              ],
+//              type1: [
+//                { type:'number', required: true, message: '请选择合同类型', trigger: 'blur' }
+//              ],
+//              type2: [
+//                { required: true, message: '请选择签订类型', trigger: 'blur' }
+//              ],
+//              time1: [
+//                { required: true, message: '请填写签订日期', trigger: 'blur' }
+//              ],
             },
           }
       },
       mounted(){
-        this._getCons()
+        this._getData()
       },
       methods:{
+          selectType1C(v){
+            this.createModel.type1 = v
+          },
+          setCTime1(date){
+            this.createModel.time1 = date
+          },
+          setCTime2(date){
+            this.createModel.time2 = date
+          },
+          setCTime3(date){
+            this.createModel.time3 = date
+          },
+          setUTime1(date){
+            this.updateModel.time1 = date
+          },
+          setUTime2(date){
+            this.updateModel.time2 = date
+          },
+          setUTime3(date){
+            this.updateModel.time3 = date
+          },
+          selectEmpForPM(result){
+             this.createModel.PM = this.selectEmpUtilFunc(result)
+          },
+          selectEmpForTM(result){
+             this.createModel.TM = this.selectEmpUtilFunc(result)
+          },
+          selectEmpForPMU(result){
+             this.updateModel.PM = this.selectEmpUtilFunc(result)
+          },
+          selectEmpForTMU(result){
+             this.updateModel.TM = this.selectEmpUtilFunc(result)
+          },
+          selectEmpUtilFunc(result){
+            //todo 将数组形式的id转为以逗号相隔的字符串
+            let re = ''
+            for(let i of result){
+              re += i+','
+            }
+            return re.substr(0, re.length - 1)
+          },
           selectCompanyIdForC(v){
             this.createModel.company_id = v
           },
           selectCompanyIdForU(v){
             this.updateModel.company_id = v
           },
-          _getCons(){
+          _getData(){
               this._setLoading()
               this.$http.get(`/${this.url}/page/${this.page}/${this.pageSize}`)
                 .then(res=>{
-                    console.log(res)
                     res = res.data.data
-                    this.$nextTick(()=>{
-                      this.total = res.total
-                      this.coors = res.coors
-                      this.types = res.types
-                      this.setDataArr(res.data)
-                      this._setLoading()
-                    })
+                    this.total = res.total
+                    this.coors = res.coors
+                    this.types = res.types
+                    this.setDataArr(res.data)
+                    this._setLoading()
                 })
           }
       },
       components:{
-          Loading, SearchCompany
+          Loading, SearchCompany, SearchEmps
       }
 
     }

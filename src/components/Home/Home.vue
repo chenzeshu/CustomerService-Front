@@ -171,13 +171,6 @@
           ]
         }
       },
-//      watch:{
-//          logined(newV){
-//              if(!newV){
-//                  this.$router.push('/signin')
-//              }
-//          }
-//      },
        computed:{
          iconSize () {
            return this.spanLeft === 5 ? 14 : 24;

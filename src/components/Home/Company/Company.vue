@@ -11,7 +11,7 @@
         <input type="text" v-model.trim="searchWord" placeholder="单位名称" class="search">
       </div>
 
-      <Table border :columns="columns" :data="dataArr" :width="curWidth"></Table>
+      <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length"></i-table>
 
       <div class="page-wrapper">
         <div class="page">
@@ -190,10 +190,10 @@
       }
     },
     mounted(){
-      this._getCompanies()
+      this._getData()
     },
     methods:{
-        _getCompanies(){
+        _getData(){
             this.$http
                 .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
                 .then(res=>{

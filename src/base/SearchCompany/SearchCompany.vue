@@ -2,7 +2,8 @@
     <div class="search-company">
       <FormItem label="选择公司" prop="company_id">
         <Select
-          v-model.trim="companyWord"
+          v-model="c_id"
+          :label="company_name"
           filterable
           remote
           :remote-method="_search"
@@ -21,26 +22,30 @@
     export default {
         data(){
           return {
-            companyWord:null,
+            c_id:null,
             loading:false,
             sTotal:null,
-            companies:[]
+            companies:[],
           }
         },
         computed:{
           ...mapGetters([
-              'dataArr'
-          ])
-        },
-        props:{
-            index: {
-              type: Number,
-              default: null
-            }
+              'dataArr', 'updateIndex'
+          ]),
+          company_name(){
+              //不能写成if(this.updateIndex) 因为当index为0 时也会被剔除
+            //尽量少使用prop, 多使用vuex?
+              if(this.updateIndex !== null && this.dataArr[this.updateIndex].company){
+                return this.dataArr[this.updateIndex].company.name
+              }
+              //create 情况 一打开就赋值this.updateIndex = null
+          }
         },
         watch:{
-            index(){
-                this.$refs.sel.setQuery(this.dataArr[this.index].company.name)
+            company_name(){
+              if(this.updateIndex !== null && this.dataArr[this.updateIndex].company) {
+                this.c_id = this.dataArr[this.updateIndex].company.id
+              }
             }
         },
         methods:{
@@ -48,21 +53,21 @@
                 this.$emit('selectCompany', company_id)
             },
             _search(query){
-                if(query !== '' && query !== this.companyWord){
-                  this.loading = true
-                  setTimeout(()=>{
-                    this.$http
-                      .get(`/employees/sc/${query}`)
-                      .then(res=>{
-                        this.loading = false
-                        res = res.data.data
-                        this.companies = res.data
-                      })
-                  }, 1000)
-                }
-                else {
-                  this.companies = []
-                }
+              if(query && query !== ''){
+                this.loading = true
+                setTimeout(()=>{
+                  this.$http
+                    .get(`/employees/sc/${query}`)
+                    .then(res=>{
+                      this.loading = false
+                      res = res.data.data
+                      this.companies = res.data
+                    })
+                }, 1000)
+              }
+              else {
+                this.emps = []
+              }
             }
         }
     }
