@@ -7,6 +7,7 @@ import Home from 'comp/Home/Home'
 import Company from 'comp/Home/Company/Company'
 import Emp from 'comp/Home/Emp/Emp'
 import Contract from 'comp/Home/Contract/Contract'
+import Service from 'comp/Home/Service/Service'
 import Contractc from 'comp/Home/Contractc/Contractc'
 
 
@@ -25,6 +26,7 @@ export default new Router({
         {path:'company', component: Company},
         {path:'emp', component: Emp},
         {path:'contract', component: Contract},
+        {path:'service', component: Service},
         {path:'contractc', component: Contractc},
       ]
     }

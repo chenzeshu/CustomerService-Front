@@ -50,7 +50,7 @@
             </RadioGroup>
           </FormItem>
           <SearchEmps @selectEmp="selectEmpForPM" v-if="dataArr.length"></SearchEmps>
-          <SearchEmps @selectEmp="selectEmpForTM" type="TM" v-if="dataArr.length"></SearchEmps>
+          <SearchEmps @selectEmp="selectEmpForTM" v-if="dataArr.length"></SearchEmps>
           <FormItem label="签订日期" prop="time1">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
           </FormItem>
@@ -133,296 +133,288 @@
   import Loading from 'base/Loading/Loading'
   import SearchCompany from 'base/SearchCompany/SearchCompany'
   import SearchEmps from 'base/SearchEmps/SearchEmps'
-  import {curdMixin, pageMixin} from 'common/js/mixin'
-//  import {formatDate} from 'common/js/date'
-    export default {
-      mixins:[curdMixin, pageMixin],
-      data(){
-          return {
-            url:'contracts',
-            types:[],
-            coors:[],
-            columns:[
-              {
-                title: `　合同编号`,
-                key: 'contract_id',
-                width: 120,
-                fixed: 'left'
-              },
-              {
-                title: ' ',
-                key: 'name',
-                width: 200,
-                fixed:'left'
-              },
-              {
-                title: '所属单位',
-                width: 200,
-                render: (h, params) => {
-                  if(this.dataArr[params.index].company){
-                    return `${this.dataArr[params.index].company.name}`
-                  }
-                }
-              },
-              {
-                title: '合同类型',
-                key: 'type1',
-                width: 100,
-                render: (h, params) => {
-                    switch (this.dataArr[params.index].type1){
-                      case "1":
-                          return `集成`
-                          break
-                      case "2":
-                          return `服务`
-                          break
-                      case "3":
-                          return `综合`
-                          break
-                      default:
-                          break
-                    }
-                }
-              },
-              {
-                title: '签订类型',
-                key: 'type2',
-                width: 100
-              },
-              {
-                title: '项目经理',
-                key: 'PM',
-                width: 300,  //改成中文人名后, 缩短为200
-                render: (h, params) => {
-                    let data = this.dataArr[params.index].PM
-                    let dom = []
-                    if(data && data.length){
-                        for(let pm of data){
-                            dom.push(h('Button', {props:{size:'small'}, style: {margin:'3px'},}, pm.name))
-                        }
-                        return h('div', [
-                            dom
-                        ])
-                    }else {
-                        return "未填写"
-                    }
-                }
-              },
-              {
-                title: '技术经理',
-                key: 'TM',
-                width: 300,
-                render: (h, params) => {
-                  let data = this.dataArr[params.index].TM
-                  let dom = []
-                  if(data && data.length){
-                    for(let tm of data){
-                      dom.push(h('Button', {props:{size:'small'}, style: {margin: '3px'},}, tm.name))
-                    }
-                    return h('div', [
-                      dom
-                    ])
-                  }else {
-                    return "未填写"
-                  }
-                }
-              },
-              {
-                title: '签订日期',
-                key: 'time1',
-                width: 120
-              },
-              {
-                title: '验收日期',
-                key: 'time2',
-                width: 120
-              },
-              {
-                title: '质保截止日期',
-                key: 'time3',
-                width: 120
-              },
-              {
-                title: '文件',
-                key: 'document',
-                width: 400,
-                render: (h, params) => {
-                  let data = this.dataArr[params.index].document
-                  let dom = []
-                  if(data && data.length){
-                    for(let doc of data){
-                      dom.push(h('Button', {props:{size:'small'}, style: {marginRight: '3px'},}, doc.name))
-                    }
-                    return h('div', [
-                      dom
-                    ])
-                  }else {
-                    return "未填写"
-                  }
-                }
-              },
-              {
-                title:"操作",
-                align: "center",
-                width: 200,
-                fixed:'right',
-                render: (h, params) => {
-                  return h('div', [
-                    h('Button', {
-                      props: {
-                        type: 'primary',
-                        size: 'small'
-                      },
-                      style: {
-                        marginRight: '5px'
-                      },
-                      on: {
-                        click: () => {
-                          this._toggleUpdate(params.index)
-                        }
-                      }
-                    }, '编辑'),
-                    h('Button', {
-                      props: {
-                        type: 'error',
-                        size: 'small'
-                      },
-                      on: {
-                        click: () => {
-                          this._toggleDelete(params.index)
-                        }
-                      }
-                    }, '删除')
-                  ]);
+  import {curdMixin, pageMixin, selMixin} from 'common/js/mixin'
+
+  export default {
+    mixins:[curdMixin, pageMixin, selMixin],
+    data(){
+        return {
+          url:'contracts',
+          types:[],
+          coors:[],
+          columns:[
+            {
+              title: `　合同编号`,
+              key: 'contract_id',
+              width: 120,
+              fixed: 'left'
+            },
+            {
+              title: ' ',
+              key: 'name',
+              width: 200,
+              fixed:'left'
+            },
+            {
+              title: '所属单位',
+              width: 200,
+              render: (h, params) => {
+                if(this.dataArr[params.index].company){
+                  return `${this.dataArr[params.index].company.name}`
                 }
               }
-            ],
-            createModel:{
-                  name:null,
-                  contract_id:null,  //合同id
-                  PM:null,  //项目经理id  多选,值格式 1,2,3
-                  TM:null,  //技术经理id  多选,值格式 1,2,3
-                  company_id:null,  //单位id
-                  desc:null,  //合同描述
-                  document: null,   //合同文件id--->关联文件表id  多选,值格式 1,2,3
-                  money: null,  //合同金额 2位小数
-                  time1: null,  //签订日期
-                  time2: null,  //验收日期
-                  time3: null,  //质保截止日期
-                  type1: null,   //合同类型
-                  type2: null,    //合同签订类型
-                  coor : null,   //外协单位id 多选,值格式 1,2,3
-              },
-            updateModel:{
-              name:null,
-              contract_id:null,
-              PM:null,
-              TM:null,
-              company:null,
-              desc:null,
-              document: null,
-              money: null,
-              time1: null,
-              time2: null,
-              time3: null,
-              type1: null,
-              type2: null,
-              coor : null,
             },
-            ruleValidate: {
-//              contract_id: [
-//                { required: true, message: '合同编号不能为空', trigger: 'blur' }
-//              ],
-//              PM: [
-//                { required: true, message: '项目经理不能为空', trigger: 'blur' }
-//              ],
-//              company_id: [
-//                { type:'number', required: true, message:'请选择单位', trigger: 'blur' }
-//              ],
-//              name: [
-//                { required: true, message: '合同名不能为空', trigger: 'blur' }
-//              ],
-//              type1: [
-//                { type:'number', required: true, message: '请选择合同类型', trigger: 'blur' }
-//              ],
-//              type2: [
-//                { required: true, message: '请选择签订类型', trigger: 'blur' }
-//              ],
-//              time1: [
-//                { required: true, message: '请填写签订日期', trigger: 'blur' }
-//              ],
+            {
+              title: '合同类型',
+              key: 'type1',
+              width: 100,
+              render: (h, params) => {
+                  switch (this.dataArr[params.index].type1){
+                    case "1":
+                        return `集成`
+                        break
+                    case "2":
+                        return `服务`
+                        break
+                    case "3":
+                        return `综合`
+                        break
+                    default:
+                        break
+                  }
+              }
             },
-          }
-      },
-      mounted(){
-        this._getData()
-      },
-      methods:{
-          selectType1C(v){
-            this.createModel.type1 = v
-          },
-          setCTime1(date){
-            this.createModel.time1 = date
-          },
-          setCTime2(date){
-            this.createModel.time2 = date
-          },
-          setCTime3(date){
-            this.createModel.time3 = date
-          },
-          setUTime1(date){
-            this.updateModel.time1 = date
-          },
-          setUTime2(date){
-            this.updateModel.time2 = date
-          },
-          setUTime3(date){
-            this.updateModel.time3 = date
-          },
-          selectEmpForPM(result){
-             this.createModel.PM = this.selectEmpUtilFunc(result)
-          },
-          selectEmpForTM(result){
-             this.createModel.TM = this.selectEmpUtilFunc(result)
-          },
-          selectEmpForPMU(result){
-             this.updateModel.PM = this.selectEmpUtilFunc(result)
-          },
-          selectEmpForTMU(result){
-             this.updateModel.TM = this.selectEmpUtilFunc(result)
-          },
-          selectEmpUtilFunc(result){
-            //todo 将数组形式的id转为以逗号相隔的字符串
-            let re = ''
-            for(let i of result){
-              re += i+','
+            {
+              title: '签订类型',
+              key: 'type2',
+              width: 100
+            },
+            {
+              title: '项目经理',
+              key: 'PM',
+              width: 300,  //改成中文人名后, 缩短为200
+              render: (h, params) => {
+                  let data = this.dataArr[params.index].PM
+                  let dom = []
+                  if(data && data.length){
+                      for(let pm of data){
+                          dom.push(h('Button', {props:{size:'small'}, style: {margin:'3px'},}, pm.name))
+                      }
+                      return h('div', [
+                          dom
+                      ])
+                  }else {
+                      return "未填写"
+                  }
+              }
+            },
+            {
+              title: '技术经理',
+              key: 'TM',
+              width: 300,
+              render: (h, params) => {
+                let data = this.dataArr[params.index].TM
+                let dom = []
+                if(data && data.length){
+                  for(let tm of data){
+                    dom.push(h('Button', {props:{size:'small'}, style: {margin: '3px'},}, tm.name))
+                  }
+                  return h('div', [
+                    dom
+                  ])
+                }else {
+                  return "未填写"
+                }
+              }
+            },
+            {
+              title: '签订日期',
+              key: 'time1',
+              width: 120
+            },
+            {
+              title: '验收日期',
+              key: 'time2',
+              width: 120
+            },
+            {
+              title: '质保截止日期',
+              key: 'time3',
+              width: 120
+            },
+            {
+              title: '文件',
+              key: 'document',
+              width: 400,
+              render: (h, params) => {
+                let data = this.dataArr[params.index].document
+                let dom = []
+                if(data && data.length){
+                  for(let doc of data){
+                    dom.push(h('Button', {props:{size:'small'}, style: {marginRight: '3px'},}, doc.name))
+                  }
+                  return h('div', [
+                    dom
+                  ])
+                }else {
+                  return "未填写"
+                }
+              }
+            },
+            {
+              title:"操作",
+              align: "center",
+              width: 200,
+              fixed:'right',
+              render: (h, params) => {
+                return h('div', [
+                  h('Button', {
+                    props: {
+                      type: 'primary',
+                      size: 'small'
+                    },
+                    style: {
+                      marginRight: '5px'
+                    },
+                    on: {
+                      click: () => {
+                        this._toggleUpdate(params.index)
+                      }
+                    }
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'error',
+                      size: 'small'
+                    },
+                    on: {
+                      click: () => {
+                        this._toggleDelete(params.index)
+                      }
+                    }
+                  }, '删除')
+                ]);
+              }
             }
-            return re.substr(0, re.length - 1)
+          ],
+          createModel:{
+                name:null,
+                contract_id:null,  //合同id
+                PM:null,  //项目经理id  多选,值格式 1,2,3
+                TM:null,  //技术经理id  多选,值格式 1,2,3
+                company_id:null,  //单位id
+                desc:null,  //合同描述
+                document: null,   //合同文件id--->关联文件表id  多选,值格式 1,2,3
+                money: null,  //合同金额 2位小数
+                time1: null,  //签订日期
+                time2: null,  //验收日期
+                time3: null,  //质保截止日期
+                type1: null,   //合同类型
+                type2: null,    //合同签订类型
+                coor : null,   //外协单位id 多选,值格式 1,2,3
+            },
+          updateModel:{
+            name:null,
+            contract_id:null,
+            PM:null,
+            TM:null,
+            company:null,
+            desc:null,
+            document: null,
+            money: null,
+            time1: null,
+            time2: null,
+            time3: null,
+            type1: null,
+            type2: null,
+            coor : null,
           },
-          selectCompanyIdForC(v){
-            this.createModel.company_id = v
+          ruleValidate: {
+            contract_id: [
+              { required: true, message: '合同编号不能为空', trigger: 'blur' }
+            ],
+            PM: [
+              { required: true, message: '项目经理不能为空', trigger: 'blur' }
+            ],
+            company_id: [
+              { type:'number', required: true, message:'请选择单位', trigger: 'blur' }
+            ],
+            name: [
+              { required: true, message: '合同名不能为空', trigger: 'blur' }
+            ],
+            type1: [
+              { type:'number', required: true, message: '请选择合同类型', trigger: 'blur' }
+            ],
+            type2: [
+              { required: true, message: '请选择签订类型', trigger: 'blur' }
+            ],
+            time1: [
+              { required: true, message: '请填写签订日期', trigger: 'blur' }
+            ],
           },
-          selectCompanyIdForU(v){
-            this.updateModel.company_id = v
-          },
-          _getData(){
-              this._setLoading()
-              this.$http.get(`/${this.url}/page/${this.page}/${this.pageSize}`)
-                .then(res=>{
-                    res = res.data.data
-                    this.total = res.total
-                    this.coors = res.coors
-                    this.types = res.types
-                    this.setDataArr(res.data)
-                    this._setLoading()
-                })
-          }
-      },
-      components:{
-          Loading, SearchCompany, SearchEmps
-      }
-
+        }
+    },
+    mounted(){
+      this._getData()
+    },
+    methods:{
+        selectType1C(v){
+          this.createModel.type1 = v
+        },
+        setCTime1(date){
+          this.createModel.time1 = date
+        },
+        setCTime2(date){
+          this.createModel.time2 = date
+        },
+        setCTime3(date){
+          this.createModel.time3 = date
+        },
+        setUTime1(date){
+          this.updateModel.time1 = date
+        },
+        setUTime2(date){
+          this.updateModel.time2 = date
+        },
+        setUTime3(date){
+          this.updateModel.time3 = date
+        },
+        selectEmpForPM(result){
+           this.createModel.PM = this.selectEmpUtilFunc(result)
+        },
+        selectEmpForTM(result){
+           this.createModel.TM = this.selectEmpUtilFunc(result)
+        },
+        selectEmpForPMU(result){
+           this.updateModel.PM = this.selectEmpUtilFunc(result)
+        },
+        selectEmpForTMU(result){
+           this.updateModel.TM = this.selectEmpUtilFunc(result)
+        },
+        selectCompanyIdForC(v){
+          this.createModel.company_id = v
+        },
+        selectCompanyIdForU(v){
+          this.updateModel.company_id = v
+        },
+        _getData(){
+            this._setLoading()
+            this.$http.get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+              .then(res=>{
+                  res = res.data.data
+                  this.total = res.total
+                  this.coors = res.coors
+                  this.types = res.types
+                  this.setDataArr(res.data)
+                  this._setLoading()
+              })
+        }
+    },
+    components:{
+        Loading, SearchCompany, SearchEmps
     }
+
+  }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">

@@ -158,7 +158,8 @@
               title:"普通合同",
               name:"3",
               children:[
-                {title:"普合列表", path:'/home/contract', name:"普合列表"}
+                {title:"普合列表", path:'/home/contract', name:"普合列表"},
+                {title:"普服列表", path:'/home/service', name:"普服列表"}
               ]
             },
             {

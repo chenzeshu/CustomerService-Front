@@ -6,7 +6,7 @@ import {mapGetters, mapMutations} from 'vuex'
 export const curdMixin = {
   data(){
     return {
-      loading:true,  //等待遮罩层的开关
+      loading:false,  //等待遮罩层的开关
       createFlag:false,
       updateFlag:false,
       deleteFlag:false,
@@ -25,7 +25,7 @@ export const curdMixin = {
   },
   destroyed(){
     clearTimeout(this.timer)
-    this.setDataArr([])
+    this.setDataArr([{}])
   },
   watch:{
     dataArr(newdataArr){
@@ -189,5 +189,19 @@ export const pageMixin = {
           this.loading = false
         })
     },
+  }
+}
+
+//选择repo
+export const selMixin = {
+  methods:{
+    selectEmpUtilFunc(result){
+      //todo 将数组形式的id转为以逗号相隔的字符串, 一般用于选人的组件
+      let re = ''
+      for(let i of result){
+        re += i+','
+      }
+      return re.substr(0, re.length - 1)
+    }
   }
 }

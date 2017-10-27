@@ -42,6 +42,10 @@
             return "项目经理"
           case 'TM':
             return "技术经理"
+          case 'MAN':
+            return "服务人员"
+          case 'CUS':
+            return "客户联系人"
           default:
             break
         }
@@ -52,6 +56,10 @@
             return "PM"
           case 'TM':
             return "TM"
+          case 'MAN':
+            return "MAN"
+          case 'CUS':
+            return "CUS"
           default:
             break
         }
@@ -61,17 +69,34 @@
             return null
         }
 
-        if(this.dataArr[this.updateIndex]){
+        if(this.dataArr[this.updateIndex] !== 'undefined'){
           let data = []
           switch (this.type){
             case 'PM':
-              for (let i of this.dataArr[this.updateIndex].PM){
-                    data.push(i.name)
+              if(this.dataArr[this.updateIndex].PM !== 'undefined'){
+                for (let i of this.dataArr[this.updateIndex].PM){
+                  data.push(i.name)
+                }
+                return data
+              }
+              break
+            case 'TM':
+              if(this.dataArr[this.updateIndex].TM !== 'undefined'){
+                for (let i of this.dataArr[this.updateIndex].TM){
+                  data.push(i.name)
+                }
+                return data
+              }
+
+              break
+            case 'MAN':
+              for (let i of this.dataArr[this.updateIndex].man){
+                data.push(i.name)
               }
               return data
               break
-            case 'TM':
-              for (let i of this.dataArr[this.updateIndex].TM){
+            case 'CUS':
+              for (let i of this.dataArr[this.updateIndex].customer){
                 data.push(i.name)
               }
               return data
@@ -88,9 +113,10 @@
     watch:{
       defaultValue(newValue){  //names
         if(newValue === null){
+            this.result = []
             return
         }
-        if(this.dataArr[this.updateIndex]){
+        if(this.dataArr[this.updateIndex] !== 'undefined'){
           let data = []
           switch (this.type){
             case 'PM':
@@ -101,6 +127,18 @@
               break
             case 'TM':
               for (let i of this.dataArr[this.updateIndex].TM){
+                data.push(i.id)
+              }
+              this.result = data
+              break
+            case 'MAN':
+              for (let i of this.dataArr[this.updateIndex].man){
+                data.push(i.id)
+              }
+              this.result = data
+              break
+            case 'CUS':
+              for (let i of this.dataArr[this.updateIndex].customer){
                 data.push(i.id)
               }
               this.result = data

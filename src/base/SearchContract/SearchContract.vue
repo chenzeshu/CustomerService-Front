@@ -1,16 +1,16 @@
 <template>
-    <div class="search-company">
-      <FormItem label="选择公司" prop="company_id">
+    <div class="search-contract">
+      <FormItem label="选择合同" prop="contract_id">
         <Select
           v-model="c_id"
-          :label="company_name"
+          :label="contract_name"
           filterable
           remote
           :remote-method="_search"
           :loading="loading"
-          @on-change="_selectCompany"
+          @on-change="_selectContract"
           ref="sel">
-          <Option :value="cv.id" v-for="(cv, ck) in companies" :key="ck">{{cv.name}}</Option>
+          <Option :value="cv.id" v-for="(cv, ck) in contracts" :key="ck">{{cv.contract_id}}</Option>
         </Select>
       </FormItem>
     </div>
@@ -25,49 +25,49 @@
             c_id:null,
             loading:false,
             sTotal:null,
-            companies:[],
+            contracts:[],
           }
         },
         computed:{
           ...mapGetters([
               'dataArr', 'updateIndex'
           ]),
-          company_name(){
+          contract_name(){
               //不能写成if(this.updateIndex) 因为当index为0 时也会被剔除
             //尽量少使用prop, 多使用vuex?
-              if(this.updateIndex !== null && this.dataArr[this.updateIndex].company){
-                return this.dataArr[this.updateIndex].company.name
+              if(this.updateIndex !== null && this.dataArr[this.updateIndex].contract){
+                return this.dataArr[this.updateIndex].contract.contract_id
               }
               //create 情况 一打开就赋值this.updateIndex = null
-            if(this.updateIndex === null){
-                  return null
-            }
+              if(this.updateIndex === null){
+                return null
+              }
           }
         },
         watch:{
-            company_name(){
-              if(this.updateIndex !== null && this.dataArr[this.updateIndex].company) {
-                this.c_id = this.dataArr[this.updateIndex].company.id
+            contract_name(){
+              if(this.updateIndex !== null && this.dataArr[this.updateIndex].contract) {
+                this.c_id = this.dataArr[this.updateIndex].contract.id
               }
               if(this.updateIndex === null){
-                  this.c_id = null
+                this.c_id = null
               }
             }
         },
         methods:{
-            _selectCompany(company_id){
-                this.$emit('selectCompany', company_id)
+           _selectContract(contract_id){
+                this.$emit('selectcontract', contract_id)
             },
             _search(query){
               if(query && query !== ''){
                 this.loading = true
                 setTimeout(()=>{
                   this.$http
-                    .get(`/employees/sc/${query}`)
+                    .get(`/employees/scon/${query}`)
                     .then(res=>{
                       this.loading = false
                       res = res.data.data
-                      this.companies = res.data
+                      this.contracts = res.data
                     })
                 }, 1000)
               }
@@ -80,7 +80,7 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-  .search-company
+  .search-contract
     .no-result
       color #ff9900!important
     .waiting

@@ -85,7 +85,7 @@
         v-model.trim="deleteFlag"
         title="删除"
         @on-ok="_delete">
-        <p>确定要删除人员?</p>
+        <p>确定要删除?</p>
       </Modal>
     </div>
 </template>
