@@ -3,6 +3,7 @@ const state = {
   logined:false,
   dataArr:[],  //用于承接各个模块的AJAX数据
   updateIndex:null,
+  updateObj:[]
 }
 
 export default state

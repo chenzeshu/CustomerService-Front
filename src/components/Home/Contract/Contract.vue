@@ -30,13 +30,14 @@
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
           <!--自动生成 + 手工填写-->
+
           <FormItem label="合同编号" prop="contract_id">
             <Input v-model.trim="createModel.contract_id" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="合同名称" prop="name">
             <Input v-model.trim="createModel.name" placeholder="请输入"></Input>
           </FormItem>
-          <SearchCompany @selectCompany="selectCompanyIdForC"></SearchCompany>
+          <NewSearchCompany @on-select="newSelectCompanyForC"></NewSearchCompany>
           <FormItem label="合同类型" prop="type1">
             <RadioGroup v-model="createModel.type1" type="button">
               <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
@@ -49,8 +50,8 @@
               <Radio label="临时"></Radio>
             </RadioGroup>
           </FormItem>
-          <SearchEmps @selectEmp="selectEmpForPM" v-if="dataArr.length"></SearchEmps>
-          <SearchEmps @selectEmp="selectEmpForTM" v-if="dataArr.length"></SearchEmps>
+          <NewSearchEmps @on-select="newSelectEmpForPMC"></NewSearchEmps>
+          <NewSearchEmps @on-select="newSelectEmpForTMC" type="TM"></NewSearchEmps>
           <FormItem label="签订日期" prop="time1">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
           </FormItem>
@@ -85,7 +86,9 @@
           <FormItem label="合同名称" prop="name">
             <Input v-model.trim="updateModel.name" placeholder="请输入"></Input>
           </FormItem>
-          <SearchCompany @selectCompany="selectCompanyIdForU" v-if="dataArr.length"></SearchCompany>
+
+          <NewSearchCompany @on-select="newSelectCompanyForU"></NewSearchCompany>
+
           <FormItem label="合同类型" prop="type1">
             <RadioGroup v-model="updateModel.type1" type="button">
               <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
@@ -98,16 +101,16 @@
               <Radio label="临时"></Radio>
             </RadioGroup>
           </FormItem>
-          <SearchEmps @selectEmp="selectEmpForPMU" v-if="dataArr.length"></SearchEmps>
-          <SearchEmps @selectEmp="selectEmpForTMU" type="TM" v-if="dataArr.length"></SearchEmps>
+          <NewSearchEmps @on-select="newSelectEmpForPMU"></NewSearchEmps>
+          <NewSearchEmps @on-select="newSelectEmpForTMU" type="TM"></NewSearchEmps>
           <FormItem label="签订日期" prop="time1">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="updateModel.time1" @on-change="setUTime1"></DatePicker>
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time1" @on-change="setUTime1"></DatePicker>
           </FormItem>
           <FormItem label="验收日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="updateModel.time2" @on-change="setUTime2"></DatePicker>
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time2" @on-change="setUTime2"></DatePicker>
           </FormItem>
           <FormItem label="质保截止">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="updateModel.time3" @on-change="setUTime3"></DatePicker>
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time3" @on-change="setUTime3"></DatePicker>
           </FormItem>
           <!--<FormItem label="上传文件">-->
             <!--<Input v-model.trim="updateModel.document" placeholder="请输入"></Input>-->
@@ -131,12 +134,12 @@
 
 <script>
   import Loading from 'base/Loading/Loading'
-  import SearchCompany from 'base/SearchCompany/SearchCompany'
-  import SearchEmps from 'base/SearchEmps/SearchEmps'
-  import {curdMixin, pageMixin, selMixin} from 'common/js/mixin'
+  import NewSearchCompany from 'base/SearchCompany/NewSearchCompany'
+  import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
+  import {curdMixin, pageMixin} from 'common/js/mixin'
 
   export default {
-    mixins:[curdMixin, pageMixin, selMixin],
+    mixins:[curdMixin, pageMixin],
     data(){
         return {
           url:'contracts',
@@ -319,6 +322,7 @@
             PM:null,
             TM:null,
             company:null,
+            company_id:null,
             desc:null,
             document: null,
             money: null,
@@ -331,19 +335,19 @@
           },
           ruleValidate: {
             contract_id: [
-              { required: true, message: '合同编号不能为空', trigger: 'blur' }
+              {required: true, message: '合同编号不能为空', trigger: 'blur' }
             ],
             PM: [
-              { required: true, message: '项目经理不能为空', trigger: 'blur' }
+              {required: true, message: '项目经理不能为空', trigger: 'blur' }
             ],
             company_id: [
-              { type:'number', required: true, message:'请选择单位', trigger: 'blur' }
+              {type:'number', required: true, message:'请选择单位', trigger: 'blur' }
             ],
             name: [
-              { required: true, message: '合同名不能为空', trigger: 'blur' }
+              {required: true, message: '合同名不能为空', trigger: 'blur' }
             ],
             type1: [
-              { type:'number', required: true, message: '请选择合同类型', trigger: 'blur' }
+              {required: true, message: '请选择合同类型', trigger: 'blur' }
             ],
             type2: [
               { required: true, message: '请选择签订类型', trigger: 'blur' }
@@ -358,8 +362,23 @@
       this._getData()
     },
     methods:{
-        selectType1C(v){
-          this.createModel.type1 = v
+        newSelectCompanyForC(v){
+          this.createModel.company_id = v
+        },
+        newSelectCompanyForU(v){
+          this.updateModel.company_id = v
+        },
+        newSelectEmpForPMC(v){
+          this.createModel.PM = v
+        },
+        newSelectEmpForTMC(v){
+          this.createModel.TM = v
+        },
+        newSelectEmpForPMU(v){
+          this.updateModel.PM = v
+        },
+        newSelectEmpForTMU(v){
+          this.updateModel.TM = v
         },
         setCTime1(date){
           this.createModel.time1 = date
@@ -378,18 +397,6 @@
         },
         setUTime3(date){
           this.updateModel.time3 = date
-        },
-        selectEmpForPM(result){
-           this.createModel.PM = this.selectEmpUtilFunc(result)
-        },
-        selectEmpForTM(result){
-           this.createModel.TM = this.selectEmpUtilFunc(result)
-        },
-        selectEmpForPMU(result){
-           this.updateModel.PM = this.selectEmpUtilFunc(result)
-        },
-        selectEmpForTMU(result){
-           this.updateModel.TM = this.selectEmpUtilFunc(result)
         },
         selectCompanyIdForC(v){
           this.createModel.company_id = v
@@ -411,7 +418,7 @@
         }
     },
     components:{
-        Loading, SearchCompany, SearchEmps
+        Loading, NewSearchEmps, NewSearchCompany
     }
 
   }

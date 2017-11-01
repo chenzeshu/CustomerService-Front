@@ -11,7 +11,7 @@
         :loading="loading"
         @on-change="_selectEmp"
         ref="sel">
-        <Option v-for="(emp, index) in emps" :value="emp.id" :key="index">{{emp.name}}</Option>
+        <Option v-for="emp in emps" :value="emp.id" :key="emp.id" v-if="emps.length > 0">{{emp.name}}</Option>
       </Select>
     </FormItem>
   </div>
@@ -26,7 +26,7 @@
         result:[],  //ids  names为defaultValue
         loading: false,
         sTotal: null,
-        emps: [],
+        emps: [{id:0, name:"未选择"}],
       }
     },
     props:{
@@ -34,6 +34,9 @@
         type: String,
         default:'PM'
       }
+    },
+    created(){
+      debugger
     },
     computed:{
       label(){
@@ -68,21 +71,29 @@
         if(this.updateIndex === null){  //用于关闭update打开create时, 避免出现残留痕迹
             return null
         }
-
-        if(this.dataArr[this.updateIndex] !== 'undefined'){
+        let arr = this.dataArr[this.updateIndex]
+        if(typeof arr !== 'undefined'){
           let data = []
           switch (this.type){
             case 'PM':
-              if(this.dataArr[this.updateIndex].PM !== 'undefined'){
-                for (let i of this.dataArr[this.updateIndex].PM){
+              let pm = arr.PM
+              if( typeof pm !== 'undefined' && pm.length){
+//                for(let i = 0 ; i < (pm.length - 1); i++){
+//                  data.push(pm[i].name)
+//                }
+                for (let i of pm){
                   data.push(i.name)
                 }
                 return data
               }
               break
             case 'TM':
-              if(this.dataArr[this.updateIndex].TM !== 'undefined'){
-                for (let i of this.dataArr[this.updateIndex].TM){
+              let tm = arr.TM
+              if( typeof tm!== 'undefined' && tm.length){
+//                for(let i = 0 ; i < (tm.length - 1); i++){
+//                    data.push(tm[i].name)
+//                }
+                for (let i of tm){
                   data.push(i.name)
                 }
                 return data
@@ -90,14 +101,26 @@
 
               break
             case 'MAN':
-              for (let i of this.dataArr[this.updateIndex].man){
-                data.push(i.name)
+              let man = arr.man
+              if( typeof man !== 'undefined' && man.length) {
+//                for(let i = 0 ; i < (man.length - 1); i++){
+//                  data.push(man[i].name)
+//                }
+                for (let i of man) {
+                  data.push(i.name)
+                }
               }
               return data
               break
             case 'CUS':
-              for (let i of this.dataArr[this.updateIndex].customer){
-                data.push(i.name)
+              let cus = arr.customer
+              if( typeof cus !== 'undefined' && cus.length) {
+//                for(let i = 0 ; i < (cus.length - 1); i++){
+//                  data.push(cus[i].name)
+//                }
+                for (let i of cus) {
+                  data.push(i.name)
+                }
               }
               return data
               break
@@ -116,32 +139,53 @@
             this.result = []
             return
         }
-        if(this.dataArr[this.updateIndex] !== 'undefined'){
+        let arr = this.dataArr[this.updateIndex]
+        if(typeof arr !== 'undefined'){
           let data = []
           switch (this.type){
             case 'PM':
-              for (let i of this.dataArr[this.updateIndex].PM){
-                data.push(i.id)
+              if( typeof arr.pm !== 'undefined'){
+                  for(let i of arr.pm){
+                      data.push(i.id)
+                  }
+//                for(let i = 0 ; i < (pm.length - 1); i++){
+//                  data.push(pm[i].id)
+//                }
+                this.result = data
               }
-              this.result = data
               break
             case 'TM':
-              for (let i of this.dataArr[this.updateIndex].TM){
-                data.push(i.id)
+              if( typeof arr.tm !== 'undefined'){
+                  for(let i of arr.tm){
+                      data.push(i.id)
+                  }
+//                for(let i = 0 ; i < (tm.length - 1); i++){
+//                  data.push(tm[i].id)
+//                }
+                this.result = data
               }
-              this.result = data
               break
             case 'MAN':
-              for (let i of this.dataArr[this.updateIndex].man){
-                data.push(i.id)
+              if( typeof arr.man !== 'undefined') {
+                  for(let i of arr.man){
+                      data.push(i.id)
+                  }
+//                for (let i = 0; i < (man.length - 1); i++) {
+//                  data.push(man[i].id)
+//                }
+                this.result = data
               }
-              this.result = data
               break
             case 'CUS':
-              for (let i of this.dataArr[this.updateIndex].customer){
-                data.push(i.id)
+              if( typeof arr.customer !== 'undefined') {
+                  for( let i of arr.cus){
+                      data.push(i.id)
+                  }
+//                for (let i = 0; i < (cus.length - 1); i++) {
+//                  data.push(cus[i].id)
+//                }
+                this.result = data
               }
-              this.result = data
               break
             default:
               break
@@ -167,7 +211,7 @@
           }, 1000)
         }
         else {
-          this.emps = []
+          this.emps = [{id:0, name:"未选择"}]
         }
       },
     }

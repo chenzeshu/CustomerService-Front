@@ -30,15 +30,15 @@
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="服务单编号" prop="service_id">
-            <Input v-model.trim="createModel.service_id" placeholder="请输入"></Input>
-          </FormItem>
-          <SearchContract @selectcontract="selectContractForC"></SearchContract>
           <FormItem label="服务类型" prop="type">
             <Select v-model="createModel.type">
               <Option v-for="(t, tk) in types" :key="tk" :value="t.id">{{t.name}}</Option>
             </Select>
           </FormItem>
+          <FormItem label="服务单编号" prop="service_id">
+            <Input v-model.trim="createModel.service_id" placeholder="请输入"></Input>
+          </FormItem>
+          <NewSearchContract @on-select="selectContractForC"></NewSearchContract>
           <FormItem label="信息来源" prop="source">
             <Select v-model="createModel.source">
               <Option v-for="(s, sk) in sources" :key="sk" :value="s.id">{{s.name}}</Option>
@@ -49,8 +49,8 @@
               <Option v-for="(s, sk) in status" :key="sk" :value="s">{{s}}</Option>
             </Select>
           </FormItem>
-          <SearchEmps @selectEmp="selectEmpForMan" type="MAN" v-if="dataArr.length"></SearchEmps>
-          <SearchEmps @selectEmp="selectEmpForCus" type="CUS" v-if="dataArr.length"></SearchEmps>
+          <NewSearchEmps @on-select="selectEmpForCus" type="CUS"></NewSearchEmps>
+          <NewSearchEmps @on-select="selectEmpForMan" type="MAN"></NewSearchEmps>
           <FormItem label="受理时间" prop="time1">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
           </FormItem>
@@ -60,14 +60,20 @@
           <FormItem label="占用工时">
             <Input v-model.trim="createModel.day_sum" placeholder="请输入工时"></Input>
           </FormItem>
-          <FormItem label="是否收费">
+          <FormItem label="是否收费" prop="charge_if">
             <RadioGroup v-model="createModel.charge_if" type="button">
               <Radio label="收费"></Radio>
-              <Radio label="未收费"></Radio>
+              <Radio label="不收费"></Radio>
             </RadioGroup>
           </FormItem>
           <FormItem label="收费数额" v-show="createModel.charge_if==='收费'">
             <Input v-model.trim="createModel.charge" placeholder="请输入数额"></Input>
+          </FormItem>
+          <FormItem label="是否到款" v-show="createModel.charge_if==='收费'">
+            <RadioGroup v-model="createModel.charge_flag" type="button">
+              <Radio label="到款"></Radio>
+              <Radio label="未到款"></Radio>
+            </RadioGroup>
           </FormItem>
           <FormItem label="问题描述">
             <Input v-model.trim="createModel.desc1" placeholder="问题描述" type="textarea"></Input>
@@ -84,6 +90,7 @@
         </Form>
       </Modal>
 
+      <!--update-->
       <Modal
         v-model="updateFlag"
         title="修改"
@@ -92,15 +99,15 @@
         <!--@on-cancel="cancel"-->
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="服务单编号" prop="service_id">
-            <Input v-model.trim="updateModel.service_id" placeholder="请输入"></Input>
-          </FormItem>
-          <SearchContract @selectcontract="selectContractForU"></SearchContract>
           <FormItem label="服务类型" prop="type">
             <Select v-model="updateModel.type">
               <Option v-for="(t, tk) in types" :key="tk" :value="t.id">{{t.name}}</Option>
             </Select>
           </FormItem>
+          <FormItem label="服务单编号" prop="service_id">
+            <Input v-model.trim="updateModel.service_id" placeholder="请输入"></Input>
+          </FormItem>
+          <NewSearchContract @on-select="selectContractForU"></NewSearchContract>
           <FormItem label="信息来源" prop="source">
             <Select v-model="updateModel.source">
               <Option v-for="(s, sk) in sources" :key="sk" :value="s.id">{{s.name}}</Option>
@@ -111,25 +118,31 @@
               <Option v-for="(s, sk) in status" :key="sk" :value="s">{{s}}</Option>
             </Select>
           </FormItem>
-          <SearchEmps @selectEmp="selectEmpForManU" type="MAN" v-if="dataArr.length"></SearchEmps>
-          <SearchEmps @selectEmp="selectEmpForCusU" type="CUS" v-if="dataArr.length"></SearchEmps>
+          <NewSearchEmps @on-select="selectEmpForCusU" type="CUS"></NewSearchEmps>
+          <NewSearchEmps @on-select="selectEmpForManU" type="MAN"></NewSearchEmps>
           <FormItem label="受理时间" prop="time1">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="updateModel.time1" @on-change="setUTime1"></DatePicker>
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time1" @on-change="setUTime1"></DatePicker>
           </FormItem>
           <FormItem label="解决时间">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" v-model="updateModel.time2" @on-change="setUTime2"></DatePicker>
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time2" @on-change="setUTime2"></DatePicker>
           </FormItem>
           <FormItem label="占用工时">
             <Input v-model.trim="updateModel.day_sum" placeholder="请输入工时"></Input>
           </FormItem>
-          <FormItem label="是否收费">
+          <FormItem label="是否收费" prop="charge_if">
             <RadioGroup v-model="updateModel.charge_if" type="button">
               <Radio label="收费"></Radio>
-              <Radio label="未收费"></Radio>
+              <Radio label="不收费"></Radio>
             </RadioGroup>
           </FormItem>
           <FormItem label="收费数额" v-show="updateModel.charge_if==='收费'">
             <Input v-model.trim="updateModel.charge" placeholder="请输入数额"></Input>
+          </FormItem>
+          <FormItem label="是否到款" v-show="updateModel.charge_if==='收费'">
+            <RadioGroup v-model="updateModel.charge_flag" type="button">
+              <Radio label="到款"></Radio>
+              <Radio label="未到款"></Radio>
+            </RadioGroup>
           </FormItem>
           <FormItem label="问题描述">
             <Input v-model.trim="updateModel.desc1" placeholder="问题描述" type="textarea"></Input>
@@ -158,14 +171,16 @@
 
 <script>
   import Loading from 'base/Loading/Loading'
-  import SearchContract from 'base/SearchContract/SearchContract'
-  import SearchEmps from 'base/SearchEmps/SearchEmps'
-  import {curdMixin, pageMixin, selMixin} from 'common/js/mixin'
+  import NewSearchContract from 'base/SearchContract/NewSearchContract'
+  import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
+  import {curdMixin, pageMixin} from 'common/js/mixin'
   export default {
-    mixins:[curdMixin, pageMixin, selMixin],
+    mixins:[curdMixin, pageMixin],
     data(){
       return {
         url: 'services',
+        haole:false,
+        customers:[],
         types: [],
         sources: [],
         status:["待审核", "拒绝", "待派单", "已派单", "申请完成", "已完成", "申述中"],
@@ -200,6 +215,31 @@
             title: '服务单状态',
             key: 'status',
             width: 100,
+          },
+          {
+            title:'响应',
+            key:'time3',
+            width:100,
+            render:(h, params)=>{
+                if(params.row.status === '待审核' ||params.row.status === '已派单'){
+                    let now = Date.parse(new Date())
+                    let before = Date.parse(new Date(params.row.time3))
+                  if( (now - before)/1000 > 86400 ){
+                    return h('div', [
+                      h('Button', {
+                        props: {
+                          type: 'error',
+                          size: 'small'
+                        }
+                      }, '超时')
+                    ]);
+                  }else {
+                        return '未超时'
+                  }
+                }else {
+                    return '自检'
+                }
+            }
           },
           {
             title: '信息来源',
@@ -283,6 +323,35 @@
             width: 120
           },
           {
+            title: '是否收费',
+            key: 'charge_if',
+            width: 100
+          },
+          {
+            title: '收费数额',
+            key: 'charge',
+            width: 100,
+            render: (h, params)=>{
+                if(params.row.charge_if === '收费'){
+                    return params.row.charge
+                }else{
+                    return '无'
+                }
+            }
+          },
+          {
+            title: '是否到款',
+            key: 'charge_flag',
+            width: 100,
+            render: (h, params, row, column)=>{
+              if(params.row.charge_if === '收费'){
+                return params.row.charge_flag
+              }else{
+                return '无'
+              }
+            }
+          },
+          {
             title: '备注',
             key: 'remark',
             width: 120
@@ -357,8 +426,10 @@
           customer:null,
           charge_if:null,
           charge:null,
+          charge_flag:null,
           time1:null,
           time2:null,
+          time3:null,
           day_sum:null,
           desc1:null,
           desc2:null,
@@ -376,8 +447,10 @@
           customer:null,
           charge_if:null,
           charge:null,
+          charge_flag:null,
           time1:null,
           time2:null,
+          time3:null,
           day_sum:null,
           desc1:null,
           desc2:null,
@@ -390,7 +463,13 @@
             {required: true, message: '服务单编号不能为空', trigger: 'blur'}
           ],
           contract_id: [
-            {required: true, message: '所属合同编号不能为空', trigger: 'blur'}
+            {type: 'number', required: true, message: '所属合同编号不能为空', trigger: 'blur'}
+          ],
+          customer: [
+            {required: true, message: '项目经理不能为空', trigger: 'blur' }
+          ],
+          charge_if:[
+            {required: true, message: '项目经理不能为空', trigger: 'blur' }
           ],
           type: [
             {type: 'number', required: true, message: '请选择服务单类型', trigger: 'blur'}
@@ -413,8 +492,25 @@
       this._getData()
     },
     methods:{
+        _searchTest(query){
+          if(query && query !== ''){
+            this.haole = true
+            setTimeout(()=>{
+              this.$http
+                .get(`/employees/se/${query}`)
+                .then(res=>{
+                  this.haole = false
+                  res = res.data.data
+                  this.customers = res.data
+                })
+            }, 1000)
+          }
+          else {
+            this.customers = [{id:0, name:"未选择"}]
+          }
+        },
       selectContractForC(contract_id){
-          this.createModel.contract_id = contract_id
+        this.createModel.contract_id = contract_id
       },
       selectContractForU(contract_id){
         this.updateModel.contract_id = contract_id
@@ -425,11 +521,11 @@
       setCTime2(date){
         this.createModel.time2 = date
       },
-      selectEmpForMan(result){
-        this.createModel.man = this.selectEmpUtilFunc(result)
+      selectEmpForMan(v){
+        this.createModel.man = v
       },
-      selectEmpForCus(result){
-        this.createModel.customer = this.selectEmpUtilFunc(result)
+      selectEmpForCus(v){
+        this.createModel.customer = v
       },
       setUTime1(date){
         this.updateModel.time1 = date
@@ -437,11 +533,11 @@
       setUTime2(date){
         this.updateModel.time2 = date
       },
-      selectEmpForManU(result){
-        this.updateModel.man = this.selectEmpUtilFunc(result)
+      selectEmpForManU(v){
+        this.updateModel.man = v
       },
-      selectEmpForCusU(result){
-        this.updateModel.customer = this.selectEmpUtilFunc(result)
+      selectEmpForCusU(v){
+        this.updateModel.customer = v
       },
       _getData(){
         this._setLoading()
@@ -457,7 +553,7 @@
       }
     },
     components:{
-        Loading, SearchEmps, SearchContract
+        Loading, NewSearchEmps, NewSearchContract
     }
   }
 </script>

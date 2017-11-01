@@ -14,6 +14,7 @@
     "chen-utils": "^1.0.5",
     "create-keyframe-animation": "0.1.0",
     "iview": "^2.6.0",
+    "underscore": "^1.8.3",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0",
     "vuex": "^2.4.0"

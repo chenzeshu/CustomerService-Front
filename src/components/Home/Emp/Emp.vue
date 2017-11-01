@@ -38,7 +38,7 @@
               <Radio label="online"></Radio>
             </RadioGroup>
           </FormItem>
-          <SearchCompany @selectCompany="selectCompanyIdForC" v-if="dataArr.length"></SearchCompany>
+          <NewSearchCompany @on-select="selectCompanyIdForC"></NewSearchCompany>
           <FormItem label="openid" prop="openid">
             <Input v-model.trim="createModel.openid" placeholder="请输入"></Input>
           </FormItem>
@@ -67,7 +67,7 @@
               <Radio label="online"></Radio>
             </RadioGroup>
           </FormItem>
-          <SearchCompany @selectCompany="selectCompanyIdForU" v-if="dataArr.length"></SearchCompany>
+          <NewSearchCompany @on-select="selectCompanyIdForU"></NewSearchCompany>
           <FormItem label="openid" prop="openid">
             <Input v-model.trim="updateModel.openid" placeholder="请输入"></Input>
           </FormItem>
@@ -92,7 +92,7 @@
 
 <script>
     import Loading from 'base/Loading/Loading'
-    import SearchCompany from 'base/SearchCompany/SearchCompany'
+    import NewSearchCompany from 'base/SearchCompany/NewSearchCompany'
     import {curdMixin, pageMixin} from 'common/js/mixin'
     import Validator from 'common/js/validator'
     export default {
@@ -243,7 +243,7 @@
           },
       },
       components:{
-          Loading, SearchCompany
+          Loading, NewSearchCompany
       }
     }
 </script>

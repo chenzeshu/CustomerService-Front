@@ -19,5 +19,9 @@ export default {
   },
   [types.SET_UPDATEINDEX](state, index){
     state.updateIndex = index
+  },
+  [types.SET_UPDATE_OBJ](state, obj){
+      state.updateObj = obj
   }
+
 }

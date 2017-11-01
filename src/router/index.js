@@ -9,7 +9,7 @@ import Emp from 'comp/Home/Emp/Emp'
 import Contract from 'comp/Home/Contract/Contract'
 import Service from 'comp/Home/Service/Service'
 import Contractc from 'comp/Home/Contractc/Contractc'
-
+import Test from 'comp/Home/Test/test'
 
 Vue.use(Router)
 
@@ -28,6 +28,7 @@ export default new Router({
         {path:'contract', component: Contract},
         {path:'service', component: Service},
         {path:'contractc', component: Contractc},
+        {path:'test', component: Test},
       ]
     }
   ]

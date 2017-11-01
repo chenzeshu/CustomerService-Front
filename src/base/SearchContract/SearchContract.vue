@@ -35,22 +35,30 @@
           contract_name(){
               //不能写成if(this.updateIndex) 因为当index为0 时也会被剔除
             //尽量少使用prop, 多使用vuex?
-              if(this.updateIndex !== null && this.dataArr[this.updateIndex].contract){
-                return this.dataArr[this.updateIndex].contract.contract_id
+            let con = this.dataArr[this.updateIndex]
+            if(typeof con !== 'undefined'){
+
+              if(this.updateIndex !== null && typeof con.contract !== 'undefined'){
+                return con.contract.contract_id
               }
               //create 情况 一打开就赋值this.updateIndex = null
               if(this.updateIndex === null){
                 return null
               }
+            }
+
           }
         },
         watch:{
             contract_name(){
-              if(this.updateIndex !== null && this.dataArr[this.updateIndex].contract) {
-                this.c_id = this.dataArr[this.updateIndex].contract.id
-              }
-              if(this.updateIndex === null){
-                this.c_id = null
+              let con = this.dataArr[this.updateIndex]
+              if(typeof con !== 'undefined'){
+                if(this.updateIndex !== null && typeof con.contract !== 'undefined') {
+                  this.c_id = con.contract.id
+                }
+                if(this.updateIndex === null){
+                  this.c_id = null
+                }
               }
             }
         },
@@ -72,7 +80,7 @@
                 }, 1000)
               }
               else {
-                this.emps = []
+                this.contracts = []
               }
             }
         }

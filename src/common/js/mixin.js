@@ -17,14 +17,13 @@ export const curdMixin = {
   },
   computed:{
     ...mapGetters([
-      'dataArr', 'updateIndex'
+      'dataArr', 'updateIndex', 'updateObj'
     ])
   },
   mounted(){
     this._search()
   },
   destroyed(){
-    clearTimeout(this.timer)
     this.setDataArr([{}])
   },
   watch:{
@@ -43,6 +42,7 @@ export const curdMixin = {
     },
     _create(){
       this.$refs.createForm.validate((valid) => {
+        console.log(this.createModel)
         if (!valid) {
           this.$Message.error('请完善表单!');
           setTimeout(()=>{
@@ -50,8 +50,7 @@ export const curdMixin = {
           }, 500)
           return
         }
-        // console.log(this.createModel)
-        // return
+
         this.$http
             .post(`/${this.url}`, this.createModel)
             .then(res=>{
@@ -79,9 +78,13 @@ export const curdMixin = {
     _toggleUpdate(index){
       this.updateFlag = !this.updateFlag
       this.setUpdateIndex(index)
-      this.updateModel = Object.assign({}, this.dataArr[index])
+      this.setUpdateObj(Object.assign({}, this.dataArr[index]))
+      this.updateModel = Object.assign({}, this.updateObj)
+      console.log(this.updateModel)
     },
     update(){
+      console.log(this.updateModel)
+      // return
       this.$refs['updateForm'].validate((valid) => {
         if (!valid) {
           this.$Message.error('请完善表单!');
@@ -90,16 +93,12 @@ export const curdMixin = {
           }, 500)
           return
         }
-        //
-        console.log(this.updateModel)
-        // return
+
         let _url = `/${this.url}/update/${this.updateModel.id}`
         this.$http.post(_url, this.updateModel)
           .then(res => {
             res = res.data
             if (parseInt(res.code) === 2003) {
-              //由于vue无法监听数组dom更新, 所以需要使用变异方法
-              //删除数组中index元素, 然后重新插入
               this.$Message.success(res.msg);
               this._getData()
             }
@@ -155,6 +154,7 @@ export const curdMixin = {
       setDataArr:'SET_DATAARR',
       setUpdateIndex:'SET_UPDATEINDEX',
       spliceDataArr:'SPLICE_DATAARR',
+      setUpdateObj:'SET_UPDATE_OBJ'
     }),
   },
 }
@@ -192,16 +192,3 @@ export const pageMixin = {
   }
 }
 
-//选择repo
-export const selMixin = {
-  methods:{
-    selectEmpUtilFunc(result){
-      //todo 将数组形式的id转为以逗号相隔的字符串, 一般用于选人的组件
-      let re = ''
-      for(let i of result){
-        re += i+','
-      }
-      return re.substr(0, re.length - 1)
-    }
-  }
-}

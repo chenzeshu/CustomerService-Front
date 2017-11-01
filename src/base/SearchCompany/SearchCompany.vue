@@ -1,6 +1,6 @@
 <template>
     <div class="search-company">
-      <FormItem label="选择公司" prop="company_id">
+      <FormItem label="选择单位" prop="company_id">
         <Select
           v-model="c_id"
           :label="company_name"
@@ -10,7 +10,7 @@
           :loading="loading"
           @on-change="_selectCompany"
           ref="sel">
-          <Option :value="cv.id" v-for="(cv, ck) in companies" :key="ck">{{cv.name}}</Option>
+          <Option :value="cv.id" v-for="cv in companies" :key="cv.id">{{cv.name}}</Option>
         </Select>
       </FormItem>
     </div>
@@ -35,23 +35,28 @@
           company_name(){
               //不能写成if(this.updateIndex) 因为当index为0 时也会被剔除
             //尽量少使用prop, 多使用vuex?
-              if(this.updateIndex !== null && this.dataArr[this.updateIndex].company){
-                return this.dataArr[this.updateIndex].company.name
-              }
-              //create 情况 一打开就赋值this.updateIndex = null
-            if(this.updateIndex === null){
+              if(typeof this.dataArr[this.updateIndex] !== 'undefined'){
+                if(this.updateIndex !== null && this.dataArr[this.updateIndex].company){
+                  return this.dataArr[this.updateIndex].company.name
+                }
+                //create 情况 一打开就赋值this.updateIndex = null
+                if(this.updateIndex === null){
                   return null
-            }
+                }
+              }
+
           }
         },
         watch:{
             company_name(){
-              if(this.updateIndex !== null && this.dataArr[this.updateIndex].company) {
-                this.c_id = this.dataArr[this.updateIndex].company.id
-              }
-              if(this.updateIndex === null){
-                  this.c_id = null
-              }
+                if(typeof this.dataArr[this.updateIndex] !== 'undefined'){
+                  if(this.updateIndex !== null && this.dataArr[this.updateIndex].company) {
+                    this.c_id = this.dataArr[this.updateIndex].company.id
+                  }
+                  if(this.updateIndex === null){
+                    this.c_id = null
+                  }
+                }
             }
         },
         methods:{
@@ -61,6 +66,7 @@
             _search(query){
               if(query && query !== ''){
                 this.loading = true
+
                 setTimeout(()=>{
                   this.$http
                     .get(`/employees/sc/${query}`)
@@ -72,7 +78,7 @@
                 }, 1000)
               }
               else {
-                this.emps = []
+                this.companies = []
               }
             }
         }

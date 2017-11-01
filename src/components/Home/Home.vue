@@ -166,7 +166,8 @@
               title:"信道合同",
               name:"4",
               children:[
-                {title:"信合列表", path:'/home/contractc', name:"信合列表"}
+                {title:"信合列表", path:'/home/contractc', name:"信合列表"},
+                {title:"测试", path:'/home/test', name:"测试"}
               ]
             },
           ]

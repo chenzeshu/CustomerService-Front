@@ -6,12 +6,14 @@ import router from './router'
 import axios from './axios'
 import iView from 'iview'
 import store from './store'
+// import UnserScore from 'underscore'
 
 import 'iview/dist/styles/iview.css';
 import "common/stylus/index.styl"
 Vue.use(iView)
 
 Vue.prototype.$http = axios
+// Vue.prototype.$obj = UnserScore
 
 Vue.config.productionTip = false
 
