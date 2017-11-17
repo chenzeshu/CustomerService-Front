@@ -30,7 +30,6 @@
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-
           <FormItem label="合同编号" prop="contract_id">
             <Input v-model.trim="createModel.contract_id" placeholder="请输入"></Input>
           </FormItem>
@@ -445,7 +444,6 @@
       .search-icon
         display inline-block
         margin-left 20px
-        padding-bottom 5px
         color #39f
         font-size 16px
         line-height: 12px;
@@ -465,5 +463,4 @@
           font-size 12px
           font-weight 700
           color #657180
-
 </style>

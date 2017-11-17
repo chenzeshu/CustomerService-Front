@@ -1,6 +1,6 @@
 <template>
   <div class="newSearchContract">
-    <FormItem label="选择合同" prop="contract_id">
+    <FormItem label="选择合同" :prop="curProp">
       <i-select
         v-model="model"
         :label="names"
@@ -21,6 +21,21 @@
   import {selectMixin} from 'common/js/baseMixin'
   export default {
     mixins:[selectMixin],
+    props:{
+      type:{
+          type:String,
+          default:"normal"
+      }
+    },
+    computed:{
+      curProp(){
+          if(this.type === "normal"){
+              return "contract_id"
+          }else{
+              return "contractc_id"
+          }
+      }
+    },
     watch:{
       updateObj(newObj){
         if(typeof newObj === 'undefined' || this.updateIndex === null){
@@ -35,12 +50,22 @@
     created(){
       this.$watch('query', debounce(()=>{
         this.loading = true;
-        this.$http
-          .get(`/employees/scon/${this.query}`)
-          .then(res=>{
-            this.loading = false;
-            this.options = res.data.data.data
-          })
+
+        if(this.type === "channel"){
+          this.$http
+            .get(`/employees/sconc/${this.query}`)
+            .then(res=>{
+              this.loading = false;
+              this.options = res.data.data.data
+            })
+        }else {
+          this.$http
+            .get(`/employees/scon/${this.query}`)
+            .then(res=>{
+              this.loading = false;
+              this.options = res.data.data.data
+            })
+        }
       }, 1000))
     },
     methods: {

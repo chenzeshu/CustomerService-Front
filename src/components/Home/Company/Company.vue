@@ -235,7 +235,6 @@
       z-index 50
       .search-icon
         display inline-block
-        padding-bottom 5px
         color #39f
         font-size 16px
         line-height: 12px;

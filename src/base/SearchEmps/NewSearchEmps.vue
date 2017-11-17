@@ -25,7 +25,8 @@
     data () {
       return {
         curProp:"",
-        selected:''
+        selected:'',
+        searchType:null,
       }
     },
     props:{
@@ -48,6 +49,10 @@
             case "MAN":
                 this.curProp = 'MAN'
                 return "服务人员"
+              break
+            case "VISITOR":
+                this.curProp = "visitor"
+                return "回访人员"
               break
             default://PM
                 this.curProp = 'PM'
@@ -73,6 +78,11 @@
               objs = newObj.customer
             }
             break
+          case "VISITOR":
+            if(newObj.visitor && newObj.visitor.length > 0){
+              objs = newObj.visitor
+            }
+            break
           case "MAN":
             if(newObj.man && newObj.man.length > 0){
               objs = newObj.man
@@ -96,9 +106,18 @@
     },
     created(){
         this.$watch('query', debounce(()=>{
+          switch(this.type){
+            case "CUS":
+                this.searchType = "out"
+                break
+            default:
+                this.searchType = "inner"
+                break
+          }
+
           this.loading = true;
           this.$http
-            .get(`/employees/se/${this.query}`)
+            .get(`/employees/se/${this.searchType}/${this.query}`)
             .then(res=>{
               this.loading = false;
               res = res.data.data

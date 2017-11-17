@@ -34,6 +34,9 @@
     },
     created(){
         this.$watch('query', debounce(()=>{
+          if(this.query === ''){
+              return
+          }
           this.loading = true;
           this.$http
             .get(`/employees/sc/${this.query}`)

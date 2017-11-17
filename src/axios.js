@@ -22,7 +22,9 @@ axios.interceptors.response.use(function (res) {
   // Do something with response data
   if(res.headers.authorization){
     let token = res.headers.authorization
+    let username = res.headers.username
     saveToLocal('token', token)
+    store.commit('SET_USERNAME', decodeURI(username))
   }
   return res;
 }, function (error) {

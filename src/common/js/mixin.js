@@ -80,10 +80,10 @@ export const curdMixin = {
       this.setUpdateIndex(index)
       this.setUpdateObj(Object.assign({}, this.dataArr[index]))
       this.updateModel = Object.assign({}, this.updateObj)
-      console.log(this.updateModel)
+      // console.log(this.updateModel)
     },
     update(){
-      console.log(this.updateModel)
+      // console.log(this.updateModel)
       // return
       this.$refs['updateForm'].validate((valid) => {
         if (!valid) {

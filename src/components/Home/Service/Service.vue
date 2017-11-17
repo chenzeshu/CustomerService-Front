@@ -12,7 +12,6 @@
         <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" v-cloak></i-table>
       </div>
 
-
       <div class="page-wrapper">
         <div class="page">
           <Page :current="page" :total="total" simple @on-change="onChange"></Page>
@@ -74,6 +73,9 @@
               <Radio label="到款"></Radio>
               <Radio label="未到款"></Radio>
             </RadioGroup>
+          </FormItem>
+          <FormItem label="到款时间" v-show="createModel.charge_if==='收费'">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="createModel.time4" @on-change="setCTime4"></DatePicker>
           </FormItem>
           <FormItem label="问题描述">
             <Input v-model.trim="createModel.desc1" placeholder="问题描述" type="textarea"></Input>
@@ -144,6 +146,9 @@
               <Radio label="未到款"></Radio>
             </RadioGroup>
           </FormItem>
+          <FormItem label="到款时间" v-show="updateModel.charge_if==='收费'">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time4" @on-change="setUTime4"></DatePicker>
+          </FormItem>
           <FormItem label="问题描述">
             <Input v-model.trim="updateModel.desc1" placeholder="问题描述" type="textarea"></Input>
           </FormItem>
@@ -166,6 +171,57 @@
         @on-ok="_delete">
         <p>确定要删除?</p>
       </Modal>
+
+      <!--showVisit-->
+      <Modal
+        v-model="visitShowFlag"
+        title="回访记录"
+        width="600"
+      >
+        <p>处理结果:{{ visitShowModel.result_deal }}</p>
+        <p>服务评价:{{ result_rating[visitShowModel.result_rating].content }}</p>
+        <p v-if="typeof visitShowModel.employees !== 'undefined' && visitShowModel.employees.length > 0">回访人:{{ visitShowModel.employees[0].name }}</p>
+        <p>回访结果:{{ result_visit[visitShowModel.result_visit].content }}</p>
+        <p>回访时间:{{ visitShowModel.time }}</p>
+      </Modal>
+
+
+      <!--createOrUpdateVisit-->
+      <Modal
+        v-model="visitFlag"
+        title="回访"
+        width="400"
+        @on-ok="visit">
+        <!--@on-cancel="cancel"-->
+        <Form :model="visitModel" :rules="ruleValidateVisit" ref="visitForm" :label-width="80">
+          <!--自动生成 + 手工填写-->
+          <FormItem label="处理结果" prop="result_deal">
+            <Select v-model="visitModel.result_deal">
+              <Option v-for="s in result_deal" :key="s" :value="s">{{s}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="服务评价" prop="result_rating">
+            <Select v-model="visitModel.result_rating">
+              <Option v-for="s in result_rating" :key="s.id" :value="s.id">{{s.content}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="回访结果" prop="result_visit">
+            <Select v-model="visitModel.result_visit">
+              <Option v-for="s in result_visit" :key="s.id" :value="s.id">{{s.content}}</Option>
+            </Select>
+          </FormItem>
+          <!--回访人-->
+          <NewSearchEmps @on-select="selectEmpForVisit" type="VISITOR"></NewSearchEmps>
+
+          <FormItem label="回访时间" prop="time">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="visitModel.time" @on-change="setVTime"></DatePicker>
+          </FormItem>
+          <FormItem label="备注">
+            <Input v-model.trim="visitModel.remark" placeholder="备注内容" type="textarea"></Input>
+          </FormItem>
+        </Form>
+      </Modal>
+
     </div>
 </template>
 
@@ -179,11 +235,49 @@
     data(){
       return {
         url: 'services',
-        haole:false,
-        customers:[],
         types: [],
         sources: [],
         status:["待审核", "拒绝", "待派单", "已派单", "申请完成", "已完成", "申述中"],
+        visitShowFlag:false,
+        visitShowModel:{
+          service_id:null,
+          result_deal:"待解决",
+          result_rating:4,
+          result_visit:4,
+          remark:null,
+          time:null,
+          visit:{
+              employees:[
+                {name:"测试"}
+              ]
+          },
+          visitor:null,
+        },
+        visitFlag : false,
+        visitModel:{
+          service_id:null,
+          result_deal:"待解决",
+          result_rating:4,
+          result_visit:4,
+          remark:null,
+          time:null,
+          visitor:null,
+        },
+        result_deal:["待解决", "未解决", "已解决"],  //默认待解决
+        result_rating:[
+          {id:0, content:"非常满意"},
+          {id:1, content:"满意"},
+          {id:2, content:"一般"},
+          {id:3, content:"不满意"},
+          {id:4, content:"未评价"},  //默认
+        ],
+        result_visit:[
+          {id:0, content:"非常满意"},
+          {id:1, content:"满意"},
+          {id:2, content:"一般"},
+          {id:3, content:"不满意"},
+          {id:4, content:"未回访"},  //默认
+        ],
         columns: [
           {
             title: `　 服务单号`,
@@ -323,6 +417,29 @@
             width: 120
           },
           {
+            "title":"回访记录",
+            key: 'visit',
+            width: 150,
+            render: (h, params) => {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      this._toggleVisitShow(params.index)
+                    }
+                  }
+                }, '查看回访记录'),
+              ]);
+            }
+          },
+          {
             title: '是否收费',
             key: 'charge_if',
             width: 100
@@ -350,6 +467,11 @@
                 return '无'
               }
             }
+          },
+          {
+            title: '到款时间',
+            key: 'time4',
+            width: 120
           },
           {
             title: '备注',
@@ -387,6 +509,20 @@
             fixed: 'right',
             render: (h, params) => {
               return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'default',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      this._toggleVisit(params.index)
+                    }
+                  }
+                }, '回访'),
                 h('Button', {
                   props: {
                     type: 'primary',
@@ -427,6 +563,7 @@
           charge_if:null,
           charge:null,
           charge_flag:null,
+          time4:null,  //到账时间
           time1:null,
           time2:null,
           time3:null,
@@ -448,6 +585,7 @@
           charge_if:null,
           charge:null,
           charge_flag:null,
+          time4:null,  //到账时间
           time1:null,
           time2:null,
           time3:null,
@@ -469,7 +607,7 @@
             {required: true, message: '项目经理不能为空', trigger: 'blur' }
           ],
           charge_if:[
-            {required: true, message: '项目经理不能为空', trigger: 'blur' }
+            {required: true, message: '是否收费', trigger: 'blur' }
           ],
           type: [
             {type: 'number', required: true, message: '请选择服务单类型', trigger: 'blur'}
@@ -484,31 +622,67 @@
             {required: true, message: '请填写受理日期', trigger: 'blur'}
           ],
         },
+        ruleValidateVisit:{
+          visitor:[
+            {required: true, message: '请选择回访人', trigger: 'blur'}
+          ] ,
+          result_deal: [
+            {required: true, message: '请选择处理结果', trigger: 'blur'}
+          ],
+          result_visit: [
+            {type: 'number', required: true, message: '请选择回访结果', trigger: 'blur'}
+          ],
+          result_rating: [
+            {type: 'number', required: true, message: '请选择服务评价', trigger: 'blur'}
+          ],
+          time: [
+            {required: true, message: '请填写回访日期', trigger: 'blur'}
+          ],
+        }
       }
     },
     created(){
-    },
-    mounted(){
       this._getData()
     },
     methods:{
-        _searchTest(query){
-          if(query && query !== ''){
-            this.haole = true
-            setTimeout(()=>{
-              this.$http
-                .get(`/employees/se/${query}`)
-                .then(res=>{
-                  this.haole = false
-                  res = res.data.data
-                  this.customers = res.data
-                })
-            }, 1000)
+      _toggleVisitShow(index){  //showVisit
+          this.visitShowModel = Object.assign({}, this.dataArr[index].visits[0])
+          this.visitShowFlag = !this.visitShowFlag
+      },
+      _toggleVisit(index){  //createOrUpdateVisit
+          this.visitModel = Object.assign({}, this.dataArr[index].visits[0])
+          this.visitFlag = !this.visitFlag
+      },
+      selectEmpForVisit(v){
+          this.visitModel.visitor = v
+      },
+      setVTime(v){
+        this.visitModel.time = v
+      },
+      visit(){
+        console.log(this.visitModel)
+        this.$refs['visitForm'].validate((valid) => {
+          if (!valid) {
+            this.$Message.error('请完善表单!');
+            setTimeout(() => {
+              this.visitFlag = !this.visitFlag
+            }, 500)
+            return
           }
-          else {
-            this.customers = [{id:0, name:"未选择"}]
-          }
-        },
+
+          let _url = `/${this.url}/visit/${this.visitModel.id}`
+          this.$http.post(_url, this.visitModel)
+            .then(res => {
+              res = res.data
+              if (parseInt(res.code) === 2005) {
+                this.$Message.success(res.msg);
+                this._getData()
+              }
+            }, err => {
+              this.$Message.error('修改失败');
+            })
+        })
+      },
       selectContractForC(contract_id){
         this.createModel.contract_id = contract_id
       },
@@ -521,6 +695,9 @@
       setCTime2(date){
         this.createModel.time2 = date
       },
+      setCTime4(date){
+        this.createModel.time4 = date
+      },
       selectEmpForMan(v){
         this.createModel.man = v
       },
@@ -532,6 +709,9 @@
       },
       setUTime2(date){
         this.updateModel.time2 = date
+      },
+      setUTime4(date){
+        this.updateModel.time4 = date
       },
       selectEmpForManU(v){
         this.updateModel.man = v
