@@ -32,7 +32,7 @@
       logined(newLogined){
         if(newLogined){
           this.$Message.success('登陆成功')
-          this.$router.push('/home/company')
+          this.$router.push('/home/vcus')
         }else{
           this.$router.push('/signin')
         }
@@ -50,8 +50,8 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-  html, body
-    height 100%
+  html, body, #app
+    height 96%
     background #f1f1f1
   #app
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -59,7 +59,6 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    height 100%
   .layout
     border: 1px solid #d7dde4;
     background: #f5f7f9;

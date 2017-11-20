@@ -36,6 +36,7 @@
             <RadioGroup v-model="createModel.status" type="button">
               <Radio label="offline"></Radio>
               <Radio label="online"></Radio>
+              <Radio label="离职"></Radio>
             </RadioGroup>
           </FormItem>
           <NewSearchCompany @on-select="selectCompanyIdForC"></NewSearchCompany>
@@ -65,6 +66,7 @@
             <RadioGroup v-model.trim="updateModel.status" type="button">
               <Radio label="offline"></Radio>
               <Radio label="online"></Radio>
+              <Radio label="离职"></Radio>
             </RadioGroup>
           </FormItem>
           <NewSearchCompany @on-select="selectCompanyIdForU"></NewSearchCompany>

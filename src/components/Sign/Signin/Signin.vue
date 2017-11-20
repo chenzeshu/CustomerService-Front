@@ -1,5 +1,6 @@
 <template>
-  <div class="signin">
+  <div class="signin" id="particles">
+    <span class="logo">中网客服管理平台</span>
     <div class="signin-wrapper" ref="signinWrapper">
       <form autocomplete="off" class="input">
         <div class="icon">
@@ -41,7 +42,6 @@
         <button class="button-button" @click="login">登陆</button>
       </div>
     </div>
-    <button @click="test">出现验证码</button>
     <!--<clock></clock>-->
   </div>
 </template>
@@ -52,6 +52,7 @@
   import Clock from 'base/Clock/Clock'
   import url from 'common/js/url'
   import Chen from 'chen-utils'
+  import particles from 'particles.js';
 
   export default {
   data () {
@@ -104,6 +105,11 @@
   created(){
       this._checkToken()
   },
+  mounted(){
+    particlesJS.load('particles','static/particles.json', function() {
+      console.log('callback - particles.js config loaded');
+    });
+  },
   computed:{
     ...mapGetters([
         'logined'
@@ -121,7 +127,6 @@
             //todo 若flag为false, 则返回登陆页面
             this.$Message.warning('登陆过期')
             this.$router.push('/signin')
-
           }
 
       },
@@ -145,7 +150,7 @@
       },
       _checkInput(){
         if(this.logined){
-          this.$router.push('/home/company')
+          this.$router.push('/home/vcus')
           return
         }
         if(!this.username){
@@ -178,14 +183,34 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
-
+  #particles
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin-bottom -20px
+    background url("/static/login-background.jpg")
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50% 50%;
   .signin
     position absolute
-    top 15vh
-    height 60vh
+    top 0vh
+    height 50vh
     width 100%
+    .logo
+      display block
+      position fixed
+      left 41.5vw
+      top 0vh
+      margin-top 6vh
+      font-size 32px
+      letter-spacing 8px
+      color #ffffff
     .signin-wrapper
       display flex
+      position fixed
+      left 40vw
+      top 15vh
       width 360px
       height 357px
       margin 0 auto

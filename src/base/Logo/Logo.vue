@@ -87,6 +87,7 @@
     margin-top 6vh
     font-size 32px
     letter-spacing 8px
+    color #ffffff
   .logo2
     display block
     position absolute

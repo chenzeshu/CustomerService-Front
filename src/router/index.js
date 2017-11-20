@@ -29,6 +29,11 @@ import Info6 from 'comp/Home/UtilsC/info6'
 import Device from 'comp/Home/Device/Device'
 import Plan from 'comp/Home/Plan/Plan'
 
+//Verify
+import Vcus from 'comp/Home/Verify/Vcus'
+import Vser from 'comp/Home/Verify/Vser'
+// import Vcus from 'comp/Home/Verify/Vcus'
+
 Vue.use(Router)
 
 export default new Router({
@@ -64,6 +69,9 @@ export default new Router({
         {path:'info6', component: Info6},
         {path:'device', component: Device},
         {path:'plan', component: Plan},
+        //Verify
+        {path:'vcus', component: Vcus},
+        {path:'vser', component: Vser},
       ]
     }
   ]
