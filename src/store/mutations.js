@@ -24,7 +24,10 @@ export default {
     state.updateIndex = index
   },
   [types.SET_UPDATE_OBJ](state, obj){
-      state.updateObj = obj
+    state.updateObj = obj
+  },
+  [types.SET_STEP_OBJ](state, obj){
+    state.stepObj = obj
   }
 
 }

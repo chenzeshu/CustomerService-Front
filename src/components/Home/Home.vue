@@ -76,7 +76,7 @@
               children:[
                 {title:"用户申请", path:'/home/vcus', name:"用户申请"},
                 {title:"普服申请", path:'/home/vser', name:"普服申请"},
-                {title:"信服申请", path:'/home/vserc', name:"信服申请"},
+                {title:"信服申请", path:'/home/vchan', name:"信服申请"},
               ]
             },
             {

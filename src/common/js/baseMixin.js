@@ -1,6 +1,5 @@
 import {mapGetters} from 'vuex'
 
-
 export const selectMixin = {
   data(){
     return {

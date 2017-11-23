@@ -32,7 +32,7 @@ import Plan from 'comp/Home/Plan/Plan'
 //Verify
 import Vcus from 'comp/Home/Verify/Vcus'
 import Vser from 'comp/Home/Verify/Vser'
-// import Vcus from 'comp/Home/Verify/Vcus'
+import Vchan from 'comp/Home/Verify/Vchan'
 
 Vue.use(Router)
 
@@ -72,6 +72,7 @@ export default new Router({
         //Verify
         {path:'vcus', component: Vcus},
         {path:'vser', component: Vser},
+        {path:'vchan', component: Vchan},
       ]
     }
   ]

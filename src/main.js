@@ -7,11 +7,11 @@ import axios from './axios'
 import iView from 'iview'
 import store from './store'
 // import UnserScore from 'underscore'
-
+import lodash from 'lodash'
 import 'iview/dist/styles/iview.css';
 import "common/stylus/index.styl"
 Vue.use(iView)
-
+Vue.prototype.$lodash = lodash
 Vue.prototype.$http = axios
 // Vue.prototype.$obj = UnserScore
 

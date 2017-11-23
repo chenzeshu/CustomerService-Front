@@ -94,14 +94,143 @@
         @on-ok="_delete">
         <p>确定要删除服务单?</p>
       </Modal>
+
+      <!--step-->
+      <Modal
+        v-model="stepFlag"
+        title="步骤详情"
+        width="450"
+        @on-ok="_updateStep">
+        <div class="step-title">
+          <Steps :current="current">
+            <Step title="待审核" style="margin-left:2%"></Step>
+            <Step title="运营调配"></Step>
+            <Step title="已完成" style="width:25%"></Step>
+          </Steps>
+        </div>
+
+        <div class="first" v-show="current === 0">
+          <Form :model="stepModel" :label-width="80">
+            <br>
+            <FormItem label="套餐">
+              <Select v-model.number="stepModel.id1" style="width:200px" disabled>
+                <Option v-for="item in plans" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="通信卫星">
+              <Select v-model.number="stepModel.id2" style="width:200px" disabled>
+                <Option v-for="item in tongxins" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="极化">
+              <Select v-model.number="stepModel.id3" style="width:200px" disabled>
+                <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="频率">
+              <Select v-model.number="stepModel.id4" style="width:200px" disabled>
+                <Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="申请时间">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="stepModel.t1" readonly></DatePicker>
+            </FormItem>
+            <FormItem label="结束时间">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="stepModel.t2" readonly></DatePicker>
+            </FormItem>
+          </Form>
+        </div>
+        <br>
+        <div class="second" v-show=" current === 1"
+             v-if="stepModel.channel_operative">
+          <Form :model="stepModel" :label-width="80" :rules="ruleValidate2" ref="secondForm">
+            <FormItem label="套餐" prop="plan">
+              <Select v-model.number="stepModel.channel_operative.id1" style="width:200px">
+                <Option v-for="item in plans" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="通信卫星" prop="tongxin">
+              <Select v-model.number="stepModel.channel_operative.id2" style="width:200px">
+                <Option v-for="item in tongxins" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="极化" prop="jihua">
+              <Select v-model.number="stepModel.channel_operative.id3" style="width:200px">
+                <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="频率" prop="pinlv">
+              <Select v-model.number="stepModel.channel_operative.id4" style="width:200px">
+                <Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="开始时间" prop="t1">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px"
+                          :value="stepModel.channel_operative.t1" @on-change="setOTime1"></DatePicker>
+            </FormItem>
+            <FormItem label="结束时间" prop="t2">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px"
+                          :value="stepModel.channel_operative.t2" @on-change="setOTime2"></DatePicker>
+            </FormItem>
+            <FormItem label="备注">
+              <Input type="textarea" v-model="stepModel.channel_operative.remark"></Input>
+            </FormItem>
+
+          </Form>
+        </div>
+        <div class="third" v-show="current === 2"
+             v-if="stepModel.channel_real">
+          <Form :model="stepModel" :label-width="80" :rules="ruleValidate3" ref="thirdForm">
+            <SearchChecker @on-select="selectCheckerForStep"></SearchChecker>
+            <FormItem label="套餐" prop="plan">
+              <Select v-model.number="stepModel.channel_real.id1" style="width:200px">
+                <Option v-for="item in plans" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="通信卫星" prop="tongxin">
+              <Select v-model.number="stepModel.channel_real.id2" style="width:200px">
+                <Option v-for="item in tongxins" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="极化" prop="jihua">
+              <Select v-model.number="stepModel.channel_real.id3" style="width:200px">
+                <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="频率" prop="pinlv">
+              <Select v-model.number="stepModel.channel_real.id4" style="width:200px">
+                <Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="开始时间" prop="t1">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px"
+                          :value="stepModel.channel_real.t1" @on-change="setRTime1"></DatePicker>
+            </FormItem>
+            <FormItem label="结束时间" prop="t2">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px"
+                          :value="stepModel.channel_real.t2" @on-change="setRTime2"></DatePicker>
+            </FormItem>
+            <FormItem label="备注">
+              <Input type="textarea" v-model="stepModel.channel_real.remark"></Input>
+            </FormItem>
+          </Form>
+        </div>
+        <div class="step-buttons" style="margin-left:30%">
+          <Button type="ghost" @click="back">上一步</Button>
+          <Button type="ghost" @click="next">下一步</Button>
+        </div>
+
+      </Modal>
     </div>
 </template>
 
 <script>
     import Loading from 'base/Loading/Loading'
     import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
+    import SearchChecker from 'base/SearchEmps/SearchChecker'
     import NewSearchContract from 'base/SearchContract/NewSearchContract'
     import {curdMixin, pageMixin} from 'common/js/mixin'
+    import {mapGetters, mapMutations} from 'vuex'
 
     export default {
       mixins:[curdMixin, pageMixin],
@@ -109,9 +238,7 @@
           return {
               url:"channels",
               sources:[],
-              status:[
-                  '待审核','运营调配', '已完成', '拒绝'
-              ],
+              status:['待审核','运营调配', '已完成', '拒绝'],
               columns:[
               {
                 title: `　`,
@@ -167,6 +294,20 @@
                   return h('div', [
                     h('Button', {
                       props: {
+                        type: 'default',
+                        size: 'small'
+                      },
+                      style: {
+                        marginRight: '5px'
+                      },
+                      on: {
+                        click: () => {
+                          this._toggleSteps(params.index)
+                        }
+                      }
+                    }, '展开详情'),
+                    h('Button', {
+                      props: {
                         type: 'primary',
                         size: 'small'
                       },
@@ -210,6 +351,16 @@
                 source:null,
                 type:null
               },
+              stepFlag:false,
+              current:1,
+              stepModel:{
+                  channel_operative:{},
+                  channel_real:{},
+              },
+              jihuas:[],
+              tongxins:[],
+              pinlvs:[],
+              plans:[],
               ruleValidate:{
                 channel_id: [
                   {required: true, message: '服务单编号不能为空', trigger: 'blur' }
@@ -226,16 +377,116 @@
                 status: [
                   { required: true, message: '请选择状态', trigger: 'blur' }
                 ],
-              }
+              },
+              ruleValidate2:{
+                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
+                jihua:[ {type:'number',required: true, message: '极化不能为空', trigger: 'blur' }],
+                tongxin:[ {type:'number',required: true, message: '通信卫星不能为空', trigger: 'blur' }],
+                plan:[ {type:'number',required: true, message: '套餐不能为空', trigger: 'blur' }],
+                t1:[{required: true, message: '开始时间不能为空', trigger: 'blur' }],
+                t2:[{required: true, message: '结束时间不能为空', trigger: 'blur' }]
+              },
+              ruleValidate3:{
+                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
+                jihua:[ {type:'number',required: true, message: '极化不能为空', trigger: 'blur' }],
+                tongxin:[ {type:'number',required: true, message: '通信卫星不能为空', trigger: 'blur' }],
+                plan:[ {type:'number',required: true, message: '套餐不能为空', trigger: 'blur' }],
+                checker:[ {required: true, message: '责任人不能为空', trigger: 'blur' }],  //虽然最后出来的是checker_id, 但是这里保证了checker的存在
+                t1:[{required: true, message: '开始时间不能为空', trigger: 'blur' }],
+                t2:[{required: true, message: '结束时间不能为空', trigger: 'blur' }]
+              },
           }
       },
       computed:{
-
+        ...mapGetters([
+            'stepObj'
+        ])
       },
       created(){
           this._getData()
       },
       methods:{
+        _toggleSteps(index){
+          this.stepFlag = !this.stepFlag
+          this.stepModel = this.$lodash.cloneDeep(this.dataArr[index].channel_applys[0])
+          this.setStepObj(this.$lodash.cloneDeep(this.stepModel.channel_real))
+          switch (this.dataArr[index].status){
+            case "运营调配":
+                this.current = 1
+                break
+            case "已完成":
+                this.current = 2
+                break
+            default:
+                this.stepFlag = !this.stepFlag
+                alert("不必展开")
+                break
+          }
+        },
+        _updateStep(){
+          console.log(this.stepModel)
+          switch (this.current){
+            case 1:
+                //更新运营调配表
+                let obj = this.stepModel.channel_operative
+                console.log(obj)
+//                return
+                this.$http.post(`/apply/operative/${obj.id}`, obj)
+                  .then(res=>{
+                    res = res.data
+                    if (parseInt(res.code) === 2003) {
+                      this.$Message.success(res.msg);
+                      this._getData()
+                    }
+                  }, err => {
+                    this.$Message.error('请完善表单');
+                  })
+              break
+            case 2:
+                //更新实际表
+                let obj2 = this.stepModel.channel_real
+                this.$http.post(`/apply/real/${obj2.id}`, obj2)
+                  .then(res=>{
+                    res = res.data
+                    if (parseInt(res.code) === 2003) {
+                      this.$Message.success(res.msg);
+                      this._getData()
+                    }
+                  }, err => {
+                    this.$Message.error('修改失败');
+                  })
+                 break
+          }
+        },
+        setOTime1(v){
+          this.stepModel.channel_operative.t1 = v
+        },
+        setOTime2(v){
+          this.stepModel.channel_operative.t2 = v
+        },
+        setRTime1(v){
+          this.stepModel.channel_real.t1 = v
+        },
+        setRTime2(v){
+          this.stepModel.channel_real.t2 = v
+        },
+        selectCheckerForStep(v){
+            this.stepModel.channel_real.checker_id = v
+        },
+        back () {
+          if (this.current == 0) {
+            this.current = 2;
+          } else {
+            this.current -= 1;
+          }
+        },
+        next () {
+          if (this.current == 2) {
+            this.current = 0;
+          } else {
+            this.current += 1;
+          }
+        },
         selectContractForC(v){
           this.createModel.contractc_id = v
         },
@@ -254,14 +505,23 @@
             .then(res=>{
               res = res.data.data
               this.total = res.total
-              this.sources = res.sources
               this.setDataArr(res.data)
+              //utils
+              this.sources = res.sources
+              this.plans = res.plans
+              this.pinlvs = res.pinlvs
+              this.jihuas = res.jihuas
+              this.tongxins = res.tongxins
+              console.log(this.plans)
               this._setLoading()
             })
-        }
+        },
+        ...mapMutations({
+          setStepObj: 'SET_STEP_OBJ'
+        })
       },
       components:{
-          Loading, NewSearchEmps, NewSearchContract
+          Loading, NewSearchEmps, NewSearchContract, SearchChecker
       }
     }
 </script>
@@ -306,4 +566,14 @@
           font-size 12px
           font-weight 700
           color #657180
+    .step-title
+      display block
+      padding-left 50px
+    .first
+      display flex
+    .second
+      display block
+    .third
+      display block
+      padding-left 50px
 </style>

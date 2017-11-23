@@ -1,6 +1,6 @@
 <template>
     <div class="v-cus">
-        <!--wrapper-->
+      <!--wrapper-->
       <div class="vcus-empty" v-if="total === 0">
         <span class="no-verify">暂时没有新申请</span>
       </div>

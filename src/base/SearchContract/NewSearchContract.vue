@@ -41,7 +41,10 @@
         if(typeof newObj === 'undefined' || this.updateIndex === null){
           return
         }
-        if(newObj.company){
+        if(newObj.contractc){
+          this.model = newObj.contractc.id
+          this.names = newObj.contractc.contract_id
+        }else{
           this.model = newObj.contract.id
           this.names = newObj.contract.contract_id
         }
