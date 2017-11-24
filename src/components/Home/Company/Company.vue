@@ -11,15 +11,13 @@
         <input type="text" v-model.trim="searchWord" placeholder="单位名称" class="search">
       </div>
 
-      <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length"></i-table>
+      <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"></i-table>
 
       <div class="page-wrapper">
         <div class="page">
           <Page :current="page" :total="total" simple @on-change="onChange"></Page>
         </div>
       </div>
-
-      <Loading :loading="loading"></Loading>
 
       <!--create-->
       <Modal
@@ -194,6 +192,7 @@
     },
     methods:{
         _getData(){
+            this._setLoading()
             this.$http
                 .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
                 .then(res=>{

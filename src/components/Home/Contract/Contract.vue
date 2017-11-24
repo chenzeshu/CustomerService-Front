@@ -11,7 +11,7 @@
         <input type="text" v-model.trim="searchWord" placeholder="合同名称" class="search">
       </div>
 
-      <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length"></i-table>
+      <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"></i-table>
 
       <div class="page-wrapper">
         <div class="page">
@@ -19,7 +19,6 @@
         </div>
       </div>
 
-      <Loading :loading="loading"></Loading>
 
       <!--create-->
       <Modal

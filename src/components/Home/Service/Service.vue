@@ -9,7 +9,7 @@
       </div>
 
       <div v-cloak>
-        <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" v-cloak></i-table>
+        <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"></i-table>
       </div>
 
       <div class="page-wrapper">
@@ -17,8 +17,6 @@
           <Page :current="page" :total="total" simple @on-change="onChange"></Page>
         </div>
       </div>
-
-      <Loading :loading="loading"></Loading>
 
       <!--create-->
       <Modal
@@ -660,7 +658,6 @@
         this.visitModel.time = v
       },
       visit(){
-        console.log(this.visitModel)
         this.$refs['visitForm'].validate((valid) => {
           if (!valid) {
             this.$Message.error('请完善表单!');

@@ -2,9 +2,13 @@
     <div class="v-chan">
 
       <!--wrapper-->
+
+      <!--假若没有申请-->
       <div class="vchan-empty" v-if="total === 0">
         <span class="no-verify">暂时没有新申请</span>
       </div>
+
+      <!--存在申请-->
       <div class="vchan-wrapper" v-else>
         <!--title-->
         <div class="title">
@@ -20,7 +24,8 @@
         </div>
 
         <Split type="zhong"></Split>
-        <!--content-->
+
+        <!--详细内容content-->
         <div class="content">
           <div class="list-item-wrapper" v-for="(item, key) in this.dataArr">
             <div class="list-item">
@@ -51,12 +56,45 @@
                 </div>
               </div>
 
+              <!--显隐的具体实现: https://segmentfault.com/q/1010000011144074-->
+
               <div class="verify">
                 <i-button type="primary" size="large" @click="_pass(item)">过审</i-button>
                 <i-button type="error" size="large" @click="_rej(item.id)">拒绝</i-button>
               </div>
 
             </div>
+            <div class="control-item" @click="showContent(key)" v-if="contentIndex !==key">
+              --------------------------------展开更多信息---------------------------------
+            </div>
+            <div class="control-item" @click="hiddenContent()" v-else>
+              --------------------------------隐藏展开信息---------------------------------
+            </div>
+
+            <transition name="slide-fade">
+              <table class="ivu-table ivu-table-border" style="width:50vw;min-width:700px; margin-top:10px"
+                     cellspacing="0" cellpadding="0" v-if="contentIndex === key">
+                <thead class="ivu-table-header">
+                <tr>
+                  <th class="ivu-table-cell">节点</th>
+                  <th class="ivu-table-cell">所属公司</th>
+                  <th class="ivu-table-cell">设备型号</th>
+                  <th class="ivu-table-cell">设备类型</th>
+                  <th class="ivu-table-cell">设备ip</th>
+                </tr>
+                </thead>
+                <tbody class="ivu-table-body">
+                <tr class="ivu-table-row" v-for="(device, kd) in item.channel_applys[0].channel_relations" :key="kd">
+                  <td class="ivu-table-cell">节点{{ kd+1 }}</td>
+                  <td class="ivu-table-cell">{{ device.company.name }}</td>
+                  <td class="ivu-table-cell">{{ device.device.device_id}}</td>
+                  <td class="ivu-table-cell">{{ device.device.type}}</td>
+                  <td class="ivu-table-cell">{{ device.device.ip}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </transition>
+
             <Split type="xi" v-show="key !== dataArr.length - 1"></Split>
           </div>
         </div>
@@ -130,8 +168,9 @@
           url:'apply',
           total:0,
           dataCount : null,
-          DFlag:false,
-          PFlag:false,
+          DFlag:false,           //detailFlag -- 人物显隐框
+          PFlag:false,           //过审ModelFlag
+          contentIndex:null,
           tongxin:[],
           pinlv:[],
           jihua:[],
@@ -146,7 +185,7 @@
                 id3:null,
                 id4:null,
           },
-          updateModel:{ //用于给后台
+          passModel:{ //用于给后台
                 channel_applys:[]
           },
           ruleValidate:{
@@ -175,14 +214,9 @@
         closeDetail(){
           this.DFlag = false
         },
-        _pass(item){
-            this.PFlag = !this.PFlag
-            this.updateModel = Object.assign({}, item)
-            this.channel_apply = Object.assign({}, item.channel_applys[0])
-        },
         passUpdate(){
-            this.updateModel.channel_applys[0] = this.channel_apply
-            console.log(this.updateModel)
+            this.passModel.channel_applys[0] = this.channel_apply
+            console.log(this.passModel)
 
           this.$refs['updateForm'].validate((valid) => {
             if (!valid) {
@@ -193,8 +227,8 @@
               return
             }
 
-            let _url = `/${this.url}/update/${this.updateModel.channel_applys[0].id}`
-            this.$http.post(_url, this.updateModel.channel_applys[0])
+            let _url = `/${this.url}/update/${this.passModel.channel_applys[0].id}`
+            this.$http.post(_url, this.passModel.channel_applys[0])
               .then(res => {
                 res = res.data
                 if (parseInt(res.code) === 2003) {
@@ -205,6 +239,17 @@
                 this.$Message.error('修改失败');
               })
           })
+        },
+        showContent(key){
+            this.contentIndex = key
+        },
+        hiddenContent(){
+            this.contentIndex = null
+        },
+        _pass(item){
+          this.PFlag = !this.PFlag
+          this.passModel = this.$lodash.cloneDeep(item)
+          this.channel_apply = this.$lodash.cloneDeep(item.channel_applys[0])
         },
         _rej(id){
           this.$http
@@ -277,6 +322,7 @@
         width 100%
         height 100%
         flex-direction column
+        justify-content space-around
         padding 10px 10px
         .list-item
           display flex
@@ -309,11 +355,28 @@
                 font-weight 700
             .info2
               flex 0 0 300px
+            .info-more
+              cursor: pointer;
           .verify
             flex 0 0 160px
             width 105px
             margin-top 10px
-    .show-man-detail
+        .control-item
+          display flex
+          width 400px
+          margin 5px auto
+          color rgba(7,17,27,0.2)
+          cursor pointer
+          font-size 14px
+          font-weight:700
+        .slide-fade-enter-active
+          transition: opacity .5s
+        .slide-fade-leave-active
+          transition: all .4s ease;
+        .slide-fade-enter, .slide-fade-leave-to
+          /* .slide-fade-leave-active for below version 2.1.8 */
+          opacity: 0;
+  .show-man-detail
       display flex
       flex-direction column
       justify-content space-around
@@ -337,4 +400,6 @@
         display inline-block
         width 20px
         margin-right 20px
+
+
 </style>
