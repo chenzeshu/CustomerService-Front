@@ -29,11 +29,7 @@
     },
     computed:{
       curProp(){
-          if(this.type === "normal"){
-              return "contract_id"
-          }else{
-              return "contractc_id"
-          }
+          return this.type === "normal" ? "contract_id" : "contractc_id"
       }
     },
     watch:{
@@ -41,13 +37,9 @@
         if(typeof newObj === 'undefined' || this.updateIndex === null){
           return
         }
-        if(newObj.contractc){
-          this.model = newObj.contractc.id
-          this.names = newObj.contractc.contract_id
-        }else{
-          this.model = newObj.contract.id
-          this.names = newObj.contract.contract_id
-        }
+        //精准布尔
+        this.model = (!!newObj.contractc) ? newObj.contractc.id : newObj.contract.id
+        this.names = (!!newObj.contractc) ? newObj.contractc.contract_id : newObj.contract.contract_id
       }
     },
     created(){

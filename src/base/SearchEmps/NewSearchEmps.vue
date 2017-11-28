@@ -24,7 +24,6 @@
     mixins:[selectMixin],
     data () {
       return {
-        curProp:"",
         selected:'',
         searchType:null,
       }
@@ -37,29 +36,15 @@
     },
     computed:{
       label(){
-          switch (this.type){
-            case "TM":
-                this.curProp = 'TM'
-                return "技术经理"
-              break
-            case "CUS":
-                this.curProp = 'customer'
-                return "客户联系人"
-              break
-            case "MAN":
-                this.curProp = 'MAN'
-                return "服务人员"
-              break
-            case "VISITOR":
-                this.curProp = "visitor"
-                return "回访人员"
-              break
-            default://PM
-                this.curProp = 'PM'
-                return "项目经理"
-              break
-          }
+          //switch高阶写法
+          let name = {"TM":"技术经理", "CUS":"客户联系人", "MAN":"服务人员", "VISITOR":"回访人员"}[this.type] || "项目经理"
+          return name
       },
+      curProp(){
+          //switch高阶写法
+          let prop = {"TM":"TM", "CUS":"customer", "MAN":"MAN", "VISITOR":"visitor"}[this.type] || "PM"
+          return prop
+      }
     },
     watch:{
       updateObj(newObj){
@@ -67,6 +52,7 @@
             return
         }
         let names = [], ids = [], objs = []
+
         switch (this.type){
           case "TM":
             if(newObj.TM && newObj.TM.length > 0){
@@ -106,14 +92,8 @@
     },
     created(){
         this.$watch('query', debounce(()=>{
-          switch(this.type){
-            case "CUS":
-                this.searchType = "out"
-                break
-            default:
-                this.searchType = "inner"
-                break
-          }
+          //switch高阶写法
+          this.searchType = { 'CUS' : "out"}[this.type] || "inner"
 
           this.loading = true;
           this.$http

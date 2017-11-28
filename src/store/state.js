@@ -6,6 +6,7 @@ const state = {
   updateIndex:null,
   updateObj:[],
   stepObj:{},
+  company_id:null, //用于选择单位后记录单位id   ->  目前用于<ShowDevice>
 }
 
 export default state

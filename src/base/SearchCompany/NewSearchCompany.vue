@@ -26,7 +26,7 @@
         if(typeof newObj === 'undefined' || this.updateIndex === null){
           return
         }
-        if(newObj.company){
+        if(!!newObj.company){
           this.model = newObj.company.id
           this.names = newObj.company.name
         }
@@ -34,7 +34,7 @@
     },
     created(){
         this.$watch('query', debounce(()=>{
-          if(this.query === ''){
+          if(!!this.query == false){
               return
           }
           this.loading = true;
@@ -48,7 +48,12 @@
     },
     methods: {
       wannaUpdate(v){
+          if(!v) return;
         this.$emit('on-select', v)
+      },
+      _reset(){
+          this.model = [],
+          this.names = []
       }
     }
   }

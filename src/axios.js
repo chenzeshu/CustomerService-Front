@@ -29,18 +29,20 @@ axios.interceptors.response.use(function (res) {
   return res;
 }, function (error) {
   // Do something with response error
-  switch (error.response.status){
-    case 401:
-      //如果是401权限问题, 就将本地loginFlag设false并返回登陆
-      saveToLocal('loginFlag', false)
-      store.commit('SET_LOGINED', false)
-      break
-    case 422:
-      //如果是422问题, 就重新请求特定的refresh_token_route刷新jwt
-      break
-    default:
-      break
-  }
+   if(!!error.response){
+     switch (error.response.status){
+       case 401:
+         //如果是401权限问题, 就将本地loginFlag设false并返回登陆
+         saveToLocal('loginFlag', false)
+         store.commit('SET_LOGINED', false)
+         break
+       case 422:
+         //如果是422问题, 就重新请求特定的refresh_token_route刷新jwt
+         break
+       default:
+         break
+     }
+   }
   return Promise.reject(error);
 });
 

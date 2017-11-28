@@ -8,3 +8,4 @@ export const updateObj = state => state.updateObj
 export const stepObj = state => state.stepObj
 
 export const updateIndex = state => state.updateIndex
+export const company_id = state => state.company_id

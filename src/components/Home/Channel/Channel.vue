@@ -219,7 +219,58 @@
           <Button type="ghost" @click="back">上一步</Button>
           <Button type="ghost" @click="next">下一步</Button>
         </div>
+      </Modal>
 
+      <!--relations节点-->
+      <Modal
+        v-model="reFlag"
+        title="节点详情"
+        :width="curTableWidth">
+        <table class="ivu-table ivu-table-border" style="width:50vw;min-width:700px; margin-top:10px"
+               cellspacing="0" cellpadding="0">
+          <thead class="ivu-table-header">
+          <tr>
+            <th class="ivu-table-cell">节点</th>
+            <th class="ivu-table-cell">所属公司</th>
+            <th class="ivu-table-cell">设备型号</th>
+            <th class="ivu-table-cell">设备类型</th>
+            <th class="ivu-table-cell">设备ip</th>
+            <th class="ivu-table-cell">操作</th>
+          </tr>
+          </thead>
+          <tbody class="ivu-table-body">
+          <tr class="ivu-table-row" v-for="(device, kd) in relationModel" :key="kd" v-if="device.company && device.device">
+            <td class="ivu-table-cell">节点{{ kd+1 }}</td>
+            <td class="ivu-table-cell">{{ device.company.name }}</td>
+            <td class="ivu-table-cell">{{ device.device.device_id}}</td>
+            <td class="ivu-table-cell">{{ device.device.type}}</td>
+            <td class="ivu-table-cell">{{ device.device.ip}}</td>
+            <td class="ivu-table-cell">
+              <i-button type="error" size="small" @click="deleteDevice(device)">删除</i-button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <br>
+        <Button @click="_toggleRelationCreate">新增节点</Button>
+      </Modal>
+
+      <!--createRelation-->
+      <Modal
+        v-model="reFlag2"
+        title="新增节点"
+        width="500"
+        @on-ok="addDevice"
+        @on-cancel="resetModel">
+        <Form :model="reCreateModel" :label-width="80">
+          <NewSearchCompany @on-select="selectCompanyForR" ref="showCompany"></NewSearchCompany>
+          <ShowDevice @selectDevice="selectDeviceForR" ref="showDevice"></ShowDevice>
+          <FormItem label="站类型">
+            <i-select v-model="reCreateModel.zhan_id">
+              <i-option v-for="type in zhanTypes" :key="type.id" :value="type.id">{{ type.name }}</i-option>
+            </i-select>
+          </FormItem>
+        </Form>
       </Modal>
     </div>
 </template>
@@ -227,7 +278,9 @@
 <script>
     import Loading from 'base/Loading/Loading'
     import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
+    import NewSearchCompany from 'base/SearchCompany/NewSearchCompany'
     import SearchChecker from 'base/SearchEmps/SearchChecker'
+    import ShowDevice from 'base/SearchDevice/ShowDevice'
     import NewSearchContract from 'base/SearchContract/NewSearchContract'
     import {curdMixin, pageMixin} from 'common/js/mixin'
     import {mapGetters, mapMutations} from 'vuex'
@@ -288,10 +341,27 @@
               {
                 title:"操作",
                 align: "center",
-                width: 200,
+                width: 300,
                 fixed:'right',
                 render: (h, params) => {
+                  if(typeof params.row.channel_applys === 'undefined'){
+                      return
+                  }
                   return h('div', [
+                    h('Button', {
+                      props: {
+                        type: 'default',
+                        size: 'small'
+                      },
+                      style: {
+                        marginRight: '5px'
+                      },
+                      on: {
+                        click: () => {
+                          this._toggleRelations(params.index)
+                        }
+                      }
+                    }, `${params.row.channel_applys[0].channel_relations.length}个节点`),
                     h('Button', {
                       props: {
                         type: 'default',
@@ -351,6 +421,19 @@
                 source:null,
                 type:null
               },
+              apply_id:null,
+              index:null,
+              reFlag:false,
+              reFlag2:false,
+              relationModel:{
+                company:{},
+                device:{}
+              },
+              reCreateModel:{
+                company_id:null,
+                device_id:null,
+                zhan_id:null
+              },
               stepFlag:false,
               current:1,
               stepModel:{
@@ -361,6 +444,7 @@
               tongxins:[],
               pinlvs:[],
               plans:[],
+              zhanTypes : [],
               ruleValidate:{
                 channel_id: [
                   {required: true, message: '服务单编号不能为空', trigger: 'blur' }
@@ -402,10 +486,76 @@
             'stepObj'
         ])
       },
+      watch:{
+        dataArr(){
+            if(this.index !==null){
+              this.relationModel = this.$lodash.cloneDeep(this.dataArr[this.index].channel_applys[0].channel_relations)
+            }
+        }
+      },
       created(){
           this._getData()
       },
       methods:{
+        addDevice(){
+          let body = {
+              channel_apply_id:this.apply_id,
+              company_id:this.reCreateModel.company_id,
+              device_id:this.reCreateModel.device_id,
+              id5:this.reCreateModel.zhan_id,
+          }
+          this.$http.post(`/channel_apply/addDeviceToChannel`, body)
+            .then(res=>{
+                res = res.data
+                if(res.code === 2003){
+                    this.$Message.success(res.msg)
+                    this.resetModel()
+                    this._getData()
+                }else if (res.code===2006){
+                  this.$Message.warning({
+                    content:res.msg,
+                    duration:3
+                  })
+                  this._toggleRelationCreate()
+                }
+            })
+        },
+        deleteDevice(item){
+          let body = {
+              channel_apply_id:item.channel_apply_id,
+              device_id:item.device_id,
+          }
+          this.$http.post(`/channel_apply/deleteRelation`, body)
+            .then(res=>{
+              res = res.data
+              if(res.code === 2005){
+                this.$Message.success('成功删除')
+                this.resetModel()
+                this._getData() //其实更好的是做一个refresh接口, 但是这么长的orm都做了, 算了
+              }
+            })
+        },
+        resetModel(){
+          this.$refs.showDevice._reset()
+          this.$refs.showCompany._reset()
+          this.reCreateModel.zhan_id = null
+        },
+        _toggleRelationCreate(){
+            this.reFlag2 = !this.reFlag2
+        },
+        selectCompanyForR(v){
+          this.setCompany_id(v)
+          this.reCreateModel.company_id = v
+        },
+        selectDeviceForR(v){
+            this.reCreateModel.device_id = v
+        },
+        _toggleRelations(index){
+            this.index = index
+            this.reFlag = !this.reFlag
+            this.apply_id = this.dataArr[index].channel_applys[0].id
+            this.relationModel = this.$lodash.cloneDeep(this.dataArr[index].channel_applys[0].channel_relations)
+        },
         _toggleSteps(index){
           this.stepFlag = !this.stepFlag
           this.stepModel = this.$lodash.cloneDeep(this.dataArr[index].channel_applys[0])
@@ -424,13 +574,10 @@
           }
         },
         _updateStep(){
-          console.log(this.stepModel)
           switch (this.current){
             case 1:
                 //更新运营调配表
                 let obj = this.stepModel.channel_operative
-                console.log(obj)
-//                return
                 this.$http.post(`/apply/operative/${obj.id}`, obj)
                   .then(res=>{
                     res = res.data
@@ -512,16 +659,18 @@
               this.pinlvs = res.pinlvs
               this.jihuas = res.jihuas
               this.tongxins = res.tongxins
-              console.log(this.plans)
+              this.zhanTypes = res.zhantypes
               this._setLoading()
             })
         },
         ...mapMutations({
-          setStepObj: 'SET_STEP_OBJ'
+          setStepObj: 'SET_STEP_OBJ',
+          setCompany_id: 'SET_COMPANY_ID',
         })
       },
       components:{
-          Loading, NewSearchEmps, NewSearchContract, SearchChecker
+          Loading, NewSearchEmps, NewSearchContract,
+          SearchChecker, NewSearchCompany, ShowDevice
       }
     }
 </script>

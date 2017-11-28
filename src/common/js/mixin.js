@@ -174,6 +174,10 @@ export const pageMixin = {
       let w = document.documentElement.clientWidth
       return w >1200 ? 1403: 800
     },
+    curTableWidth(){
+      let w = document.documentElement.clientWidth
+      return w >1200 ? 1003: 800
+    }
   },
   methods:{
     onChange(curPage){

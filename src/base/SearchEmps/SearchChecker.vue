@@ -46,7 +46,10 @@
         }
       },
       cname(){
-        return this.stepObj.checker.name
+          if(typeof this.stepObj.checker !== 'undefined'){
+            return this.stepObj.checker.name
+          }
+
       },
       ...mapGetters([
           'stepObj'
@@ -62,14 +65,8 @@
     },
     created(){
       this.$watch('query', debounce(()=>{
-        switch(this.type){
-          case "CUS":
-            this.searchType = "out"
-            break
-          default:
-            this.searchType = "out"  //为了方便查更多的人, 先out 之后改成inner
-            break
-        }
+        //switch高阶写法
+        this.searchType = { 'CUS' : "out"}[this.type] || "inner"
 
         this.loading = true;
         this.$http

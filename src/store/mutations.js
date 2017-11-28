@@ -28,6 +28,10 @@ export default {
   },
   [types.SET_STEP_OBJ](state, obj){
     state.stepObj = obj
+  },
+  [types.SET_COMPANY_ID](state, id){
+    state.company_id = id
   }
+
 
 }
