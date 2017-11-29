@@ -20,5 +20,14 @@ export default {
       }
       callback();
     }
+  },
+  //禁止选2个以上联系人
+  validateRefer :(rule, value, callback) => {
+    if(value.indexOf(',') > -1 ){
+      callback(new Error('申请人不能多于2个'))
+    } else if (value === ''){
+      callback(new Error('请至少选择一个申请人'))
+    }
+    callback();
   }
 }

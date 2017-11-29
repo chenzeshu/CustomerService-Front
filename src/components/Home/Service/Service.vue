@@ -46,9 +46,10 @@
               <Option v-for="(s, sk) in status" :key="sk" :value="s">{{s}}</Option>
             </Select>
           </FormItem>
+          <NewSearchEmps @on-select="selectEmpForRefer" type="REFER"></NewSearchEmps>
           <NewSearchEmps @on-select="selectEmpForCus" type="CUS"></NewSearchEmps>
           <NewSearchEmps @on-select="selectEmpForMan" type="MAN"></NewSearchEmps>
-          <FormItem label="受理时间" prop="time1">
+          <FormItem label="派单时间" prop="time1">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
           </FormItem>
           <FormItem label="解决时间">
@@ -118,9 +119,10 @@
               <Option v-for="(s, sk) in status" :key="sk" :value="s">{{s}}</Option>
             </Select>
           </FormItem>
+          <NewSearchEmps @on-select="selectEmpForReferU" type="REFER"></NewSearchEmps>
           <NewSearchEmps @on-select="selectEmpForCusU" type="CUS"></NewSearchEmps>
           <NewSearchEmps @on-select="selectEmpForManU" type="MAN"></NewSearchEmps>
-          <FormItem label="受理时间" prop="time1">
+          <FormItem label="派单时间" prop="time1">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time1" @on-change="setUTime1"></DatePicker>
           </FormItem>
           <FormItem label="解决时间">
@@ -227,6 +229,7 @@
   import NewSearchContract from 'base/SearchContract/NewSearchContract'
   import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
   import {curdMixin, pageMixin} from 'common/js/mixin'
+  import Validator from 'common/js/validator'
   export default {
     mixins:[curdMixin, pageMixin],
     data(){
@@ -308,31 +311,6 @@
             width: 100,
           },
           {
-            title:'响应',
-            key:'time3',
-            width:100,
-            render:(h, params)=>{
-                if(params.row.status === '待审核' ||params.row.status === '已派单'){
-                    let now = Date.parse(new Date())
-                    let before = Date.parse(new Date(params.row.time3))
-                  if( (now - before)/1000 > 86400 ){
-                    return h('div', [
-                      h('Button', {
-                        props: {
-                          type: 'error',
-                          size: 'small'
-                        }
-                      }, '超时')
-                    ]);
-                  }else {
-                        return '未超时'
-                  }
-                }else {
-                    return '自检'
-                }
-            }
-          },
-          {
             title: '信息来源',
             key: 'source',
             width: 100,
@@ -348,6 +326,25 @@
             render: (h, params) => {
                 let index = params.row.type
                 return typeof this.types[index] !== 'undefined' ? this.types[index].name : '其他'
+            }
+          },
+          {
+            title: '申请人',
+            key: 'refer_man',
+            width: 200,
+            render: (h, params) => {
+              let refer_man = this.dataArr[params.index].refer_man
+              let dom = []
+              if (refer_man) {
+                for (let man of refer_man) {
+                  dom.push(h('Button', {props: {size: 'small'}, style: {margin: '3px'},}, man.name))
+                }
+                return h('div', [
+                  dom
+                ])
+              } else {
+                return "未填写"
+              }
             }
           },
           {
@@ -389,7 +386,7 @@
             }
           },
           {
-            title: '受理时间',
+            title: '派单时间',
             key: 'time1',
             width: 120
           },
@@ -555,6 +552,7 @@
           status:null,
           source:null,
           type:null,
+          refer_man:null,
           man:null,
           customer:null,
           charge_if:null,
@@ -577,6 +575,7 @@
           status:null,
           source:null,
           type:null,
+          refer_man:null,
           man:null,
           customer:null,
           charge_if:null,
@@ -599,6 +598,9 @@
           ],
           contract_id: [
             {type: 'number', required: true, message: '所属合同编号不能为空', trigger: 'blur'}
+          ],
+          refer_man: [
+            { validator:Validator.validateRefer, trigger: 'change' }
           ],
           customer: [
             {required: true, message: '项目经理不能为空', trigger: 'blur' }
@@ -654,7 +656,7 @@
           this.visitModel.visitor = v
       },
       setVTime(v){
-        this.visitModel.time = v
+          this.visitModel.time = v
       },
       visit(){
         this.$refs['visitForm'].validate((valid) => {
@@ -694,6 +696,9 @@
       setCTime4(date){
         this.createModel.time4 = date
       },
+      selectEmpForRefer(v){
+        this.createModel.refer_man = v
+      },
       selectEmpForMan(v){
         this.createModel.man = v
       },
@@ -708,6 +713,9 @@
       },
       setUTime4(date){
         this.updateModel.time4 = date
+      },
+      selectEmpForReferU(v){
+        this.updateModel.refer_man = v
       },
       selectEmpForManU(v){
         this.updateModel.man = v
@@ -725,6 +733,7 @@
             this.types = res.types
             this.setDataArr(res.data)
             this._setLoading()
+            return
           })
       }
     },

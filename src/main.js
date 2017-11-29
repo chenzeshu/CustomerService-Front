@@ -6,14 +6,12 @@ import router from './router'
 import axios from './axios'
 import iView from 'iview'
 import store from './store'
-// import UnserScore from 'underscore'
 import lodash from 'lodash'
 import 'iview/dist/styles/iview.css';
 import "common/stylus/index.styl"
 Vue.use(iView)
 Vue.prototype.$lodash = lodash
 Vue.prototype.$http = axios
-// Vue.prototype.$obj = UnserScore
 
 Vue.config.productionTip = false
 
@@ -26,16 +24,16 @@ new Vue({
   components: { App }
 })
 
+
 router.push('/signin')
-// router.beforeEach((to, from, next) => {
-//   if (loadFromLocal('loginFlag') && store.state.logined){
-//     next()
-//   }
-//   else {
-//     next({
-//       path:'/signin'
-//     })
-//   }
-// })
+// 全局配置
+router.beforeEach((to, from, next) => {
+  // Change doc title
+  // document.title = to.meta.title || 'Unknow title'
+  document.title ='中网客服管理平台'
+  // document.querySelector('meta[name="keywords"]').setAttribute('content', 'keywords')
+  // document.querySelector('meta[name="description"]').setAttribute('content', 'description')
+  next()
+})
 
 

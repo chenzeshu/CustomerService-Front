@@ -26,6 +26,7 @@
               <div class="item-left">
                 <div class="avatar">
                   <img src="/static/avatar.png" alt="" width="64" height="64">
+                  <p>提交人</p>
                 </div>
                 <div class="info1" v-if="item.customer[0]">
                   <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
@@ -60,7 +61,7 @@
 
               </div>
               <div class="verify">
-                <i-button type="primary" size="large" @click="_pass(item.id)">过审</i-button>
+                <i-button type="primary" size="large" @click="_pass(item.id)">通过审核</i-button>
                 <i-button type="error" size="large" @click="_rej(item.id)">拒绝</i-button>
               </div>
 

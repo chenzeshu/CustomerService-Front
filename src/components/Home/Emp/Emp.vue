@@ -60,7 +60,7 @@
         @on-ok="update">
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
           <FormItem label="人员名称" prop="name">
-            <Input v-model.trim="updateModel.name" placeholder="输入公司名后, 下方会显示公司列表"></Input>
+            <Input v-model.trim="updateModel.name" placeholder="输入单位名后, 下方会显示单位列表"></Input>
           </FormItem>
           <FormItem label="状态" prop="status">
             <RadioGroup v-model.trim="updateModel.status" type="button">
@@ -116,7 +116,7 @@
                   fixed:'left'
                 },
                 {
-                  title: '所属公司',
+                  title: '所属单位',
                   width: this.curWidth < 1200 ? 200 : 350,
                   render: (h, params) => {
                         if(this.dataArr[params.index].company){
@@ -204,7 +204,7 @@
                   { required: true, message: '请选择状态', trigger: 'blur' }
                 ],
                 company_id: [
-                  { type:'number', required: true, message: '请选择公司', trigger: 'blur' }
+                  { type:'number', required: true, message: '请选择单位', trigger: 'blur' }
                 ],
                 email: [
                   { required: true, message: '邮箱不能为空', trigger: 'blur' },

@@ -127,11 +127,11 @@
                 <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="频率">
-              <Select v-model.number="stepModel.id4" style="width:200px" disabled>
-                <Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>
-              </Select>
-            </FormItem>
+            <!--<FormItem label="频率">-->
+              <!--<Select v-model.number="stepModel.id4" style="width:200px" disabled>-->
+                <!--<Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>-->
+              <!--</Select>-->
+            <!--</FormItem>-->
             <FormItem label="申请时间">
               <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="stepModel.t1" readonly></DatePicker>
             </FormItem>
@@ -159,11 +159,11 @@
                 <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="频率" prop="pinlv">
-              <Select v-model.number="stepModel.channel_operative.id4" style="width:200px">
-                <Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>
-              </Select>
-            </FormItem>
+            <!--<FormItem label="频率" prop="pinlv">-->
+              <!--<Select v-model.number="stepModel.channel_operative.id4" style="width:200px">-->
+                <!--<Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>-->
+              <!--</Select>-->
+            <!--</FormItem>-->
             <FormItem label="开始时间" prop="t1">
               <DatePicker type="date" placeholder="选择日期" style="width: 200px"
                           :value="stepModel.channel_operative.t1" @on-change="setOTime1"></DatePicker>
@@ -197,11 +197,11 @@
                 <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="频率" prop="pinlv">
-              <Select v-model.number="stepModel.channel_real.id4" style="width:200px">
-                <Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>
-              </Select>
-            </FormItem>
+            <!--<FormItem label="频率" prop="pinlv">-->
+              <!--<Select v-model.number="stepModel.channel_real.id4" style="width:200px">-->
+                <!--<Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>-->
+              <!--</Select>-->
+            <!--</FormItem>-->
             <FormItem label="开始时间" prop="t1">
               <DatePicker type="date" placeholder="选择日期" style="width: 200px"
                           :value="stepModel.channel_real.t1" @on-change="setRTime1"></DatePicker>
@@ -463,7 +463,7 @@
                 ],
               },
               ruleValidate2:{
-                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
+//                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
                 jihua:[ {type:'number',required: true, message: '极化不能为空', trigger: 'blur' }],
                 tongxin:[ {type:'number',required: true, message: '通信卫星不能为空', trigger: 'blur' }],
                 plan:[ {type:'number',required: true, message: '套餐不能为空', trigger: 'blur' }],
@@ -471,7 +471,7 @@
                 t2:[{required: true, message: '结束时间不能为空', trigger: 'blur' }]
               },
               ruleValidate3:{
-                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
+//                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
                 jihua:[ {type:'number',required: true, message: '极化不能为空', trigger: 'blur' }],
                 tongxin:[ {type:'number',required: true, message: '通信卫星不能为空', trigger: 'blur' }],
                 plan:[ {type:'number',required: true, message: '套餐不能为空', trigger: 'blur' }],
@@ -656,7 +656,7 @@
               //utils
               this.sources = res.sources
               this.plans = res.plans
-              this.pinlvs = res.pinlvs
+//              this.pinlvs = res.pinlvs
               this.jihuas = res.jihuas
               this.tongxins = res.tongxins
               this.zhanTypes = res.zhantypes

@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-
 import Signin from 'comp/Sign/Signin/Signin'
 import Home from 'comp/Home/Home'
+import FrontPage from 'comp/Home/FrontPage'
 import Company from 'comp/Home/Company/Company'
 import Emp from 'comp/Home/Emp/Emp'
 import Contract from 'comp/Home/Contract/Contract'
@@ -23,7 +23,7 @@ import File from 'comp/Home/Utils/File'
 import Info1 from 'comp/Home/UtilsC/info1'
 import Info2 from 'comp/Home/UtilsC/info2'
 import Info3 from 'comp/Home/UtilsC/info3'
-import Info4 from 'comp/Home/UtilsC/info4'
+// import Info4 from 'comp/Home/UtilsC/info4'
 import Info5 from 'comp/Home/UtilsC/info5'
 import Info6 from 'comp/Home/UtilsC/info6'
 import Device from 'comp/Home/Device/Device'
@@ -46,6 +46,9 @@ export default new Router({
       path: '/home',
       component: Home,
       children:[
+        //管理控制台
+        {path:'frontpage', component: FrontPage},
+        //功能页
         {path:'company', component: Company},
         {path:'emp', component: Emp},
         {path:'contract', component: Contract},
@@ -64,7 +67,7 @@ export default new Router({
         {path:'info1', component: Info1},
         {path:'info2', component: Info2},
         {path:'info3', component: Info3},
-        {path:'info4', component: Info4},
+        // {path:'info4', component: Info4}, //频率
         {path:'info5', component: Info5},
         {path:'info6', component: Info6},
         {path:'device', component: Device},
@@ -77,3 +80,5 @@ export default new Router({
     }
   ]
 })
+
+

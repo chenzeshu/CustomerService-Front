@@ -37,12 +37,12 @@
     computed:{
       label(){
           //switch高阶写法
-          let name = {"TM":"技术经理", "CUS":"客户联系人", "MAN":"服务人员", "VISITOR":"回访人员"}[this.type] || "项目经理"
+          let name = {"TM":"技术经理", "CUS":"客户联系人", "MAN":"服务人员", "VISITOR":"回访人员", "REFER":"申请人"}[this.type] || "项目经理"
           return name
       },
       curProp(){
           //switch高阶写法
-          let prop = {"TM":"TM", "CUS":"customer", "MAN":"MAN", "VISITOR":"visitor"}[this.type] || "PM"
+          let prop = {"TM":"TM", "CUS":"customer", "MAN":"MAN", "VISITOR":"visitor", "REFER":"refer_man"}[this.type] || "PM"
           return prop
       }
     },
@@ -71,6 +71,11 @@
             break
           case "MAN":
             if(newObj.man && newObj.man.length > 0){
+              objs = newObj.man
+            }
+            break
+          case "REFER":
+            if(newObj.refer_man && newObj.refer_man.length > 0){
               objs = newObj.man
             }
             break

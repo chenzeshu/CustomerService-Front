@@ -38,7 +38,7 @@
               </div>
 
               <div class="verify">
-                <i-button type="primary" size="large" @click="_pass(item.id)">过审</i-button>
+                <i-button type="primary" size="large" @click="_pass(item.id)">通过审核</i-button>
                 <i-button type="error" size="large" @click="_rej(item.id)">拒绝</i-button>
               </div>
 

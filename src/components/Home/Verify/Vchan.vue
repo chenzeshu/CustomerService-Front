@@ -59,7 +59,7 @@
               <!--显隐的具体实现: https://segmentfault.com/q/1010000011144074-->
 
               <div class="verify">
-                <i-button type="primary" size="large" @click="_pass(item)">过审</i-button>
+                <i-button type="primary" size="large" @click="_pass(item)">通过审核</i-button>
                 <i-button type="error" size="large" @click="_rej(item.id)">拒绝</i-button>
               </div>
 
@@ -132,7 +132,7 @@
       <!--update-->
       <Modal
         v-model="PFlag"
-        title="补充并过审"
+        title="补充并通过审核"
         width="400"
         @on-ok="passUpdate">
         <!--@on-cancel="cancel"-->
@@ -169,7 +169,7 @@
           total:0,
           dataCount : null,
           DFlag:false,           //detailFlag -- 人物显隐框
-          PFlag:false,           //过审ModelFlag
+          PFlag:false,           //通过审核ModelFlag
           contentIndex:null,
           tongxin:[],
           pinlv:[],

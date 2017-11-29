@@ -32,7 +32,7 @@
       logined(newLogined){
         if(newLogined){
           this.$Message.success('登陆成功')
-          this.$router.push('/home/vcus')
+          this.$router.push('/home/frontpage')
         }else{
           this.$router.push('/signin')
         }
