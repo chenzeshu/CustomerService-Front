@@ -283,6 +283,7 @@
     import ShowDevice from 'base/SearchDevice/ShowDevice'
     import NewSearchContract from 'base/SearchContract/NewSearchContract'
     import {curdMixin, pageMixin} from 'common/js/mixin'
+//    import {uploadMixin} from 'common/js/baseMixin'
     import {mapGetters, mapMutations} from 'vuex'
 
     export default {

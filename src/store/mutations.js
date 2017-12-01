@@ -31,7 +31,8 @@ export default {
   },
   [types.SET_COMPANY_ID](state, id){
     state.company_id = id
+  },
+  [types.SET_FILE_LIST](state, list){
+    state.fileList = list
   }
-
-
 }

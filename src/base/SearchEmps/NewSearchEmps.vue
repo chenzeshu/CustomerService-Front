@@ -76,7 +76,7 @@
             break
           case "REFER":
             if(newObj.refer_man && newObj.refer_man.length > 0){
-              objs = newObj.man
+              objs = newObj.refer_man
             }
             break
           default://PM

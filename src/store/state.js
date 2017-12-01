@@ -7,6 +7,7 @@ const state = {
   updateObj:[],
   stepObj:{},
   company_id:null, //用于选择单位后记录单位id   ->  目前用于<ShowDevice>
+  fileList:[], //上传的文件列表
 }
 
 export default state

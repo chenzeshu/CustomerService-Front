@@ -1,4 +1,5 @@
-import {mapGetters} from 'vuex'
+import {mapGetters, mapMutations} from 'vuex'
+import url from 'common/js/url'
 
 export const selectMixin = {
   data(){
@@ -35,5 +36,48 @@ export const selectMixin = {
         this.options = [];
       }
     }
+  }
+}
+
+export const uploadMixin = {
+  data(){
+    return {
+      action : url.uploadAction,  //上传到临时temp目录
+      uploadName : "uploadFiles[]",
+      defaultList:[],
+      editDefaultList:[]
+    }
+  },
+  computed:{
+    ...mapGetters([
+      'fileList'
+    ])
+  },
+  methods:{
+    handleUpload(file){
+
+    },
+    handleSuccess(response, file, fileList){
+      file.path = response.path
+      this.setFileList(this.$lodash.cloneDeep(fileList))
+      this.$Message.success('上传成功')
+    },
+    handleError(err, file, fileList){
+      this.$Message.error(file.name+"上传失败")
+    },
+    handleRemove(file, fileList){
+      let files = {
+        filePath:file.path
+      }
+      this.$http
+        .post('/deleteFile/', files)
+        .then(res=>{
+          this.$Message.success(file.name+"已删除")
+          this.setFileList(this.$lodash.cloneDeep(fileList))
+        })
+    },
+    ...mapMutations({
+        setFileList : 'SET_FILE_LIST'
+    })
   }
 }

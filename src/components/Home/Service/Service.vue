@@ -82,9 +82,23 @@
           <FormItem label="处理描述">
             <Input v-model.trim="createModel.desc2" placeholder="处理描述" type="textarea"></Input>
           </FormItem>
-          <!--<FormItem label="上传文件">-->
-          <!--<Input v-model.trim="createModel.document" placeholder="请输入"></Input>-->
-          <!--</FormItem>-->
+          <FormItem label="上传文件">
+            <Upload
+              ref="upload"
+              multiple
+              type="drag"
+              :action="action"
+              :name="uploadName"
+              :default-file-list="defaultList"
+              :on-success="handleSuccess"
+              :on-error="handleError"
+              :on-remove="handleRemove">
+              <div style="padding: 20px 0">
+                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                <p>点击或将文件拖拽到这里上传</p>
+              </div>
+            </Upload>
+          </FormItem>
           <FormItem label="申述内容">
             <Input v-model.trim="createModel.allege" placeholder="申述内容" type="textarea"></Input>
           </FormItem>
@@ -155,9 +169,24 @@
           <FormItem label="处理描述">
             <Input v-model.trim="updateModel.desc2" placeholder="处理描述" type="textarea"></Input>
           </FormItem>
-          <!--<FormItem label="上传文件">-->
-          <!--<Input v-model.trim="updateModel.document" placeholder="请输入"></Input>-->
-          <!--</FormItem>-->
+          <FormItem label="上传文件">
+            <Upload
+              ref="upload"
+              multiple
+              type="drag"
+              :action="action"
+              :name="uploadName"
+              :default-file-list="editDefaultList"
+              :before-upload="handleUpload"
+              :on-success="handleSuccess"
+              :on-error="handleError"
+              :on-remove="handleRemove">
+              <div style="padding: 20px 0">
+                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                <p>点击或将文件拖拽到这里上传</p>
+              </div>
+            </Upload>
+          </FormItem>
           <FormItem label="申述内容">
             <Input v-model.trim="updateModel.allege" placeholder="申述内容" type="textarea"></Input>
           </FormItem>
@@ -229,9 +258,10 @@
   import NewSearchContract from 'base/SearchContract/NewSearchContract'
   import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
   import {curdMixin, pageMixin} from 'common/js/mixin'
+  import {uploadMixin} from 'common/js/baseMixin'
   import Validator from 'common/js/validator'
   export default {
-    mixins:[curdMixin, pageMixin],
+    mixins:[curdMixin, pageMixin, uploadMixin],
     data(){
       return {
         url: 'services',
@@ -290,8 +320,8 @@
             width: 200,
             fixed: 'left',
             render: (h, params) => {
-              if (this.dataArr[params.index].company) {
-                return `${this.dataArr[params.index].company.name}`
+              if (this.dataArr[params.index].contract) {
+                return `${this.dataArr[params.index].contract.company.name}`
               }
             }
           },
@@ -600,6 +630,7 @@
             {type: 'number', required: true, message: '所属合同编号不能为空', trigger: 'blur'}
           ],
           refer_man: [
+            { required: true, message: '申请人不能为空', trigger: 'blur'},
             { validator:Validator.validateRefer, trigger: 'change' }
           ],
           customer: [

@@ -39,7 +39,7 @@
                     <div class="icon">
                       <Icon type="android-document"></Icon>
                     </div>
-                    所属合同: {{ item.contract.name }}</span>
+                    所属合同: {{ item.contract && item.contract.name }}</span>
                   <span>
                     <div class="icon">
                       <Icon type="man"></Icon>
@@ -64,7 +64,6 @@
                 <i-button type="primary" size="large" @click="_pass(item.id)">通过审核</i-button>
                 <i-button type="error" size="large" @click="_rej(item.id)">拒绝</i-button>
               </div>
-
             </div>
             <Split type="xi" v-show="key !== dataArr.length - 1"></Split>
           </div>

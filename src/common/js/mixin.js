@@ -41,14 +41,32 @@ export const curdMixin = {
       this.setUpdateIndex(null)
     },
     _create(){
+      switch (this.url){
+        // case "contracts":
+        //   this.createModel.type1 = parseInt(this.createModel.type1)
+        //   break
+        case "services":
+          if(this.createModel.charge_if==="不收费"){
+            this.createModel.charge = null
+            this.createModel.charge_flag = "未到款"
+            this.createModel.time4 = null
+          }
+          break
+        default:
+          break
+      }
+
       this.$refs.createForm.validate((valid) => {
-        console.log(this.createModel)
         if (!valid) {
           this.$Message.error('请完善表单!');
           setTimeout(()=>{
             this._toggleCreate()
           }, 500)
           return
+        }
+
+        if(!!this.fileList){
+          this.createModel.fileList = this.fileList
         }
 
         this.$http
@@ -60,6 +78,9 @@ export const curdMixin = {
                 this.$Message.success(res.msg);
                 //并更新dom
                 this._getData()
+                if(!!this.fileList){
+                  this.setFileList([])
+                }
               }
             }).catch(error=>{
               let text = error.response.data.errors
@@ -80,11 +101,25 @@ export const curdMixin = {
       this.setUpdateIndex(index)
       this.setUpdateObj(Object.assign({}, this.dataArr[index]))
       this.updateModel = Object.assign({}, this.updateObj)
-      // console.log(this.updateModel)
+      this.editDefaultList = this.updateModel.document
+      console.log(this.editDefaultList)
     },
     update(){
-      // console.log(this.updateModel)
-      // return
+      switch (this.url){
+        case "contracts":
+          this.updateModel.type1 = parseInt(this.updateModel.type1)
+          break
+        case "services":
+          if(this.updateModel.charge_if==="不收费"){
+            this.updateModel.charge = null
+            this.updateModel.charge_flag = "未到款"
+            this.updateModel.time4 = null
+          }
+          break
+        default:
+          break
+      }
+
       this.$refs['updateForm'].validate((valid) => {
         if (!valid) {
           this.$Message.error('请完善表单!');
@@ -94,6 +129,11 @@ export const curdMixin = {
           return
         }
 
+        if(!!this.fileList){
+          this.updateModel.fileList = this.fileList
+        }
+        // console.log(this.updateModel)
+        // return
         let _url = `/${this.url}/update/${this.updateModel.id}`
         this.$http.post(_url, this.updateModel)
           .then(res => {
@@ -101,6 +141,10 @@ export const curdMixin = {
             if (parseInt(res.code) === 2003) {
               this.$Message.success(res.msg);
               this._getData()
+              if(!!this.fileList){
+                this.setFileList([])
+              }
+
             }
           }, err => {
             this.$Message.error('修改失败');

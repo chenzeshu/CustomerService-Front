@@ -48,9 +48,23 @@
           <FormItem label="失效日期" prop="deadline">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime3"></DatePicker>
           </FormItem>
-          <!--<FormItem label="上传文件">-->
-          <!--<Input v-model.trim="createModel.document" placeholder="请输入"></Input>-->
-          <!--</FormItem>-->
+          <FormItem label="上传文件">
+            <Upload
+              ref="upload"
+              multiple
+              type="drag"
+              :action="action"
+              :name="uploadName"
+              :default-file-list="defaultList"
+              :on-success="handleSuccess"
+              :on-error="handleError"
+              :on-remove="handleRemove">
+              <div style="padding: 20px 0">
+                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                <p>点击或将文件拖拽到这里上传</p>
+              </div>
+            </Upload>
+          </FormItem>
           <FormItem label="合同金额(元)" prop="money">
             <Input v-model.trim="createModel.money"></Input>
           </FormItem>
@@ -87,9 +101,24 @@
           <FormItem label="失效日期" prop="deadline">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.deadline" @on-change="setUTime3"></DatePicker>
           </FormItem>
-          <!--<FormItem label="上传文件">-->
-          <!--<Input v-model.trim="createModel.document" placeholder="请输入"></Input>-->
-          <!--</FormItem>-->
+          <FormItem label="上传文件">
+            <Upload
+              ref="upload"
+              multiple
+              type="drag"
+              :action="action"
+              :name="uploadName"
+              :default-file-list="editDefaultList"
+              :before-upload="handleUpload"
+              :on-success="handleSuccess"
+              :on-error="handleError"
+              :on-remove="handleRemove">
+              <div style="padding: 20px 0">
+                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                <p>点击或将文件拖拽到这里上传</p>
+              </div>
+            </Upload>
+          </FormItem>
           <FormItem label="合同金额(元)" prop="money">
             <Input v-model.trim="updateModel.money"></Input>
           </FormItem>
@@ -115,9 +144,10 @@
     import {mapGetters, mapMutations} from 'vuex'
     import Loading from 'base/Loading/Loading'
     import {curdMixin, pageMixin} from 'common/js/mixin'
+    import {uploadMixin} from 'common/js/baseMixin'
 
     export default {
-       mixins:[curdMixin, pageMixin],
+       mixins:[curdMixin, pageMixin, uploadMixin],
        data(){
            return {
              url: 'contractcs',

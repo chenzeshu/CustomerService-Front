@@ -59,9 +59,23 @@
           <FormItem label="质保截止">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime3"></DatePicker>
           </FormItem>
-          <!--<FormItem label="上传文件">-->
-            <!--<Input v-model.trim="createModel.document" placeholder="请输入"></Input>-->
-          <!--</FormItem>-->
+          <FormItem label="上传文件">
+            <Upload
+              ref="upload"
+              multiple
+              type="drag"
+              :action="action"
+              :name="uploadName"
+              :default-file-list="defaultList"
+              :on-success="handleSuccess"
+              :on-error="handleError"
+              :on-remove="handleRemove">
+              <div style="padding: 20px 0">
+                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                <p>点击或将文件拖拽到这里上传</p>
+              </div>
+            </Upload>
+          </FormItem>
           <FormItem label="协作单位">
             <Select v-model.trim="createModel.coor" placeholder="请选择">
               <Option :value="c.id" v-for="(c, ck) in coors" :key="ck">{{c.name}}</Option>
@@ -88,7 +102,7 @@
           <NewSearchCompany @on-select="newSelectCompanyForU"></NewSearchCompany>
 
           <FormItem label="合同类型" prop="type1">
-            <RadioGroup v-model="updateModel.type1" type="button">
+            <RadioGroup v-model.number="updateModel.type1" type="button">
               <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
             </RadioGroup>
           </FormItem>
@@ -110,9 +124,24 @@
           <FormItem label="质保截止">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time3" @on-change="setUTime3"></DatePicker>
           </FormItem>
-          <!--<FormItem label="上传文件">-->
-            <!--<Input v-model.trim="updateModel.document" placeholder="请输入"></Input>-->
-          <!--</FormItem>-->
+          <FormItem label="上传文件">
+            <Upload
+              ref="upload"
+              multiple
+              type="drag"
+              :action="action"
+              :name="uploadName"
+              :default-file-list="editDefaultList"
+              :before-upload="handleUpload"
+              :on-success="handleSuccess"
+              :on-error="handleError"
+              :on-remove="handleRemove">
+              <div style="padding: 20px 0">
+                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                <p>点击或将文件拖拽到这里上传</p>
+              </div>
+            </Upload>
+          </FormItem>
           <FormItem label="协作单位">
             <Select v-model.trim="updateModel.coor" placeholder="请选择">
               <Option :value="c.id" v-for="(c, ck) in coors" :key="ck">{{c.name}}</Option>
@@ -135,9 +164,10 @@
   import NewSearchCompany from 'base/SearchCompany/NewSearchCompany'
   import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
   import {curdMixin, pageMixin} from 'common/js/mixin'
+  import {uploadMixin} from 'common/js/baseMixin'
 
   export default {
-    mixins:[curdMixin, pageMixin],
+    mixins:[curdMixin, pageMixin, uploadMixin],
     data(){
         return {
           url:'contracts',
@@ -345,7 +375,7 @@
               {required: true, message: '合同名不能为空', trigger: 'blur' }
             ],
             type1: [
-              {required: true, message: '请选择合同类型', trigger: 'blur' }
+              { type:"number", required: true, message: '请选择合同类型', trigger: 'blur' }
             ],
             type2: [
               { required: true, message: '请选择签订类型', trigger: 'blur' }
@@ -360,6 +390,9 @@
       this._getData()
     },
     methods:{
+        showList(){
+          console.log(this.fileList)
+        },
         newSelectCompanyForC(v){
           this.createModel.company_id = v
         },
