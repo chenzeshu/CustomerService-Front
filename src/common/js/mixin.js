@@ -221,6 +221,10 @@ export const pageMixin = {
     curTableWidth(){
       let w = document.documentElement.clientWidth
       return w >1200 ? 1003: 800
+    },
+    MoneyTableWidth(){
+      let w = document.documentElement.clientWidth
+      return w >1200 ? 670: 650
     }
   },
   methods:{

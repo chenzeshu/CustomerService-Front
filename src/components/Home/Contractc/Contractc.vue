@@ -135,12 +135,97 @@
         @on-ok="_delete">
         <p>确定要删除合同?</p>
       </Modal>
+
+      <!--回款情况-->
+      <Modal
+        v-model="moneyFlag"
+        title="回款情况"
+        :width="MoneyTableWidth + 50">
+        <Tabs>
+          <TabPane label="回款详情" icon="social-apple" v-if="moneyModel">
+            <div v-if="moneyModel.money">
+              <p class="detail-font">合同金额总计: <span style="font-weight: 700">{{moneyModel.money}} </span> 元</p>
+              <p class="detail-font">到款金额总计: <span style="font-weight: 700">{{moneyModel.reach}} </span> 元</p>
+              <p class="detail-font">剩余金额总计: <span style="font-weight: 700">{{moneyModel.left }} </span> 元</p>
+              <p class="detail-font">是否结清: <span style="font-weight: 700">{{moneyModel.finish }} </span></p>
+              <p class="detail-font">分次数目: <span style="font-weight: 700">{{moneyModel.num}} </span> </p>
+              <p class="detail-font" v-if="moneyModel.checker">责任人: <span style="font-weight: 700">{{moneyModel.checker.name}} </span> </p>
+              <p class="detail-font">约定截止日期: <span style="font-weight: 700">{{moneyModel.t1}} </span> </p>
+              <p class="detail-font">实际到款日期: <span style="font-weight: 700">{{moneyModel.t2}} </span> </p>
+            </div>
+            <div v-else>
+              <h1 style="font-size:24px">未填写</h1>
+            </div>
+            <i-button @click="_toggleMoneyEdit" style="margin:0 auto;width:200px">编辑</i-button>
+          </TabPane>
+          <TabPane label="历次回款" icon="social-windows">
+            <i-table border :columns="moneyColumn" :data="moneyDetailModel" :width="MoneyTableWidth" :loading="loading"></i-table>
+            <br>
+            <Button @click="_toggleMoneyDetailCreate" type="primary">新增回款细节</Button>
+          </TabPane>
+        </Tabs>
+      </Modal>
+
+      <!--回款详情编辑-->
+      <Modal
+        v-model="moneyEditFlag"
+        title="回款情况编辑"
+        width="400"
+        @on-ok="updateMoney">
+        <Form :model="moneyEditModel" :label-width="80">
+          <FormItem label="合同金额">
+            <Input v-model.trim="moneyEditModel.money" placeholder="请输入合同总金额"></Input>
+          </FormItem>
+          <FormItem label="是否分次" prop="type">
+            <RadioGroup v-model="moneyEditModel.type" type="button">
+              <Radio label="分次付款"></Radio>
+              <Radio label="不分次"></Radio>
+            </RadioGroup>
+          </FormItem>
+          <FormItem label="分次次数">
+            <Input v-model.number="moneyEditModel.num" placeholder="请输入分次次数"></Input>
+          </FormItem>
+          <FormItem label="是否结清">
+            <RadioGroup v-model="moneyEditModel.finish" type="button">
+              <Radio label="结清"></Radio>
+              <Radio label="未结清"></Radio>
+            </RadioGroup>
+          </FormItem>
+          <SearchChecker @on-select="selectCheckerForMoney"></SearchChecker>
+
+          <FormItem label="约定日期">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyEditModel.t1" @on-change="setMoneyTime1"></DatePicker>
+          </FormItem>
+          <FormItem label="结清日期">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyEditModel.t2" @on-change="setMoneyTime2"></DatePicker>
+          </FormItem>
+        </Form>
+      </Modal>
+      <!--历次回款create-->
+      <Modal
+        v-model="moneyDetailCreateFlag"
+        title="回款记录"
+        width="400"
+        @on-ok="_createMoneyDetail">
+        <Form :model="moneyDetailCreateModel" :label-width="80">
+          <FormItem label="合同金额">
+            <Input v-model.trim="moneyDetailCreateModel.money" placeholder="请输入合同总金额"></Input>
+          </FormItem>
+          <FormItem label="约定日期">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyDetailCreateModel.t1" @on-change="setMoneyCTime1"></DatePicker>
+          </FormItem>
+          <FormItem label="结清日期">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyDetailCreateModel.t2" @on-change="setMoneyCTime2"></DatePicker>
+          </FormItem>
+        </Form>
+      </Modal>
     </div>
 </template>
 
 <script>
     import NewSearchCompany from 'base/SearchCompany/NewSearchCompany'
     import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
+    import SearchChecker from 'base/SearchEmps/SearchChecker'
     import {mapGetters, mapMutations} from 'vuex'
     import Loading from 'base/Loading/Loading'
     import {curdMixin, pageMixin} from 'common/js/mixin'
@@ -207,11 +292,11 @@
                  key: 'deadline',
                  width: 120
                },
-               {
-                 title: '合同金额(元)',
-                 key: 'money',
-                 width: 150
-               },
+//               {
+//                 title: '合同金额(元)',
+//                 key: 'money',
+//                 width: 150
+//               },
                {
                  title: '合同描述',
                  key: 'desc',
@@ -243,6 +328,20 @@
                  fixed:'right',
                  render: (h, params) => {
                    return h('div', [
+                     h('Button', {
+                       props: {
+                         type: 'default',
+                         size: 'small'
+                       },
+                       style: {
+                         marginRight: '5px'
+                       },
+                       on: {
+                         click: () => {
+                           this.toggleMoney(params.index)
+                         }
+                       }
+                     }, '回款情况'),
                      h('Button', {
                        props: {
                          type: 'primary',
@@ -323,16 +422,186 @@
                money: [
                  { required: true, message: '请填写合同金额', trigger: 'blur' }
                ]
-             }
+             },
+             //回款
+             index:null,
+             moneyId : null,
+             moneyFlag:false,
+             moneyEditFlag:false,
+             moneyModel:{},    //详情展示model
+             moneyDetailModel:[],  //历次回款展示数组model
+             moneyEditModel:{  //详情修改model
+               money:null,
+               t1:null,
+               t2:null
+             },
+             moneyColumn:[
+               {
+                 title: `序号`,
+                 key: 'id',
+                 width: 60,
+                 fixed:'left',
+                 render : (h, params) => {
+                   return ++params.index
+                 }
+               },
+               {
+                 title: `到款金额`,
+                 key: 'money',
+                 width: 120,
+               },
+               {
+                 title: `预计到款时间`,
+                 key: 't1',
+                 width: 180,
+               },
+               {
+                 title: `实际到款时间`,
+                 key: 't2',
+                 width: 180,
+               },
+               {
+                 title:"操作",
+                 align: "center",
+                 width: 120,
+                 fixed:'right',
+                 render: (h, params) => {
+                   return h('div', [
+                     h('Button', {
+                       props: {
+                         type: 'error',
+                         size: 'small'
+                       },
+                       on: {
+                         click: () => {
+                           this._deleteMoneyDetail(params.row.id)
+                         }
+                       }
+                     }, '删除')
+                   ]);
+                 }
+               }
+             ],
+             //回款细节
+             moneyDetailCreateFlag:false,
+             moneyDetailCreateModel:{},
            }
        },
        created(){
           this._getData()
        },
        computed:{
-
+         ...mapGetters([
+           'stepObj'
+         ])
        },
+        watch:{
+          dataArr(){
+            if(this.index !== null){
+              this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[this.index].channel_money.channel_money_details)
+            }
+          }
+        },
        methods:{
+         //回款细节
+         setMoneyCTime1(v){
+           this.moneyDetailCreateModel.t1 = v
+         },
+         setMoneyCTime2(v){
+           this.moneyDetailCreateModel.t2 = v
+         },
+         _toggleMoneyDetailCreate(){
+           //校验是否超过次数
+           if(this.moneyDetailModel.length >= this.moneyModel.num){
+             this.$Message.error({
+               'content' : '已达回款分次次数上限',
+               'duration' : 3
+             })
+             return
+           }
+
+
+           this.moneyDetailCreateFlag = !this.moneyDetailCreateFlag
+         },
+         _createMoneyDetail(){
+           let url = `${this.url}/createMoneyDetail/${this.moneyId}`
+           this.$http.post(url, this.moneyDetailCreateModel)
+             .then(res=>{
+               res = res.data
+               if(parseInt(res.code) === 2006){
+                 this.$Message.success({
+                   'content':res.msg
+                 })
+                 this._getData()
+               }
+             })
+         },
+         _updateMoneyDetail(){
+
+         },
+         _deleteMoneyDetail(id){
+           let url = `${this.url}/delMoneyDetail/${id}`
+           this.$http.get(url)
+             .then(res=>{
+               res = res.data
+               if(parseInt(res.code) === 2006){
+                 this.$Message.success({
+                   'content':res.msg
+                 })
+                 this._getData()
+               }
+             })
+         },
+         //回款
+         updateMoney(){
+           let url = `${this.url}/updateMoney/${this.moneyId}`
+           this.$http.post(url, this.moneyEditModel)
+             .then(res=>{
+               res = res.data
+               if(parseInt(res.code) === 2006){
+                 this.$Message.success({
+                   'content':res.msg
+                 })
+                 this._getData()
+                 this.moneyFlag = !this.moneyFlag
+                 setTimeout(()=>{
+                   this.toggleMoney(this.index)
+                 }, 1000)
+               }
+             })
+         },
+         toggleMoney(index){
+           this.index = index
+           this.moneyId = this.dataArr[index].id   //不是money表而是contract表的id, 用于orm
+           this.moneyFlag = !this.moneyFlag
+           this.moneyModel = this.$lodash.cloneDeep(this.dataArr[index].channel_money)
+           this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[index].channel_money.channel_money_details)
+
+           if(typeof this.moneyModel !== 'undefined'){
+             this.moneyModel.reach = 0
+             this.moneyDetailModel.map((item)=>{
+               this.moneyModel.reach += parseInt(item.money)
+             })
+             this.moneyModel.left = this.moneyModel.money - this.moneyModel.reach
+           }
+         },
+         _toggleMoneyEdit(){
+           this.moneyEditFlag = !this.moneyEditFlag
+           this.moneyEditModel = this.$lodash.cloneDeep(this.moneyModel)
+           if(this.moneyEditModel.checker){
+             this.setStepObj(this.$lodash.cloneDeep(this.moneyEditModel))
+           }
+         },
+         selectCheckerForMoney(v){
+           this.moneyEditModel.checker_id = v
+         },
+         setMoneyTime1(v){
+           this.moneyEditModel.t1 = v
+         },
+         setMoneyTime2(v){
+           this.moneyEditModel.t2 = v
+         },
+         //CURD
          newSelectCompanyForC(v){
            this.createModel.company_id = v
          },
@@ -373,9 +642,12 @@
                 this._setLoading()
               })
           },
+         ...mapMutations({
+           setStepObj : 'SET_STEP_OBJ'
+         })
        },
        components:{
-           Loading, NewSearchEmps, NewSearchCompany
+           Loading, NewSearchEmps, NewSearchCompany, SearchChecker
        }
     }
 </script>

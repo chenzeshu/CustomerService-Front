@@ -49,7 +49,6 @@
           if(typeof this.stepObj.checker !== 'undefined'){
             return this.stepObj.checker.name
           }
-
       },
       ...mapGetters([
           'stepObj'
