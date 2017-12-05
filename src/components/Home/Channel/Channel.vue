@@ -133,10 +133,10 @@
               <!--</Select>-->
             <!--</FormItem>-->
             <FormItem label="申请时间">
-              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="stepModel.t1" readonly></DatePicker>
+              <DatePicker type="datetime" placeholder="选择日期" style="width: 200px" :value="stepModel.t1" readonly></DatePicker>
             </FormItem>
             <FormItem label="结束时间">
-              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="stepModel.t2" readonly></DatePicker>
+              <DatePicker type="datetime" placeholder="选择日期" style="width: 200px" :value="stepModel.t2" readonly></DatePicker>
             </FormItem>
           </Form>
         </div>
@@ -165,11 +165,11 @@
               <!--</Select>-->
             <!--</FormItem>-->
             <FormItem label="开始时间" prop="t1">
-              <DatePicker type="date" placeholder="选择日期" style="width: 200px"
+              <DatePicker type="datetime" placeholder="选择日期" style="width: 200px"
                           :value="stepModel.channel_operative.t1" @on-change="setOTime1"></DatePicker>
             </FormItem>
             <FormItem label="结束时间" prop="t2">
-              <DatePicker type="date" placeholder="选择日期" style="width: 200px"
+              <DatePicker type="datetime" placeholder="选择日期" style="width: 200px"
                           :value="stepModel.channel_operative.t2" @on-change="setOTime2"></DatePicker>
             </FormItem>
             <FormItem label="备注">
@@ -203,11 +203,11 @@
               <!--</Select>-->
             <!--</FormItem>-->
             <FormItem label="开始时间" prop="t1">
-              <DatePicker type="date" placeholder="选择日期" style="width: 200px"
+              <DatePicker type="datetime" placeholder="选择日期" style="width: 200px"
                           :value="stepModel.channel_real.t1" @on-change="setRTime1"></DatePicker>
             </FormItem>
             <FormItem label="结束时间" prop="t2">
-              <DatePicker type="date" placeholder="选择日期" style="width: 200px"
+              <DatePicker type="datetime" placeholder="选择日期" style="width: 200px"
                           :value="stepModel.channel_real.t2" @on-change="setRTime2"></DatePicker>
             </FormItem>
             <FormItem label="备注">
@@ -303,7 +303,41 @@
               {
                 title: '状态',
                 key:'status',
-                width: 200
+                width: 200,
+                filters:[
+                  {
+                    label: '运营调配',
+                    value: '运营调配'
+                  },
+                  {
+                    label: '已完成',
+                    value: '已完成'
+                  },
+                  {
+                    label: '拒绝',
+                    value: '拒绝'
+                  }
+                ],
+                filterMultiple:false,
+                filterRemote(value, row){
+                  this.filterValueOne = (!!value[0]) === false ? "" : value[0]
+                  this._setLoading()
+                  let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
+                  this.$http.get(url)
+                    .then(res=>{
+                      res = res.data.data
+                      this.total = res.total
+                      this.setDataArr(res.data)
+                      //utils
+                      this.sources = res.sources
+                      this.plans = res.plans
+//              this.pinlvs = res.pinlvs
+                      this.jihuas = res.jihuas
+                      this.tongxins = res.tongxins
+                      this.zhanTypes = res.zhantypes
+                      this._setLoading()
+                    })
+                }
               },
               {
                 title: '客户联系人',
@@ -649,7 +683,8 @@
         },
         _getData(){
           this._setLoading()
-          this.$http.get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+          let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
+          this.$http.get(url)
             .then(res=>{
               res = res.data.data
               this.total = res.total

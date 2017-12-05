@@ -338,7 +338,45 @@
           {
             title: '服务单状态',
             key: 'status',
-            width: 100,
+            width: 150,
+            filters:[
+              {
+                label: '待派单',
+                value: '待派单'
+              },
+              {
+                label: '已派单',
+                value: '已派单'
+              },
+              {
+                label: '申请完成',
+                value: '申请完成'
+              },
+              {
+                label: '已完成',
+                value: '已完成'
+              },
+              {
+                label: '拒绝',
+                value: '拒绝'
+              }
+            ],
+            filterMultiple:false,
+            filterRemote(value, row){
+              this.filterValueOne = (!!value[0]) === false ? "" : value[0]
+              this._setLoading()
+              let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
+              this.$http.get(url)
+                .then(res=>{
+                  res = res.data.data
+                  this.total = res.total
+                  this.sources = res.sources
+                  this.types = res.types
+                  this.setDataArr(res.data)
+                  this._setLoading()
+                  return
+                })
+            }
           },
           {
             title: '信息来源',
@@ -490,6 +528,32 @@
               }else{
                 return '无'
               }
+            },
+            filters:[
+              {
+                label: '到款',
+                value: '到款'
+              },
+              {
+                label: '未到款',
+                value: '未到款'
+              },
+            ],
+            filterMultiple:false,
+            filterRemote(value, row){
+              this.filterValueTwo = (!!value[0]) === false ? "" : value[0]
+              this._setLoading()
+              let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
+              this.$http.get(url)
+                .then(res=>{
+                  res = res.data.data
+                  this.total = res.total
+                  this.sources = res.sources
+                  this.types = res.types
+                  this.setDataArr(res.data)
+                  this._setLoading()
+                  return
+                })
             }
           },
           {
@@ -756,7 +820,8 @@
       },
       _getData(){
         this._setLoading()
-        this.$http.get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+        let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
+        this.$http.get(url)
           .then(res=>{
             res = res.data.data
             this.total = res.total

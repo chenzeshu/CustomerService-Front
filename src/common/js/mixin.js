@@ -41,6 +41,8 @@ export const curdMixin = {
       this.setUpdateIndex(null)
     },
     _create(){
+      // console.log(this.createModel)
+      // return
       switch (this.url){
         // case "contracts":
         //   this.createModel.type1 = parseInt(this.createModel.type1)
@@ -210,6 +212,8 @@ export const pageMixin = {
       page:1,  //当前页码
       pageSize:10, //单页数目
       total:100,   //数组总数
+      filterValueOne:"",
+      filterValueTwo:"",
     }
   },
   computed:{
@@ -231,9 +235,8 @@ export const pageMixin = {
     onChange(curPage){
       this.page = curPage
       this._setLoading()
-      let _url = `/${this.url}/page/${this.page}/${this.pageSize}`
-      this.$http
-        .get(_url)
+      let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
+      this.$http.get(url)
         .then(res=>{
           res = res.data.data
           this.total = res.total  //数组总数

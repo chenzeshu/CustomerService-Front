@@ -176,7 +176,7 @@
             <div v-else>
               <h1 style="font-size:24px">未填写</h1>
             </div>
-            <i-button @click="_toggleMoneyEdit" style="margin:0 auto;width:200px">编辑</i-button>
+            <i-button @click="_toggleMoneyEdit" style="margin-left:20px;width:200px">编辑</i-button>
           </TabPane>
           <TabPane label="历次回款" icon="social-windows">
             <i-table border :columns="moneyColumn" :data="moneyDetailModel" :width="MoneyTableWidth" :loading="loading"></i-table>
@@ -279,6 +279,41 @@
                 if(this.dataArr[params.index].company){
                   return `${this.dataArr[params.index].company.name}`
                 }
+              }
+            },
+            {
+              title: '是否结清',
+              width: 150,
+              render: (h, params) => {
+                if(this.dataArr[params.index].service_money){
+                  return `${this.dataArr[params.index].service_money.finish}`
+                }
+              },
+              filters:[
+                {
+                  label: '结清',
+                  value: '结清'
+                },
+                {
+                  label: '未结清',
+                  value: '未结清'
+                },
+              ],
+              filterMultiple:false,
+              filterRemote(value, row){
+                this.filterValueOne = (!!value[0]) === false ? "" : value[0]
+                this._setLoading()
+                let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
+                this.$http.get(url)
+                  .then(res=>{
+                    res = res.data.data
+                    this.total = res.total
+                    this.coors = res.coors
+                    this.types = res.types
+                    this.setDataArr(res.data)
+                    this._setLoading()
+                    return
+                  })
               }
             },
             {
@@ -711,7 +746,8 @@
         },
         _getData(){
             this._setLoading()
-            this.$http.get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+            let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
+            this.$http.get(url)
               .then(res=>{
                   res = res.data.data
                   this.total = res.total
