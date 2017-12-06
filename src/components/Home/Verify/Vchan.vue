@@ -48,7 +48,7 @@
                 <div class="info2">
                   <span>通信卫星: <span v-if="item.tongxin[0]">{{ item.tongxin[0].name }}</span> <span style="color:red" v-else>未选择</span></span>
                   <span>极化: <span v-if="item.jihua[0]">{{ item.jihua[0].name }}</span> <span style="color:red" v-else>未选择</span></span>
-                  <span>频率: <span v-if="item.pinlv[0]">{{ item.pinlv[0].name }}</span> <span style="color:red" v-else>未选择</span></span>
+                  <span>带宽: <span v-if="item.daikuan[0]">{{ item.daikuan[0].name }}</span> <span style="color:red" v-else>未选择</span></span>
                   <span>类型:{{ item.type }}</span>
                   <span><div class="icon">
                     <Icon type="clock"></Icon>
@@ -147,9 +147,9 @@
               <Radio :label="t.id" v-for="(t, tk) in jihua" :key="tk">{{t.name}}</Radio>
             </RadioGroup>
           </FormItem>
-          <FormItem label="频率" prop="id4">
+          <FormItem label="带宽" prop="id4">
             <RadioGroup v-model="channel_apply.id4" type="button">
-              <Radio :label="t.id" v-for="(t, tk) in pinlv" :key="tk">{{t.name}}</Radio>
+              <Radio :label="t.id" v-for="(t, tk) in daikuan" :key="tk">{{t.name}}</Radio>
             </RadioGroup>
           </FormItem>
         </Form>
@@ -172,7 +172,7 @@
           PFlag:false,           //通过审核ModelFlag
           contentIndex:null,
           tongxin:[],
-          pinlv:[],
+          daikuan:[],
           jihua:[],
           curDetail:{
             name:null,
@@ -191,7 +191,7 @@
           ruleValidate:{
                 id2:[{type:'number', required: true, message: '选择通信卫星', trigger: 'blur' }],
                 id3:[{type:'number', required: true, message: '选择极化', trigger: 'blur' }],
-                id4:[{type:'number', required: true, message: '选择频率', trigger: 'blur' }],
+                id4:[{type:'number', required: true, message: '选择带宽', trigger: 'blur' }],
           }
       }
     },
@@ -274,7 +274,7 @@
                 this.setDataArr(res.data)
                 this.tongxin = res.tongxin
                 this.jihua = res.jihua
-                this.pinlv = res.pinlv
+                this.daikuan = res.daikuan
                 this.dataCount = this.dataArr.length
                 this.loading = false
               }, err=>{

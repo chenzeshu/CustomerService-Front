@@ -173,7 +173,7 @@
         width="400"
         @on-ok="updateMoney">
         <Form :model="moneyEditModel" :label-width="80">
-          <FormItem label="合同金额">
+          <FormItem label="合同金额(元)">
             <Input v-model.trim="moneyEditModel.money" placeholder="请输入合同总金额"></Input>
           </FormItem>
           <FormItem label="是否分次" prop="type">
@@ -208,7 +208,7 @@
         width="400"
         @on-ok="_createMoneyDetail">
         <Form :model="moneyDetailCreateModel" :label-width="80">
-          <FormItem label="合同金额">
+          <FormItem label="合同金额(元)">
             <Input v-model.trim="moneyDetailCreateModel.money" placeholder="请输入合同总金额"></Input>
           </FormItem>
           <FormItem label="约定日期">
@@ -257,6 +257,11 @@
                      return `${this.dataArr[params.index].company.name}`
                    }
                  }
+               },
+               {
+                 title:'合同金额(元)',
+                 width:160,
+                 key:'money',
                },
                {
                  title: '是否结清',
@@ -325,11 +330,6 @@
                  key: 'deadline',
                  width: 120
                },
-//               {
-//                 title: '合同金额(元)',
-//                 key: 'money',
-//                 width: 150
-//               },
                {
                  title: '合同描述',
                  key: 'desc',

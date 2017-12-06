@@ -104,7 +104,6 @@ export const curdMixin = {
       this.setUpdateObj(Object.assign({}, this.dataArr[index]))
       this.updateModel = Object.assign({}, this.updateObj)
       this.editDefaultList = this.updateModel.document
-      console.log(this.editDefaultList)
     },
     update(){
       switch (this.url){
