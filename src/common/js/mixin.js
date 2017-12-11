@@ -246,3 +246,119 @@ export const pageMixin = {
   }
 }
 
+//回款mixin
+export const moneyMixin = {
+  data(){
+    return {
+      contractMoney:null, //合同金额
+      index:null,
+      moneyId : null,
+      moneyEditModel:{  //详情修改model
+        money:null,
+        t1:null,
+        t2:null
+      },
+      moneyFlag:false,
+      moneyEditFlag:false,
+      moneyModel:{},    //详情展示model
+      moneyDetailModel:[],  //历次回款展示数组model
+    }
+  },
+  methods:{
+    updateMoney(){
+      let url = `${this.url}/updateMoney/${this.moneyId}`
+      if(this.moneyEditModel.type === "不分次"){
+        this.moneyEditModel.num = 1
+      }
+      this.$http.post(url, this.moneyEditModel)
+        .then(res=>{
+          res = res.data
+          if(parseInt(res.code) === 2006){
+            this.$Message.success({
+              'content':res.msg
+            })
+            this._getData()
+            this.moneyFlag = !this.moneyFlag
+            setTimeout(()=>{
+              this.toggleMoney(this.index)
+            }, 1000)
+          }
+        })
+    },
+    toggleMoney(index){
+      this.index = index
+      this.moneyId = this.dataArr[index].id   //不是money表而是contract表的id, 用于orm
+      this.contractMoney = this.dataArr[index].money
+      this.moneyFlag = !this.moneyFlag
+
+      switch (this.url){
+        case "contracts":
+          this.moneyModel = this.$lodash.cloneDeep(this.dataArr[index].service_money)
+          this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[index].service_money.service_money_details)
+          break
+        default : //contractcs
+          this.moneyModel = this.$lodash.cloneDeep(this.dataArr[index].channel_money)
+          this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[index].channel_money.channel_money_details)
+          break
+      }
+
+
+      if(typeof this.moneyModel !== 'undefined'){
+        this.moneyModel.reach = 0
+        this.moneyDetailModel.map((item)=>{
+          this.moneyModel.reach += parseInt(item.money)
+        })
+        this.moneyModel.left = this.contractMoney - this.moneyModel.reach
+      }
+    },
+    _toggleMoneyEdit(){
+      this.moneyEditFlag = !this.moneyEditFlag
+      this.moneyEditModel = this.$lodash.cloneDeep(this.moneyModel)
+      if(this.moneyEditModel.checker){
+        this.setStepObj(this.$lodash.cloneDeep(this.moneyEditModel))
+      }
+    },
+    //回款细节
+    _toggleMoneyDetailCreate(){
+      //校验是否超过次数
+      if(this.moneyDetailModel.length >= this.moneyModel.num){
+        this.$Message.error({
+          'content' : '已达回款分次次数上限',
+          'duration' : 3
+        })
+        return
+      }
+
+      this.moneyDetailCreateFlag = !this.moneyDetailCreateFlag
+    },
+    _createMoneyDetail(){
+      let url = `${this.url}/createMoneyDetail/${this.moneyId}`
+      this.$http.post(url, this.moneyDetailCreateModel)
+        .then(res=>{
+          res = res.data
+          if(parseInt(res.code) === 2006){
+            this.$Message.success({
+              'content':res.msg
+            })
+            this._getData()
+          }
+        })
+    },
+    _updateMoneyDetail(){
+
+    },
+    _deleteMoneyDetail(id){
+      let url = `${this.url}/delMoneyDetail/${id}`
+      this.$http.get(url)
+        .then(res=>{
+          res = res.data
+          if(parseInt(res.code) === 2006){
+            this.$Message.success({
+              'content':res.msg
+            })
+            this._getData()
+          }
+        })
+    },
+  }
+}

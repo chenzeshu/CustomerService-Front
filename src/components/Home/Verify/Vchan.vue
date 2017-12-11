@@ -77,7 +77,7 @@
                 <thead class="ivu-table-header">
                 <tr>
                   <th class="ivu-table-cell">节点</th>
-                  <th class="ivu-table-cell">所属公司</th>
+                  <th class="ivu-table-cell">所属单位</th>
                   <th class="ivu-table-cell">设备型号</th>
                   <th class="ivu-table-cell">设备类型</th>
                   <th class="ivu-table-cell">设备ip</th>
@@ -100,25 +100,21 @@
         </div>
       </div>
 
-      <div class="show-man-detail" v-show="DFlag && curDetail" ref="showWrapper">
-          <span class="name">
+      <ShowDetail class="show-man-detail" ref="showDetail">
+         <span class="name">
                 <div class="icon">
                   <Icon type="person"></Icon>
                 </div>
             姓名: {{ curDetail.name }}</span>
-          <span><div class="icon">
+        <span><div class="icon">
                   <Icon type="home"></Icon>
                 </div>
-            公司: <span>{{ curDetail.company.name }}</span></span>
-          <span><div class="icon">
+            单位: <span>{{ curDetail.company.name }}</span></span>
+        <span><div class="icon">
                   <Icon type="iphone"></Icon>
                 </div>
             手机: <span>{{ curDetail.phone }}</span></span>
-          <span><div class="icon">
-                  <Icon type="email"></Icon>
-                </div>
-            邮箱: <span>{{ curDetail.email }}</span> </span>
-      </div>
+      </ShowDetail>
 
       <br>
       <div class="page-wrapper">
@@ -161,6 +157,7 @@
   import {curdMixin, pageMixin} from 'common/js/mixin'
   import Loading from 'base/Loading/Loading'
   import Split from 'base/Split/Split'
+  import ShowDetail from 'base/Show/ShowDetail'
   export default {
     mixins:[curdMixin, pageMixin],
     data () {
@@ -168,7 +165,6 @@
           url:'apply',
           total:0,
           dataCount : null,
-          DFlag:false,           //detailFlag -- 人物显隐框
           PFlag:false,           //通过审核ModelFlag
           contentIndex:null,
           tongxin:[],
@@ -200,19 +196,13 @@
     },
     methods: {
         showManDetail(key, e){
-            this.DFlag = true
             let emp = this.dataArr[key].employee
             this.curDetail = Object.assign({}, emp)
-            //获得焦点的坐标
-            let rect = e.target.getBoundingClientRect()
-            let x = rect.left + 64
-            let y = rect.top + 32
-            this.$refs.showWrapper.style.position = "fixed"
-            this.$refs.showWrapper.style.top = `${y}px`
-            this.$refs.showWrapper.style.left = `${x}px`
+            //调用组件方法显示细节面板并改变位置
+            this.$refs.showDetail.showManDetail(e)
         },
         closeDetail(){
-          this.DFlag = false
+          this.$refs.showDetail.closeDetail()
         },
         passUpdate(){
             this.passModel.channel_applys[0] = this.channel_apply
@@ -283,7 +273,7 @@
         }
     },
     components:{
-        Loading, Split
+        Loading, Split, ShowDetail
     }
   }
 </script>
@@ -377,19 +367,6 @@
           /* .slide-fade-leave-active for below version 2.1.8 */
           opacity: 0;
   .show-man-detail
-      display flex
-      flex-direction column
-      justify-content space-around
-      align-items flex-start
-      width 340px
-      height 140px
-      padding 4px 20px
-      border 1px solid rgba(7,17,27,0.2)
-      border-radius 5px
-      box-shadow 2px 2px 2px rgb(7,17,27)
-      background #fff
-      font-size 14px
-      z-index 100
       .name
         font-weight:700
         .icon

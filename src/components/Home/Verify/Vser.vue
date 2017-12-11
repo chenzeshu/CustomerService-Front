@@ -25,8 +25,11 @@
             <div class="list-item">
               <div class="item-left">
                 <div class="avatar">
-                  <img src="/static/avatar.png" alt="" width="64" height="64">
-                  <p>提交人</p>
+                  <img src="/static/avatar.png" alt="" width="64" height="64" style="cursor: pointer"
+                       @mouseover="showManDetail(key, $event)"
+                       @mouseleave="closeDetail">
+                  <p class="name1">提交人</p>
+                  <p class="name2">{{ item.refer_man[0].name }}</p>
                 </div>
                 <div class="info1" v-if="item.customer[0]">
                   <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
@@ -69,12 +72,30 @@
           </div>
         </div>
       </div>
+
+      <ShowDetail class="show-man-detail" ref="showDetail">
+         <span class="name">
+                <div class="icon">
+                  <Icon type="person"></Icon>
+                </div>
+            姓名: {{ curDetail.name }}</span>
+        <span><div class="icon">
+                  <Icon type="home"></Icon>
+                </div>
+            单位: <span>{{ curDetail.company.name }}</span></span>
+        <span><div class="icon">
+                  <Icon type="iphone"></Icon>
+                </div>
+            手机: <span>{{ curDetail.phone }}</span></span>
+      </ShowDetail>
     </div>
 </template>
 
 <script>
   import Split from 'base/Split/Split'
   import {curdMixin} from 'common/js/mixin'
+  import ShowDetail from 'base/Show/ShowDetail'
+
   export default {
         mixins:[curdMixin],
         data(){
@@ -82,12 +103,27 @@
               url:"services",
               total:0,
               dataCount : null,
+              curDetail:{
+                name:null,
+                phone:null,
+                email:null,
+                company:{}
+              },
           }
         },
         created(){
           this._getData()
         },
         methods:{
+          showManDetail(key, e){
+            let emp = this.dataArr[key].refer_man[0]
+            this.curDetail = Object.assign({}, emp)
+            //调用组件方法显示细节面板并改变位置
+            this.$refs.showDetail.showManDetail(e)
+          },
+          closeDetail(){
+            this.$refs.showDetail.closeDetail()
+          },
           _pass(id){
               this.$http
                 .get(`/${this.url}/pass/${id}`)
@@ -129,7 +165,7 @@
           }
         },
         components:{
-            Split
+            Split, ShowDetail
         }
     }
 </script>
@@ -183,8 +219,13 @@
               vertical-align top
               width 64px
               height 64px
+              .name1, .name2
+                font-size:14px
+                font-weight 700
+              .name2
+                margin-top 6px
             .info1, .info2
-              flex 0 0 400px
+              flex 0 0 500px
               display flex
               flex-direction column
               flex-wrap: wrap
@@ -202,4 +243,15 @@
             flex 0 0 160px
             width 105px
             margin-top 10px
+    .show-man-detail
+      .name
+        font-weight:700
+        .icon
+          display inline-block
+          width 20px
+          margin-right 20px
+      .icon
+        display inline-block
+        width 20px
+        margin-right 20px
 </style>

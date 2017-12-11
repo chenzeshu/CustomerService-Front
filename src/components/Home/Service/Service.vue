@@ -542,18 +542,7 @@
             filterMultiple:false,
             filterRemote(value, row){
               this.filterValueTwo = (!!value[0]) === false ? "" : value[0]
-              this._setLoading()
-              let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
-              this.$http.get(url)
-                .then(res=>{
-                  res = res.data.data
-                  this.total = res.total
-                  this.sources = res.sources
-                  this.types = res.types
-                  this.setDataArr(res.data)
-                  this._setLoading()
-                  return
-                })
+              this._getData()
             }
           },
           {

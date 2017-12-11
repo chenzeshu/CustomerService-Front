@@ -143,8 +143,8 @@
         :width="MoneyTableWidth + 50">
         <Tabs>
           <TabPane label="回款详情" icon="social-apple" v-if="moneyModel">
-            <div v-if="moneyModel.money">
-              <p class="detail-font">合同金额总计: <span style="font-weight: 700">{{moneyModel.money}} </span> 元</p>
+            <div v-if="contractMoney">
+              <p class="detail-font">合同金额总计: <span style="font-weight: 700">{{contractMoney}} </span> 元</p>
               <p class="detail-font">到款金额总计: <span style="font-weight: 700">{{moneyModel.reach}} </span> 元</p>
               <p class="detail-font">剩余金额总计: <span style="font-weight: 700">{{moneyModel.left }} </span> 元</p>
               <p class="detail-font">是否结清: <span style="font-weight: 700">{{moneyModel.finish }} </span></p>
@@ -173,18 +173,16 @@
         width="400"
         @on-ok="updateMoney">
         <Form :model="moneyEditModel" :label-width="80">
-          <FormItem label="合同金额(元)">
-            <Input v-model.trim="moneyEditModel.money" placeholder="请输入合同总金额"></Input>
-          </FormItem>
           <FormItem label="是否分次" prop="type">
             <RadioGroup v-model="moneyEditModel.type" type="button">
               <Radio label="分次付款"></Radio>
               <Radio label="不分次"></Radio>
             </RadioGroup>
           </FormItem>
-          <FormItem label="分次次数">
+          <FormItem label="分次次数" v-if="moneyEditModel.type === '分次付款'">
             <Input v-model.number="moneyEditModel.num" placeholder="请输入分次次数"></Input>
           </FormItem>
+
           <FormItem label="是否结清">
             <RadioGroup v-model="moneyEditModel.finish" type="button">
               <Radio label="结清"></Radio>
@@ -228,11 +226,11 @@
     import SearchChecker from 'base/SearchEmps/SearchChecker'
     import {mapGetters, mapMutations} from 'vuex'
     import Loading from 'base/Loading/Loading'
-    import {curdMixin, pageMixin} from 'common/js/mixin'
+    import {curdMixin, pageMixin, moneyMixin} from 'common/js/mixin'
     import {uploadMixin} from 'common/js/baseMixin'
 
     export default {
-       mixins:[curdMixin, pageMixin, uploadMixin],
+       mixins:[curdMixin, pageMixin, uploadMixin, moneyMixin],
        data(){
            return {
              url: 'contractcs',
@@ -284,16 +282,7 @@
                  filterMultiple:false,
                  filterRemote(value, row){
                    this.filterValueOne = (!!value[0]) === false ? "" : value[0]
-                   this._setLoading()
-                   let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
-                   this.$http.get(url)
-                     .then(res=>{
-                       res = res.data.data
-                       this.total = res.total
-                       this.setDataArr(res.data)
-                       this._setLoading()
-                       return
-                     })
+                   this._getData()
                  }
                },
                {
@@ -457,17 +446,6 @@
                ]
              },
              //回款
-             index:null,
-             moneyId : null,
-             moneyFlag:false,
-             moneyEditFlag:false,
-             moneyModel:{},    //详情展示model
-             moneyDetailModel:[],  //历次回款展示数组model
-             moneyEditModel:{  //详情修改model
-               money:null,
-               t1:null,
-               t2:null
-             },
              moneyColumn:[
                {
                  title: `序号`,
@@ -528,102 +506,20 @@
            'stepObj'
          ])
        },
-        watch:{
-          dataArr(){
-            if(this.index !== null){
-              this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[this.index].channel_money.channel_money_details)
-            }
-          }
-        },
+       watch:{
+         dataArr(){
+           if(this.index !== null){
+             this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[this.index].channel_money.channel_money_details)
+           }
+         }
+       },
        methods:{
-         //回款细节
+         //回款的一些组件暴露的选择方法, 不放入moneyMixin
          setMoneyCTime1(v){
            this.moneyDetailCreateModel.t1 = v
          },
          setMoneyCTime2(v){
            this.moneyDetailCreateModel.t2 = v
-         },
-         _toggleMoneyDetailCreate(){
-           //校验是否超过次数
-           if(this.moneyDetailModel.length >= this.moneyModel.num){
-             this.$Message.error({
-               'content' : '已达回款分次次数上限',
-               'duration' : 3
-             })
-             return
-           }
-
-
-           this.moneyDetailCreateFlag = !this.moneyDetailCreateFlag
-         },
-         _createMoneyDetail(){
-           let url = `${this.url}/createMoneyDetail/${this.moneyId}`
-           this.$http.post(url, this.moneyDetailCreateModel)
-             .then(res=>{
-               res = res.data
-               if(parseInt(res.code) === 2006){
-                 this.$Message.success({
-                   'content':res.msg
-                 })
-                 this._getData()
-               }
-             })
-         },
-         _updateMoneyDetail(){
-
-         },
-         _deleteMoneyDetail(id){
-           let url = `${this.url}/delMoneyDetail/${id}`
-           this.$http.get(url)
-             .then(res=>{
-               res = res.data
-               if(parseInt(res.code) === 2006){
-                 this.$Message.success({
-                   'content':res.msg
-                 })
-                 this._getData()
-               }
-             })
-         },
-         //回款
-         updateMoney(){
-           let url = `${this.url}/updateMoney/${this.moneyId}`
-           this.$http.post(url, this.moneyEditModel)
-             .then(res=>{
-               res = res.data
-               if(parseInt(res.code) === 2006){
-                 this.$Message.success({
-                   'content':res.msg
-                 })
-                 this._getData()
-                 this.moneyFlag = !this.moneyFlag
-                 setTimeout(()=>{
-                   this.toggleMoney(this.index)
-                 }, 1000)
-               }
-             })
-         },
-         toggleMoney(index){
-           this.index = index
-           this.moneyId = this.dataArr[index].id   //不是money表而是contract表的id, 用于orm
-           this.moneyFlag = !this.moneyFlag
-           this.moneyModel = this.$lodash.cloneDeep(this.dataArr[index].channel_money)
-           this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[index].channel_money.channel_money_details)
-
-           if(typeof this.moneyModel !== 'undefined'){
-             this.moneyModel.reach = 0
-             this.moneyDetailModel.map((item)=>{
-               this.moneyModel.reach += parseInt(item.money)
-             })
-             this.moneyModel.left = this.moneyModel.money - this.moneyModel.reach
-           }
-         },
-         _toggleMoneyEdit(){
-           this.moneyEditFlag = !this.moneyEditFlag
-           this.moneyEditModel = this.$lodash.cloneDeep(this.moneyModel)
-           if(this.moneyEditModel.checker){
-             this.setStepObj(this.$lodash.cloneDeep(this.moneyEditModel))
-           }
          },
          selectCheckerForMoney(v){
            this.moneyEditModel.checker_id = v

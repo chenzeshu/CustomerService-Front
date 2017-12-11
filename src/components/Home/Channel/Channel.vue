@@ -231,9 +231,10 @@
           <thead class="ivu-table-header">
           <tr>
             <th class="ivu-table-cell">节点</th>
-            <th class="ivu-table-cell">所属公司</th>
+            <th class="ivu-table-cell">所属单位</th>
             <th class="ivu-table-cell">设备型号</th>
             <th class="ivu-table-cell">设备类型</th>
+            <th class="ivu-table-cell">设备状态</th>
             <th class="ivu-table-cell">设备ip</th>
             <th class="ivu-table-cell">操作</th>
           </tr>
@@ -244,6 +245,7 @@
             <td class="ivu-table-cell">{{ device.company.name }}</td>
             <td class="ivu-table-cell">{{ device.device.device_id}}</td>
             <td class="ivu-table-cell">{{ device.device.type}}</td>
+            <td class="ivu-table-cell">{{ device.device.status}}</td>
             <td class="ivu-table-cell">{{ device.device.ip}}</td>
             <td class="ivu-table-cell">
               <i-button type="error" size="small" @click="deleteDevice(device)">删除</i-button>
@@ -272,6 +274,18 @@
           </FormItem>
         </Form>
       </Modal>
+      <!--客户联系人弹窗-->
+      <ShowDetail class="show-man-detail" ref="showDetail">
+         <span class="name">
+                <div class="icon">
+                  <Icon type="person"></Icon>
+                </div>
+            姓名: {{ curDetail.name }}</span>
+        <span><div class="icon">
+                  <Icon type="iphone"></Icon>
+                </div>
+            手机: <span>{{ curDetail.phone }}</span></span>
+      </ShowDetail>
     </div>
 </template>
 
@@ -285,6 +299,7 @@
     import {curdMixin, pageMixin} from 'common/js/mixin'
 //    import {uploadMixin} from 'common/js/baseMixin'
     import {mapGetters, mapMutations} from 'vuex'
+    import ShowDetail from 'base/Show/ShowDetail'
 
     export default {
       mixins:[curdMixin, pageMixin],
@@ -293,6 +308,13 @@
               url:"channels",
               sources:[],
               status:['待审核','运营调配', '已完成', '拒绝'],
+              //客户联系人弹窗
+              curDetail:{
+                name:null,
+                phone:null,
+                email:null,
+                company:{}
+              },
               columns:[
               {
                 title: `　`,
@@ -321,22 +343,7 @@
                 filterMultiple:false,
                 filterRemote(value, row){
                   this.filterValueOne = (!!value[0]) === false ? "" : value[0]
-                  this._setLoading()
-                  let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
-                  this.$http.get(url)
-                    .then(res=>{
-                      res = res.data.data
-                      this.total = res.total
-                      this.setDataArr(res.data)
-                      //utils
-                      this.sources = res.sources
-                      this.plans = res.plans
-//              this.pinlvs = res.pinlvs
-                      this.jihuas = res.jihuas
-                      this.tongxins = res.tongxins
-                      this.zhanTypes = res.zhantypes
-                      this._setLoading()
-                    })
+                  this._getData()
                 }
               },
               {
@@ -348,7 +355,19 @@
                   let dom = []
                   if(data && data.length){
                     for(let cus of data){
-                      dom.push(h('Button', {props:{size:'small'}, style: {margin:'3px'},}, cus.name))
+                      dom.push(
+                          h('Button', {
+                              nativeOn:{
+                                mouseover: ($event) => {
+                                  this.showManDetail(params.index, $event)
+                                },
+                                mouseleave: () => {
+                                  this.closeDetail()
+                                }
+                              },
+                              props:{size:'small'},
+                              style: {margin:'3px'},
+                          }, cus.name))
                     }
                     return h('div', [
                       dom
@@ -532,6 +551,16 @@
           this._getData()
       },
       methods:{
+//          客户联系人弹窗
+        showManDetail(key, e){
+          let emp = this.dataArr[key].customer[0]
+          this.curDetail = Object.assign({}, emp)
+          //调用组件方法显示细节面板并改变位置
+          this.$refs.showDetail.showManDetail(e)
+        },
+        closeDetail(){
+          this.$refs.showDetail.closeDetail()
+        },
         addDevice(){
           let body = {
               channel_apply_id:this.apply_id,
@@ -690,9 +719,8 @@
               this.total = res.total
               this.setDataArr(res.data)
               //utils
-              this.sources = res.sources
+              this.sources = res.service_sources
               this.plans = res.plans
-//              this.pinlvs = res.pinlvs
               this.jihuas = res.jihuas
               this.tongxins = res.tongxins
               this.zhanTypes = res.zhantypes
@@ -706,7 +734,7 @@
       },
       components:{
           Loading, NewSearchEmps, NewSearchContract,
-          SearchChecker, NewSearchCompany, ShowDevice
+          SearchChecker, NewSearchCompany, ShowDevice, ShowDetail
       }
     }
 </script>

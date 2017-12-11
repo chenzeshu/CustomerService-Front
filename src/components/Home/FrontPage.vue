@@ -12,10 +12,10 @@
           <MyCard title="未结清普通合同" :num="calData.contract_count"></MyCard>
         </i-col>
         <i-col span="6">
-          <MyCard color="green" title="待审批普通服务" :num="calData.service_count"></MyCard>
+          <MyCard color="green" title="未结清信道合同" :num="calData.contractc_count"></MyCard>
         </i-col>
         <i-col span="6">
-          <MyCard color="red" title="未结清信道合同" :num="calData.contractc_count"></MyCard>
+          <MyCard color="red" title="待审批普通服务" :num="calData.service_count"></MyCard>
         </i-col>
         <i-col span="6">
           <MyCard color="purple" title="待审批信道服务" :num="calData.channel_count"></MyCard>
