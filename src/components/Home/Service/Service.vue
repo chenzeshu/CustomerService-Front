@@ -250,6 +250,18 @@
         </Form>
       </Modal>
 
+      <!--showDetail-->
+      <ShowDetail class="show-man-detail" ref="showDetail">
+         <span class="name">
+                <div class="icon">
+                  <Icon type="person"></Icon>
+                </div>
+            姓名: {{ curDetail.name }}</span>
+        <span><div class="icon">
+                  <Icon type="iphone"></Icon>
+                </div>
+            手机: <span>{{ curDetail.phone }}</span></span>
+      </ShowDetail>
     </div>
 </template>
 
@@ -260,11 +272,19 @@
   import {curdMixin, pageMixin} from 'common/js/mixin'
   import {uploadMixin} from 'common/js/baseMixin'
   import Validator from 'common/js/validator'
+  import ShowDetail from 'base/Show/ShowDetail'
+
   export default {
     mixins:[curdMixin, pageMixin, uploadMixin],
     data(){
       return {
         url: 'services',
+        curDetail:{
+          name:null,
+          phone:null,
+          email:null,
+          company:{}
+        },
         types: [],
         sources: [],
         status:["待审核", "拒绝", "待派单", "已派单", "申请完成", "已完成", "申述中"],
@@ -405,7 +425,14 @@
               let dom = []
               if (refer_man) {
                 for (let man of refer_man) {
-                  dom.push(h('Button', {props: {size: 'small'}, style: {margin: '3px'},}, man.name))
+                  dom.push(h('Button', { nativeOn:{
+                    mouseover: ($event) => {
+                      this.showManDetail(params.index, $event)
+                    },
+                    mouseleave: () => {
+                      this.closeDetail()
+                    }
+                  }, props: {size: 'small'}, style: {margin: '3px'},}, man.name))
                 }
                 return h('div', [
                   dom
@@ -728,6 +755,15 @@
       this._getData()
     },
     methods:{
+      showManDetail(key, e){
+        let emp = this.dataArr[key].customer[0]
+        this.curDetail = Object.assign({}, emp)
+        //调用组件方法显示细节面板并改变位置
+        this.$refs.showDetail.showManDetail(e)
+      },
+      closeDetail(){
+        this.$refs.showDetail.closeDetail()
+      },
       _toggleVisitShow(index){  //showVisit
           this.visitShowModel = Object.assign({}, this.dataArr[index].visits[0])
           this.visitShowFlag = !this.visitShowFlag
@@ -818,12 +854,11 @@
             this.types = res.types
             this.setDataArr(res.data)
             this._setLoading()
-            return
           })
       }
     },
     components:{
-        Loading, NewSearchEmps, NewSearchContract
+        Loading, NewSearchEmps, NewSearchContract, ShowDetail
     }
   }
 </script>

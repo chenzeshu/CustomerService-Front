@@ -17,7 +17,7 @@ export const curdMixin = {
   },
   computed:{
     ...mapGetters([
-      'dataArr', 'updateIndex', 'updateObj'
+      'dataArr', 'updateIndex', 'updateObj', 'stepObj'
     ])
   },
   mounted(){
@@ -101,7 +101,13 @@ export const curdMixin = {
     _toggleUpdate(index){
       this.updateFlag = !this.updateFlag
       this.setUpdateIndex(index)
-      this.setUpdateObj(Object.assign({}, this.dataArr[index]))
+      if(this.url === "channelduty"){
+        this.setStepObj(Object.assign({}, this.dataArr[index]))
+        console.log(index)
+        console.log(this.stepObj)
+      }else{
+        this.setUpdateObj(Object.assign({}, this.dataArr[index]))
+      }
       this.updateModel = Object.assign({}, this.updateObj)
       this.editDefaultList = this.updateModel.document
     },
@@ -197,6 +203,7 @@ export const curdMixin = {
     },
     ...mapMutations({
       setDataArr:'SET_DATAARR',
+      setStepObj:'SET_STEP_OBJ',
       setUpdateIndex:'SET_UPDATEINDEX',
       spliceDataArr:'SPLICE_DATAARR',
       setUpdateObj:'SET_UPDATE_OBJ'

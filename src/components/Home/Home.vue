@@ -114,6 +114,7 @@
               children:[
                 {title:"信道合同", path:'/home/contractc', name:"信道合同"},
                 {title:"信道服务单", path:'/home/channel', name:"信道服务单"},
+                {title:"信道值班表", path:'/home/channelDuty', name:"信道值班表"},
                 {title:"设备列表", path:'/home/device', name:"设备列表"},
                 {title:"套餐列表", path:'/home/plan', name:"套餐列表"},
 //                {title:"测试", path:'/home/test', name:"测试"}

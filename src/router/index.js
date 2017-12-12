@@ -28,7 +28,7 @@ import Info5 from 'comp/Home/UtilsC/info5'
 import Info6 from 'comp/Home/UtilsC/info6'
 import Device from 'comp/Home/Device/Device'
 import Plan from 'comp/Home/Plan/Plan'
-
+import ChannelDuty from 'comp/Home/Channel/ChannelDuty'
 //Verify
 import Vcus from 'comp/Home/Verify/Vcus'
 import Vser from 'comp/Home/Verify/Vser'
@@ -67,6 +67,7 @@ export default new Router({
         {path:'info1', component: Info1},
         {path:'info2', component: Info2},
         {path:'info3', component: Info3},
+        {path:'channelDuty', component: ChannelDuty},
         // {path:'info4', component: Info4}, //频率
         {path:'info5', component: Info5},
         {path:'info6', component: Info6},

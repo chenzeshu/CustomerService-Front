@@ -592,7 +592,7 @@
           this.$http.post(`/channel_apply/deleteRelation`, body)
             .then(res=>{
               res = res.data
-              if(res.code === 2005){
+              if(parseInt(res.code) === 2005){
                 this.$Message.success('成功删除')
                 this.resetModel()
                 this._getData() //其实更好的是做一个refresh接口, 但是这么长的orm都做了, 算了
