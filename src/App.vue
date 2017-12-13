@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <Logo :logined="logined"></Logo>
-
     <!--一级路由-->
     <router-view></router-view>
   </div>
@@ -39,6 +38,7 @@
       },
     },
     methods:{
+
       ...mapMutations({
         setLogined:'SET_LOGINED'
       })

@@ -32,12 +32,22 @@ axios.interceptors.response.use(function (res) {
    if(!!error.response){
      switch (error.response.status){
        case 401:
+         alert('请勿频繁刷新页面')
          //如果是401权限问题, 就将本地loginFlag设false并返回登陆
          saveToLocal('loginFlag', false)
          store.commit('SET_LOGINED', false)
          break
+       case 404:
+         alert('未知请求, 请更换请求或请联系维护者')
+         break
        case 422:
          //如果是422问题, 就重新请求特定的refresh_token_route刷新jwt
+         break
+       case 500:
+         alert('服务端异常, 请联系维护者')
+         //返回登陆页
+         saveToLocal('loginFlag', false)
+         store.commit('SET_LOGINED', false)
          break
        default:
          break

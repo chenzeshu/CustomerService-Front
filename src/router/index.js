@@ -33,6 +33,8 @@ import ChannelDuty from 'comp/Home/Channel/ChannelDuty'
 import Vcus from 'comp/Home/Verify/Vcus'
 import Vser from 'comp/Home/Verify/Vser'
 import Vchan from 'comp/Home/Verify/Vchan'
+import VserTemp from 'comp/Home/Verify/VserTemp'
+import VchanTemp from 'comp/Home/Verify/VchanTemp'
 
 Vue.use(Router)
 
@@ -77,6 +79,8 @@ export default new Router({
         {path:'vcus', component: Vcus},
         {path:'vser', component: Vser},
         {path:'vchan', component: Vchan},
+        {path:'vserTemp', component: VserTemp},
+        {path:'vchanTemp', component: VchanTemp},
       ]
     }
   ]
