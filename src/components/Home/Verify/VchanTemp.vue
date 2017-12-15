@@ -3,9 +3,9 @@
 
       <!--wrapper-->
 
-      <!--假若没有申请-->
+      <!--假若没有申请或权限不够-->
       <div class="vchan-empty" v-if="total === 0">
-        <span class="no-verify">暂时没有走临时合同的新申请</span>
+        <span class="no-verify">{{ serverRes }}</span>
       </div>
 
       <!--存在申请-->
@@ -14,7 +14,7 @@
         <div class="title">
           <div class="left-title">
             待审核[临时]信道服务单({{total}})
-            </div>
+          </div>
           <div class="right-title">
             <a href="#" style="color:#2d8cf0" @click.prevent="_getData">
               <Icon type="ios-loop-strong"></Icon>
@@ -170,6 +170,7 @@
           tongxin:[],
           daikuan:[],
           jihua:[],
+          serverRes:null,
           curDetail:{
             name:null,
             phone:null,
@@ -254,18 +255,28 @@
             })
         },
         _getData(){
+          this.loading = !this.loading
           this.$http
             .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
             .then( res => {
               res = res.data.data
               this.$nextTick(()=>{
-                this.$Message.info(`有${res.total}条数据`);
-                this.total = res.total
-                this.setDataArr(res.data)
-                this.tongxin = res.tongxin
-                this.jihua = res.jihua
-                this.daikuan = res.daikuan
-                this.dataCount = this.dataArr.length
+                if(parseInt(res.code) === -4001){
+                  this.total = 0;
+                  this.serverRes = "你没有权限"
+                }else if(parseInt(res.total) === 0){
+                  this.total = 0;
+                  this.serverRes = "暂时没有新申请"
+                }
+                else{
+                  this.$Message.info(`有${res.total}条数据`);
+                  this.total = res.total
+                  this.setDataArr(res.data)
+                  this.tongxin = res.tongxin
+                  this.jihua = res.jihua
+                  this.daikuan = res.daikuan
+                  this.dataCount = this.dataArr.length
+                }
                 this.loading = !this.loading
               }, err=>{
               })

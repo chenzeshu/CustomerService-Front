@@ -164,7 +164,6 @@
         @on-ok="_delete">
         <p>确定要删除合同?</p>
       </Modal>
-
       <!--回款情况-->
       <Modal
         v-model="moneyFlag"
@@ -194,7 +193,6 @@
           </TabPane>
         </Tabs>
       </Modal>
-
       <!--回款详情编辑-->
       <Modal
         v-model="moneyEditFlag"
@@ -245,6 +243,40 @@
           </FormItem>
         </Form>
       </Modal>
+      <!--套餐使用情况-->
+      <Modal
+        v-model="planFlag"
+        title="合同套餐详情"
+        width="800"
+     >
+        <i-table border :columns="planColumns" :data="planModel" :loading="loading"></i-table>
+        <br>
+        <i-button type="primary" @click="_toggleAddPlan">新增套餐</i-button>
+      </Modal>
+
+      <!--添加套餐-->
+      <Modal
+        v-model="planCreateFlag"
+        title="为合同添加套餐"
+        width="400"
+        @on-ok="addPlan">
+        <Form :model="planCreateModel" :label-width="80">
+          <FormItem label="协作单位">
+            <Select v-model.trim="planCreateModel.plan_id" placeholder="请选择套餐">
+              <Option :value="c.id" v-for="(c, ck) in contract_plans" :key="ck">{{c.name}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="填写次数">
+            <Input v-model.number="planCreateModel.total" placeholder="请输入次数"></Input>
+          </FormItem>
+          <FormItem label="标准/规格">
+            <Input v-model.trim="planCreateModel.desc" placeholder="请输入标准/规格" type="textarea"></Input>
+          </FormItem>
+          <FormItem label="备注">
+            <Input v-model.trim="planCreateModel.remark" placeholder="有备注吗?" type="textarea"></Input>
+          </FormItem>
+        </Form>
+      </Modal>
     </div>
 </template>
 
@@ -257,7 +289,6 @@
   import {uploadMixin} from 'common/js/baseMixin'
   import {mapGetters, mapMutations} from 'vuex'
 
-
   export default {
     mixins:[curdMixin, pageMixin, uploadMixin, moneyMixin],
     data(){
@@ -265,6 +296,7 @@
           url:'contracts',
           types:[],
           coors:[],
+          contract_plans:[],
           columns:[
             {
               title: `　合同编号`,
@@ -419,7 +451,22 @@
               width: 200,
               fixed:'right',
               render: (h, params) => {
+                  let planNum = params.row.contract_plans && params.row.contract_plans.length
                 return h('div', [
+                  h('Button', {
+                    props: {
+                      type: 'default',
+                      size: 'small'
+                    },
+                    style: {
+                      marginRight: '5px'
+                    },
+                    on: {
+                      click: () => {
+                        this._togglePlans(params.index)
+                      }
+                    }
+                  }, `${planNum}个套餐`),
                   h('Button', {
                     props: {
                       type: 'default',
@@ -570,6 +617,78 @@
           //回款细节
           moneyDetailCreateFlag:false,
           moneyDetailCreateModel:{},
+          //套餐详情
+          planFlag:false,
+          planCreateFlag:false,
+          contract_id : null, //用于存储打开时的合同id便于ORM
+          planIndex:null,  //用于更新planModel
+          planChanged:0,
+          planColumns:[
+            {
+              title:"#",
+              key:"id",
+              width:60,
+            },
+            {
+              title:"名称",
+              key:"name",
+              width:150,
+              render: (h, params) => {
+                return params.row.plan_util.name
+              }
+            },
+            {
+              title:"总数",
+              key:"total",
+              width:80,
+            },
+            {
+              title:"单位",
+              key:"unit",
+              width:120,
+              render: (h, params) => {
+                return params.row.plan_util.unit
+              }
+            },
+            {
+              title:"已使用",
+              key:"use",
+              width:80
+            },
+            {
+              title:"描述",
+              key:"desc",
+              width:300,
+            },
+            {
+              title:"备注",
+              key:"remark",
+              width:150,
+            },
+            {
+              title:"操作",
+              align: "center",
+              width: 100,
+              fixed:'right',
+              render: (h, params) => {
+                return h('div', [
+                  h('Button', {
+                    props: {
+                      type: 'error',
+                      size: 'small'
+                    },
+                    on: {
+                      click: () => {
+                        this._togglePlanDelete(params.row.id)
+                      }
+                    }
+                  }, '删除')
+                ]);
+              }
+            }
+          ],
+          planModel:[],
+          planCreateModel:{}
         }
     },
     mounted(){
@@ -585,71 +704,63 @@
         if(this.index !== null){
           this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[this.index].service_money.service_money_details)
         }
+        if(this.planIndex !== null){
+          this.planModel = this.$lodash.cloneDeep(this.dataArr[this.planIndex].contract_plans)
+        }
       }
     },
     methods:{
+      //套餐详情
+        _togglePlans(index){
+            this.planIndex = index
+            this.contract_id = this.dataArr[index].id
+            this.planModel = this.$lodash.cloneDeep(this.dataArr[index].contract_plans)
+            this.planFlag = !this.planFlag
+        },
+        _toggleAddPlan(){
+            this.planCreateFlag = !this.planCreateFlag
+        },
+        addPlan(){
+          let url = `/${this.url}/addPlan/${this.contract_id}`
+          this.$http.post(url, this.planCreateModel)
+            .then(res=>{
+              if(parseInt(res.data.code) === 2004){
+                this._getData()
+              }
+            })
+        },
+        _togglePlanDelete(id){
+          let url = `/${this.url}/deletePlan/${id}`
+          this.$http
+            .get(url)
+            .then(res=>{
+                if(parseInt(res.data.code) === 2006){
+                    this._getData()
+                }
+            })
+        },
       //回款的一些组件暴露的选择方法, 不放入moneyMixin
-        setMoneyCTime1(v){
-          this.moneyDetailCreateModel.t1 = v
-        },
-        setMoneyCTime2(v){
-          this.moneyDetailCreateModel.t2 = v
-        },
-        selectCheckerForMoney(v){
-            this.moneyEditModel.checker_id = v
-        },
-        setMoneyTime1(v){
-            this.moneyEditModel.t1 = v
-        },
-        setMoneyTime2(v){
-            this.moneyEditModel.t2 = v
-        },
+        setMoneyCTime1(v){this.moneyDetailCreateModel.t1 = v},
+        setMoneyCTime2(v){this.moneyDetailCreateModel.t2 = v},
+        selectCheckerForMoney(v){this.moneyEditModel.checker_id = v},
+        setMoneyTime1(v){this.moneyEditModel.t1 = v},
+        setMoneyTime2(v){this.moneyEditModel.t2 = v},
         //CURD
-        showList(){
-          console.log(this.fileList)
-        },
-        newSelectCompanyForC(v){
-          this.createModel.company_id = v
-        },
-        newSelectCompanyForU(v){
-          this.updateModel.company_id = v
-        },
-        newSelectEmpForPMC(v){
-          this.createModel.PM = v
-        },
-        newSelectEmpForTMC(v){
-          this.createModel.TM = v
-        },
-        newSelectEmpForPMU(v){
-          this.updateModel.PM = v
-        },
-        newSelectEmpForTMU(v){
-          this.updateModel.TM = v
-        },
-        setCTime1(date){
-          this.createModel.time1 = date
-        },
-        setCTime2(date){
-          this.createModel.time2 = date
-        },
-        setCTime3(date){
-          this.createModel.time3 = date
-        },
-        setUTime1(date){
-          this.updateModel.time1 = date
-        },
-        setUTime2(date){
-          this.updateModel.time2 = date
-        },
-        setUTime3(date){
-          this.updateModel.time3 = date
-        },
-        selectCompanyIdForC(v){
-          this.createModel.company_id = v
-        },
-        selectCompanyIdForU(v){
-          this.updateModel.company_id = v
-        },
+        showList(){console.log(this.fileList)},
+        newSelectCompanyForC(v){this.createModel.company_id = v},
+        newSelectCompanyForU(v){this.updateModel.company_id = v},
+        newSelectEmpForPMC(v){this.createModel.PM = v},
+        newSelectEmpForTMC(v){this.createModel.TM = v},
+        newSelectEmpForPMU(v){this.updateModel.PM = v},
+        newSelectEmpForTMU(v){this.updateModel.TM = v},
+        setCTime1(date){this.createModel.time1 = date},
+        setCTime2(date){this.createModel.time2 = date},
+        setCTime3(date){this.createModel.time3 = date},
+        setUTime1(date){this.updateModel.time1 = date},
+        setUTime2(date){this.updateModel.time2 = date},
+        setUTime3(date){this.updateModel.time3 = date},
+        selectCompanyIdForC(v){this.createModel.company_id = v},
+        selectCompanyIdForU(v){this.updateModel.company_id = v},
         _getData(){
             this._setLoading()
             let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
@@ -659,6 +770,7 @@
                   this.total = res.total
                   this.coors = res.coors
                   this.types = res.contract_types
+                  this.contract_plans = res.contract_plans
                   this.setDataArr(res.data)
                   this._setLoading()
               })

@@ -19,6 +19,9 @@ import ServiceSource from 'comp/Home/Utils/ServiceSource'
 import Profession from 'comp/Home/Utils/Profession'
 import File from 'comp/Home/Utils/File'
 
+//contract utils
+import ContractPlan from 'comp/Home/Contract/ContractPlan'
+
 //channel utils
 import Info1 from 'comp/Home/UtilsC/info1'
 import Info2 from 'comp/Home/UtilsC/info2'
@@ -65,6 +68,7 @@ export default new Router({
         {path:'serviceSource', component: ServiceSource},
         {path:'profession', component: Profession},
         {path:'file', component: File},
+        {path:'contractPlan', component: ContractPlan},
         //utilsC
         {path:'info1', component: Info1},
         {path:'info2', component: Info2},

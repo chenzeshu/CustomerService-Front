@@ -107,7 +107,8 @@
               name:"5",
               children:[
                 {title:"服务合同", path:'/home/contract', name:"服务合同"},
-                {title:"普通服务单", path:'/home/service', name:"普通服务单"}
+                {title:"普通服务单", path:'/home/service', name:"普通服务单"},
+                {title:"服务套餐表", path:'/home/contractPlan', name:"服务套餐表"}
               ]
             },
             {
@@ -129,7 +130,7 @@
                 {title:"外协单位", path:'/home/coor', name:"外协单位"},
                 {title:"合同类型", path:'/home/contractType', name:"合同类型"},
                 {title:"服务信息来源", path:'/home/serviceSource', name:"服务信息来源"},
-                {title:"服务类型", path:'/home/serviceType', name:"服务类型"},
+//                {title:"服务类型", path:'/home/serviceType', name:"服务类型"},
                 {title:"行业列表", path:'/home/profession', name:"行业列表"},
                 {title:"文件列表", path:'/home/file', name:"文件列表"},
               ]

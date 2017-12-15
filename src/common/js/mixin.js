@@ -112,6 +112,8 @@ export const curdMixin = {
       this.editDefaultList = this.updateModel.document
     },
     update(){
+      // console.log(this.updateModel)
+      // return
       switch (this.url){
         case "contracts":
           this.updateModel.type1 = parseInt(this.updateModel.type1)
