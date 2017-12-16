@@ -23,7 +23,7 @@
           <FormItem label="套餐名称">
             <Input v-model.trim="createModel.name" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="单位">
+          <FormItem label="计量单位">
             <Input v-model.trim="createModel.unit" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="描述">
@@ -45,8 +45,18 @@
           <FormItem label="套餐名称">
             <Input v-model.trim="updateModel.name" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="单位">
+          <FormItem label="计量单位">
             <Input v-model.trim="updateModel.unit" placeholder="请输入"></Input>
+          </FormItem>
+          <FormItem label="套餐类型">
+            <RadioGroup v-model="updateModel.type2" type="button">
+              <Radio :label="t" v-for="t in type2" :key="t"></Radio>
+            </RadioGroup>
+          </FormItem>
+          <FormItem label="有无计划">
+            <RadioGroup v-model="updateModel.type" type="button">
+              <Radio :label="t" v-for="t in type" :key="t"></Radio>
+            </RadioGroup>
           </FormItem>
           <FormItem label="描述">
             <Input v-model.trim="updateModel.desc" placeholder="请输入" type="textarea"></Input>
@@ -67,6 +77,8 @@
         data(){
             return {
                 url:"contract_plans",
+                type:['无计划', '有计划'],
+                type2:['普通', '财务', '其他'],
                 columns:[
                   {
                       title:"#",
@@ -79,9 +91,19 @@
                       width:150,
                   },
                   {
-                    title:"单位",
+                    title:"计量单位",
                     key:"unit",
                     width:120,
+                  },
+                  {
+                    title:"套餐类型",
+                    key:"type2",
+                    width:100
+                  },
+                  {
+                    title:"计划类型",
+                    key:"type",
+                    width:100
                   },
                   {
                     title:"描述",

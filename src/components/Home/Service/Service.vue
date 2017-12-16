@@ -27,10 +27,13 @@
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="服务类型" prop="type">
-            <Select v-model="createModel.type">
-              <Option v-for="(t, tk) in types" :key="tk" :value="t.id">{{t.name}}</Option>
+          <FormItem label="套餐类型" prop="type">
+            <Select v-model="createModel.type" v-if="curPlans">
+              <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
             </Select>
+          </FormItem>
+          <FormItem label="套餐用量" v-if="_checkPlanForC()">
+            <Input v-model.trim="createModel.plan_num" placeholder="套餐用量默认为1"></Input>
           </FormItem>
           <FormItem label="服务单编号" prop="service_id">
             <Input v-model.trim="createModel.service_id" placeholder="请输入"></Input>
@@ -113,11 +116,16 @@
         @on-ok="update">
         <!--@on-cancel="cancel"-->
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
-          <!--自动生成 + 手工填写-->
-          <FormItem label="服务类型" prop="type">
-            <Select v-model="updateModel.type">
-              <Option v-for="(t, tk) in types" :key="tk" :value="t.id">{{t.name}}</Option>
+          <!--合同编号自动生成 + 手工填写-->
+
+          <FormItem label="套餐类型" prop="type">
+            <Select v-model="updateModel.type" v-if="curPlans">
+              <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
             </Select>
+          </FormItem>
+          <FormItem label="套餐用量" v-if="_checkPlanForC()">
+            <!--做validate时, 一定要做正负判断-->
+            <Input v-model.number="updateModel.plan_num" placeholder="套餐用量默认为1"></Input>
           </FormItem>
           <FormItem label="服务单编号" prop="service_id">
             <Input v-model.trim="updateModel.service_id" placeholder="请输入"></Input>
@@ -419,7 +427,7 @@
           {
             title: '申请人',
             key: 'refer_man',
-            width: 200,
+            width: 100,
             render: (h, params) => {
               let refer_man = this.dataArr[params.index].refer_man
               let dom = []
@@ -445,7 +453,7 @@
           {
             title: '服务员工',
             key: 'man',
-            width: 300,
+            width: 200,
             render: (h, params) => {
               let data = this.dataArr[params.index].man
               let dom = []
@@ -464,7 +472,7 @@
           {
             title: '客户联系人',
             key: 'customer',
-            width: 300,
+            width: 100,
             render: (h, params) => {
               let data = this.dataArr[params.index].customer
               let dom = []
@@ -498,12 +506,12 @@
           {
             title: '问题描述',
             key: 'desc1',
-            width: 120
+            width: 200
           },
           {
             title: '处理描述',
             key: 'desc2',
-            width: 120
+            width: 200
           },
           {
             "title":"回访记录",
@@ -580,7 +588,7 @@
           {
             title: '备注',
             key: 'remark',
-            width: 120
+            width: 200
           },
           {
             title: '文件',
@@ -657,6 +665,7 @@
           }
         ],
         createModel: {
+          plan_num : 1,
           contract_id: null,  //合同id
           service_id:null,
           status:null,
@@ -680,6 +689,7 @@
           allege:null
         },
         updateModel: {
+          plan_num : 1, //套餐用量
           contract_id: null,  //合同id
           service_id:null,
           status:null,
@@ -731,6 +741,9 @@
           time1: [
             {required: true, message: '请填写受理日期', trigger: 'blur'}
           ],
+          plan_num : [
+              //  做validate时, 一定要做正负判断, 不然被恶意增加了负数就杯具了
+          ]
         },
         ruleValidateVisit:{
           visitor:[
@@ -748,13 +761,26 @@
           time: [
             {required: true, message: '请填写回访日期', trigger: 'blur'}
           ],
-        }
+        },
+        curPlans:[],//用于承载根据合同id检索到的合同下的套餐
       }
     },
     created(){
       this._getData()
     },
     methods:{
+        //校验是否是金钱套餐
+      _checkPlanForC(){
+          let id = this.createdModel && this.createdModel.type
+          let uid = !!this.updateModel && this.updateModel.type
+          let choose = this.curPlans.filter((item)=>{
+              return item.plan_util && item.plan_util.type2 === "财务" && (item.id === id || item.id === uid)
+          })
+          return choose.length > 0 ? true : false
+      },
+      _checkPlanForU(){
+          //iview的input的方法都同时触发了, 看ForC即可
+      },
       showManDetail(key, e){
         let emp = this.dataArr[key].customer[0]
         this.curDetail = Object.assign({}, emp)
@@ -802,7 +828,17 @@
         })
       },
       selectContractForC(contract_id){
-        this.createModel.contract_id = contract_id
+          //FIXME-提醒 由于代码没有深入到iview组件的watch, 所以写在统一组件的C和U都有用
+          if(typeof contract_id !== 'object'){
+            this.createModel.contract_id = contract_id
+            this.$http(`contracts/getContractPlans/${contract_id}`).then(res=>{
+              this.curPlans = res.data.data
+              this.$Message.info({
+                'content': `所属合同下有${this.curPlans.length}个套餐`,
+                'duration':3
+              })
+            })
+          }
       },
       selectContractForU(contract_id){
         this.updateModel.contract_id = contract_id

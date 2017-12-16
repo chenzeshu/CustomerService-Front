@@ -34,9 +34,7 @@
     },
     created(){
         this.$watch('query', debounce(()=>{
-          if(!!this.query == false){
-              return
-          }
+          if(typeof this.query === "object" || !!this.query === false) return;
           this.loading = true;
           this.$http
             .get(`/employees/sc/${this.query}`)
@@ -48,7 +46,7 @@
     },
     methods: {
       wannaUpdate(v){
-          if(!v) return;
+        if(!v) return;
         this.$emit('on-select', v)
       },
       _reset(){

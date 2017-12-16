@@ -60,7 +60,7 @@
           <FormItem label="验收日期">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime2"></DatePicker>
           </FormItem>
-          <FormItem label="质保截止">
+          <FormItem label="失效日期">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime3"></DatePicker>
           </FormItem>
           <FormItem label="上传文件">
@@ -129,7 +129,7 @@
           <FormItem label="验收日期">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time2" @on-change="setUTime2"></DatePicker>
           </FormItem>
-          <FormItem label="质保截止">
+          <FormItem label="失效日期">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time3" @on-change="setUTime3"></DatePicker>
           </FormItem>
           <FormItem label="上传文件">
@@ -422,7 +422,7 @@
               width: 120
             },
             {
-              title: '质保截止日期',
+              title: '失效日期',
               key: 'time3',
               width: 120
             },
@@ -521,7 +521,7 @@
 //                money: null,  //合同金额 2位小数
                 time1: null,  //签订日期
                 time2: null,  //验收日期
-                time3: null,  //质保截止日期
+                time3: null,  //失效日期
                 type1: null,   //合同类型
                 type2: null,    //合同签订类型
                 coor : null,   //外协单位id 多选,值格式 1,2,3

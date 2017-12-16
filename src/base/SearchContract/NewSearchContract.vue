@@ -45,6 +45,7 @@
     created(){
       this.$watch('query', debounce(()=>{
         this.loading = true;
+        if(typeof this.query === "object" || !!this.query === false) return;
 
         if(this.type === "channel"){
           this.$http

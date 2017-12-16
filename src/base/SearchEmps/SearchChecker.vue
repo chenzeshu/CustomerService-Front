@@ -66,7 +66,7 @@
       this.$watch('query', debounce(()=>{
         //switch高阶写法
         this.searchType = { 'CUS' : "out"}[this.type] || "inner"
-
+        if(typeof this.query === "object" || !!this.query === false) return;
         this.loading = true;
         this.$http
           .get(`/employees/se/${this.searchType}/${this.query}`)

@@ -83,6 +83,12 @@ export const curdMixin = {
                 if(!!this.fileList){
                   this.setFileList([])
                 }
+              }else{
+                //后台throw new Excetion
+                this.$Message.warning({
+                  content:res.msg,
+                  duration:3
+                });
               }
             }).catch(error=>{
               let text = error.response.data.errors
@@ -102,13 +108,13 @@ export const curdMixin = {
       this.updateFlag = !this.updateFlag
       this.setUpdateIndex(index)
       if(this.url === "channelduty"){
-        this.setStepObj(Object.assign({}, this.dataArr[index]))
+        this.setStepObj(this.$lodash.cloneDeep(this.dataArr[index]))
         console.log(index)
         console.log(this.stepObj)
       }else{
-        this.setUpdateObj(Object.assign({}, this.dataArr[index]))
+        this.setUpdateObj(this.$lodash.cloneDeep(this.dataArr[index]))
       }
-      this.updateModel = Object.assign({}, this.updateObj)
+      this.updateModel = this.$lodash.cloneDeep(this.dataArr[index])
       this.editDefaultList = this.updateModel.document
     },
     update(){
@@ -154,6 +160,13 @@ export const curdMixin = {
                 this.setFileList([])
               }
 
+            }
+            else{
+              //后台throw new Excetion
+              this.$Message.warning({
+                content:res.msg,
+                duration:3
+              });
             }
           }, err => {
             this.$Message.error('修改失败');
