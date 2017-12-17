@@ -261,16 +261,16 @@
         width="400"
         @on-ok="addPlan">
         <Form :model="planCreateModel" :label-width="80">
-          <FormItem label="协作单位">
+          <FormItem label="套餐类型">
             <Select v-model.trim="planCreateModel.plan_id" placeholder="请选择套餐">
               <Option :value="c.id" v-for="(c, ck) in contract_plans" :key="ck">{{c.name}}</Option>
             </Select>
           </FormItem>
+          <FormItem label="标准/规格描述(别名)">
+            <Input v-model.trim="planCreateModel.desc" placeholder="请输入标准/规格描述(别名)" type="textarea"></Input>
+          </FormItem>
           <FormItem label="填写次数">
             <Input v-model.number="planCreateModel.total" placeholder="请输入次数"></Input>
-          </FormItem>
-          <FormItem label="标准/规格">
-            <Input v-model.trim="planCreateModel.desc" placeholder="请输入标准/规格" type="textarea"></Input>
           </FormItem>
           <FormItem label="备注">
             <Input v-model.trim="planCreateModel.remark" placeholder="有备注吗?" type="textarea"></Input>
@@ -630,9 +630,14 @@
               width:60,
             },
             {
-              title:"名称",
-              key:"name",
+              title:"描述(别名)",
+              key:"desc",
               width:150,
+            },
+            {
+              title:"套餐原名",
+              key:"name",
+              width:120,
               render: (h, params) => {
                 return params.row.plan_util.name
               }
@@ -654,11 +659,6 @@
               title:"已使用",
               key:"use",
               width:80
-            },
-            {
-              title:"描述",
-              key:"desc",
-              width:300,
             },
             {
               title:"备注",

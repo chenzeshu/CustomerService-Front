@@ -26,6 +26,8 @@
         @on-ok="_create">
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
+          <NewSearchContract @on-select="selectContractForC"></NewSearchContract>
+
           <!--自动生成 + 手工填写-->
           <FormItem label="套餐类型" prop="type">
             <Select v-model="createModel.type" v-if="curPlans">
@@ -38,7 +40,6 @@
           <FormItem label="服务单编号" prop="service_id">
             <Input v-model.trim="createModel.service_id" placeholder="请输入"></Input>
           </FormItem>
-          <NewSearchContract @on-select="selectContractForC"></NewSearchContract>
           <FormItem label="信息来源" prop="source">
             <Select v-model="createModel.source">
               <Option v-for="(s, sk) in sources" :key="sk" :value="s.id">{{s.name}}</Option>
@@ -116,21 +117,20 @@
         @on-ok="update">
         <!--@on-cancel="cancel"-->
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
+          <NewSearchContract @on-select="selectContractForU"></NewSearchContract>
           <!--合同编号自动生成 + 手工填写-->
-
           <FormItem label="套餐类型" prop="type">
-            <Select v-model="updateModel.type" v-if="curPlans">
+            <Select v-model="updateModel.type" v-if="curPlans" disabled>
               <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
             </Select>
           </FormItem>
           <FormItem label="套餐用量" v-if="_checkPlanForC()">
             <!--做validate时, 一定要做正负判断-->
-            <Input v-model.number="updateModel.plan_num" placeholder="套餐用量默认为1"></Input>
+            <Input v-model.number="updateModel.plan_num" placeholder="套餐用量默认为1" readonly></Input>
           </FormItem>
           <FormItem label="服务单编号" prop="service_id">
             <Input v-model.trim="updateModel.service_id" placeholder="请输入"></Input>
           </FormItem>
-          <NewSearchContract @on-select="selectContractForU"></NewSearchContract>
           <FormItem label="信息来源" prop="source">
             <Select v-model="updateModel.source">
               <Option v-for="(s, sk) in sources" :key="sk" :value="s.id">{{s.name}}</Option>

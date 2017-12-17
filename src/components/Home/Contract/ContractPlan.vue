@@ -66,6 +66,16 @@
           </FormItem>
         </Form>
       </Modal>
+
+      <!--delete-->
+      <Modal
+        v-model="deleteFlag"
+        title="删除"
+        @on-ok="_delete">
+        <p style="color: red;font-size:14px;font-weight: 700;">
+          注意, 删除本套餐很可能造成相关合同错乱!!!
+        </p>
+      </Modal>
     </div>
 </template>
 

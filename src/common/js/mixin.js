@@ -90,6 +90,7 @@ export const curdMixin = {
                   duration:3
                 });
               }
+              this.createModel = {}
             }).catch(error=>{
               let text = error.response.data.errors
               let content = ''
