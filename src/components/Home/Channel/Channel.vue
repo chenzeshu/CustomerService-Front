@@ -30,14 +30,29 @@
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
           <!--自动生成 + 手工填写-->
+          <NewSearchContract @on-select="selectContractForC" type="channel"></NewSearchContract>
+          <FormItem label="套餐">
+            <Select v-model.number="createModel.id1" style="width:200px">
+              <Option v-for="s in curPlans" :value="s.id" :key="s.id">{{s.alias}}</Option>
+            </Select>
+
+            <!--fixme 后面再做一个选中套餐后提示剩余时间-->
+
+          </FormItem>
           <FormItem label="服务单编号" prop="channel_id">
             <Input v-model.trim="createModel.channel_id" placeholder="请输入"></Input>
           </FormItem>
-          <NewSearchContract @on-select="selectContractForC" type="channel"></NewSearchContract>
+          <FormItem label="用星类型" prop="type">
+            <RadioGroup v-model="createModel.type" type="button">
+              <Radio label="外部用星"></Radio>
+              <Radio label="内部用星"></Radio>
+            </RadioGroup>
+          </FormItem>
           <NewSearchEmps @on-select="selectEmpForCus" type="CUS"></NewSearchEmps>
           <FormItem label="状态" prop="status">
             <Select v-model="createModel.status" style="width:200px">
-              <Option v-for="item in status" :value="item" :key="item">{{ item }}</Option>
+              <!--<Option v-for="item in status" :value="item" :key="item">{{ item }}</Option>-->
+              <Option value="待审核">待审核</Option>
             </Select>
           </FormItem>
           <FormItem label="来源" prop="source">
@@ -45,11 +60,23 @@
               <Option v-for="s in sources" :value="s.id" :key="s.id">{{s.name}}</Option>
             </Select>
           </FormItem>
-          <FormItem label="用星类型" prop="type">
-            <RadioGroup v-model="createModel.type" type="button">
-              <Radio label="外部用星"></Radio>
-              <Radio label="内部用星"></Radio>
-            </RadioGroup>
+          <FormItem label="通信卫星">
+            <Select v-model.number="createModel.id2" style="width:200px">
+              <Option v-for="item in tongxins" :value="item.id" :key="item.id">{{ item.name }}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="极化">
+            <Select v-model.number="createModel.id3" style="width:200px">
+              <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="开始时间" prop="t1">
+            <DatePicker type="datetime" placeholder="选择日期" style="width: 200px"
+                        :value="createModel.t1" @on-change="setCTime1"></DatePicker>
+          </FormItem>
+          <FormItem label="结束时间" prop="t2">
+            <DatePicker type="datetime" placeholder="选择日期" style="width: 200px"
+                        :value="createModel.t2" @on-change="setCTime2"></DatePicker>
           </FormItem>
         </Form>
       </Modal>
@@ -63,10 +90,21 @@
         <!--@on-cancel="cancel"-->
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
           <!--自动生成 + 手工填写-->
+          <NewSearchContract @on-select="selectContractForU" type="channel"></NewSearchContract>
+          <FormItem label="套餐">
+            <Select v-model.number="updateModel.id1" style="width:200px">
+              <Option v-for="s in curPlans" :value="s.id" :key="s.id">{{s.alias}}</Option>
+            </Select>
+          </FormItem>
           <FormItem label="服务单编号" prop="channel_id">
             <Input v-model.trim="updateModel.channel_id" placeholder="请输入"></Input>
           </FormItem>
-          <NewSearchContract @on-select="selectContractForU" type="channel"></NewSearchContract>
+          <FormItem label="用星类型" prop="type">
+            <RadioGroup v-model="updateModel.type" type="button">
+              <Radio label="外部用星"></Radio>
+              <Radio label="内部用星"></Radio>
+            </RadioGroup>
+          </FormItem>
           <NewSearchEmps @on-select="selectEmpForCusU" type="CUS"></NewSearchEmps>
           <FormItem label="状态" prop="status">
             <Select v-model="updateModel.status" style="width:200px">
@@ -77,12 +115,6 @@
             <Select v-model.number="updateModel.source" style="width:200px">
               <Option v-for="s in sources" :value="s.id" :key="s.id">{{s.name}}</Option>
             </Select>
-          </FormItem>
-          <FormItem label="用星类型" prop="type">
-            <RadioGroup v-model="updateModel.type" type="button">
-              <Radio label="外部用星"></Radio>
-              <Radio label="内部用星"></Radio>
-            </RadioGroup>
           </FormItem>
         </Form>
       </Modal>
@@ -114,7 +146,7 @@
             <br>
             <FormItem label="套餐">
               <Select v-model.number="stepModel.id1" style="width:200px" disabled>
-                <Option v-for="item in plans" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                <Option v-for="item in plans" :value="item.plan_id" :key="item.id">{{ item.alias }}</Option>
               </Select>
             </FormItem>
             <FormItem label="通信卫星">
@@ -146,7 +178,7 @@
           <Form :model="stepModel" :label-width="80" :rules="ruleValidate2" ref="secondForm">
             <FormItem label="套餐" prop="plan">
               <Select v-model.number="stepModel.channel_operative.id1" style="width:200px">
-                <Option v-for="item in plans" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                <Option v-for="item in plans" :value="item.plan_id" :key="item.id">{{ item.alias }}</Option>
               </Select>
             </FormItem>
             <FormItem label="通信卫星" prop="tongxin">
@@ -184,7 +216,7 @@
             <SearchChecker @on-select="selectCheckerForStep"></SearchChecker>
             <FormItem label="套餐" prop="plan">
               <Select v-model.number="stepModel.channel_real.id1" style="width:200px">
-                <Option v-for="item in plans" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                <Option v-for="item in plans" :value="item.plan_id" :key="item.id">{{ item.alias }}</Option>
               </Select>
             </FormItem>
             <FormItem label="通信卫星" prop="tongxin">
@@ -497,42 +529,43 @@
               jihuas:[],
               tongxins:[],
               pinlvs:[],
-              plans:[],
+              plans:[],  //展开详情里的套餐展示
+              curPlans:[],  //新增/修改因合同id变动请求而来的套餐展示
               zhanTypes : [],
               ruleValidate:{
-                channel_id: [
-                  {required: true, message: '服务单编号不能为空', trigger: 'blur' }
-                ],
-                contractc_id: [
-                  {type:"number", required: true, message: '合同编号不能为空', trigger: 'blur' }
-                ],
-                type: [
-                  {required: true, message: '请选择合同类型', trigger: 'blur' }
-                ],
-                source: [
-                  { type:"number", required: true, message: '请选择来源', trigger: 'blur' }
-                ],
-                status: [
-                  { required: true, message: '请选择状态', trigger: 'blur' }
-                ],
-              },
+                  channel_id: [
+                    {required: true, message: '服务单编号不能为空', trigger: 'blur' }
+                  ],
+                  contractc_id: [
+                    {type:"number", required: true, message: '合同编号不能为空', trigger: 'blur' }
+                  ],
+                  type: [
+                    {required: true, message: '请选择合同类型', trigger: 'blur' }
+                  ],
+                  source: [
+                    { type:"number", required: true, message: '请选择来源', trigger: 'blur' }
+                  ],
+                  status: [
+                    { required: true, message: '请选择状态', trigger: 'blur' }
+                  ],
+                },
               ruleValidate2:{
-//                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
-                jihua:[ {type:'number',required: true, message: '极化不能为空', trigger: 'blur' }],
-                tongxin:[ {type:'number',required: true, message: '通信卫星不能为空', trigger: 'blur' }],
-                plan:[ {type:'number',required: true, message: '套餐不能为空', trigger: 'blur' }],
-                t1:[{required: true, message: '开始时间不能为空', trigger: 'blur' }],
-                t2:[{required: true, message: '结束时间不能为空', trigger: 'blur' }]
-              },
+  //                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
+                  jihua:[ {type:'number',required: true, message: '极化不能为空', trigger: 'blur' }],
+                  tongxin:[ {type:'number',required: true, message: '通信卫星不能为空', trigger: 'blur' }],
+                  plan:[ {type:'number',required: true, message: '套餐不能为空', trigger: 'blur' }],
+                  t1:[{required: true, message: '开始时间不能为空', trigger: 'blur' }],
+                  t2:[{required: true, message: '结束时间不能为空', trigger: 'blur' }]
+                },
               ruleValidate3:{
-//                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
-                jihua:[ {type:'number',required: true, message: '极化不能为空', trigger: 'blur' }],
-                tongxin:[ {type:'number',required: true, message: '通信卫星不能为空', trigger: 'blur' }],
-                plan:[ {type:'number',required: true, message: '套餐不能为空', trigger: 'blur' }],
-                checker:[ {required: true, message: '责任人不能为空', trigger: 'blur' }],  //虽然最后出来的是checker_id, 但是这里保证了checker的存在
-                t1:[{required: true, message: '开始时间不能为空', trigger: 'blur' }],
-                t2:[{required: true, message: '结束时间不能为空', trigger: 'blur' }]
-              },
+  //                pinlv:[ {type:'number',required: true, message: '频率不能为空', trigger: 'blur' }],
+                  jihua:[ {type:'number',required: true, message: '极化不能为空', trigger: 'blur' }],
+                  tongxin:[ {type:'number',required: true, message: '通信卫星不能为空', trigger: 'blur' }],
+                  plan:[ {type:'number',required: true, message: '套餐不能为空', trigger: 'blur' }],
+                  checker:[ {required: true, message: '责任人不能为空', trigger: 'blur' }],  //虽然最后出来的是checker_id, 但是这里保证了checker的存在
+                  t1:[{required: true, message: '开始时间不能为空', trigger: 'blur' }],
+                  t2:[{required: true, message: '结束时间不能为空', trigger: 'blur' }]
+                },
           }
       },
       computed:{
@@ -623,6 +656,32 @@
         _toggleSteps(index){
           this.stepFlag = !this.stepFlag
           this.stepModel = this.$lodash.cloneDeep(this.dataArr[index].channel_applys[0])
+          this.plans = this.$lodash.cloneDeep(this.dataArr[index].contractc.contractc_plans)
+          //todo 假如operative和real没有数据, operative用apply填, real用operative填, 没有则apply
+          if(!!this.stepModel.channel_operative === false){
+            this.stepModel.channel_operative = Object.assign({}, {
+                'channel_apply_id' : this.stepModel.id,
+                'id1' : this.stepModel.id1,
+                'id2' : this.stepModel.id2,
+                'id3' : this.stepModel.id3,
+                'id4' : this.stepModel.id4,
+                't1' :this.stepModel.t1,
+                't2' :this.stepModel.t2
+            })
+            this.stepModel.channel_real = Object.assign({'checker':{}},this.stepModel.channel_operative)
+          } else if (!!this.stepModel.channel_operative === true && !!this.stepModel.channel_real === false){
+            this.stepModel.channel_real = Object.assign({}, {
+              'checker' : {},
+              'channel_apply_id' : this.stepModel.id,
+              'id1' : this.stepModel.channel_operative.id1,
+              'id2' : this.stepModel.channel_operative.id2,
+              'id3' : this.stepModel.channel_operative.id3,
+              'id4' : this.stepModel.channel_operative.id4,
+              't1' :this.stepModel.channel_operative.t1,
+              't2' :this.stepModel.channel_operative.t2
+            })
+          }
+
           this.setStepObj(this.$lodash.cloneDeep(this.stepModel.channel_real))
           switch (this.dataArr[index].status){
             case "运营调配":
@@ -642,21 +701,30 @@
             case 1:
                 //更新运营调配表
                 let obj = this.stepModel.channel_operative
-                this.$http.post(`/apply/operative/${obj.id}`, obj)
+              console.log(obj)
+//              return
+                this.$http.post(`/apply/operative/${this.stepModel.id}`, obj)
                   .then(res=>{
                     res = res.data
                     if (parseInt(res.code) === 2003) {
                       this.$Message.success(res.msg);
                       this._getData()
+                    }else{
+                      this.$Message.warning({
+                        content:res.msg,
+                        duration:3
+                      });
                     }
                   }, err => {
-                    this.$Message.error('请完善表单');
+
                   })
               break
             case 2:
                 //更新实际表
                 let obj2 = this.stepModel.channel_real
-                this.$http.post(`/apply/real/${obj2.id}`, obj2)
+              console.log(obj2)
+//              return
+                this.$http.post(`/apply/real/${this.stepModel.id}`, obj2)
                   .then(res=>{
                     res = res.data
                     if (parseInt(res.code) === 2003) {
@@ -668,6 +736,18 @@
                   })
                  break
           }
+        },
+        setCTime1(v){
+          this.createModel.t1 = v
+        },
+        setCTime2(v){
+          this.createModel.t2 = v
+        },
+        setUTime1(v){
+          this.updateModel.t1 = v
+        },
+        setUTime2(v){
+          this.updateModel.t2 = v
         },
         setOTime1(v){
           this.stepModel.channel_operative.t1 = v
@@ -685,21 +765,22 @@
             this.stepModel.channel_real.checker_id = v
         },
         back () {
-          if (this.current == 0) {
-            this.current = 2;
-          } else {
-            this.current -= 1;
-          }
+          this.current = this.current == 0 ? 2 :  this.current -= 1;
         },
         next () {
-          if (this.current == 2) {
-            this.current = 0;
-          } else {
-            this.current += 1;
-          }
+          this.current = this.current == 2 ? 0 :  this.current += 1;
         },
         selectContractForC(v){
-          this.createModel.contractc_id = v
+          if(typeof contract_id !== 'object') {
+            this.createModel.contractc_id = v
+            this.$http(`contractcs/getContractcPlans/${v}`).then(res => {
+              this.curPlans = res.data.data
+              this.$Message.info({
+                'content': `所属合同下有${this.curPlans.length}个套餐`,
+                'duration': 3
+              })
+            })
+          }
         },
         selectContractForU(v){
           this.updateModel.contractc_id = v

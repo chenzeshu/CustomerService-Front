@@ -448,7 +448,7 @@
             {
               title:"操作",
               align: "center",
-              width: 200,
+              width: 240,
               fixed:'right',
               render: (h, params) => {
                   let planNum = params.row.contract_plans && params.row.contract_plans.length
@@ -770,7 +770,7 @@
                   this.total = res.total
                   this.coors = res.coors
                   this.types = res.contract_types
-                  this.contract_plans = res.contract_plans
+//                  this.contract_plans = res.contract_plans
                   this.setDataArr(res.data)
                   this._setLoading()
               })

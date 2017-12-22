@@ -782,7 +782,7 @@
           //iview的input的方法都同时触发了, 看ForC即可
       },
       showManDetail(key, e){
-        let emp = this.dataArr[key].customer[0]
+        let emp = this.dataArr[key].refer_man[0]
         this.curDetail = Object.assign({}, emp)
         //调用组件方法显示细节面板并改变位置
         this.$refs.showDetail.showManDetail(e)
