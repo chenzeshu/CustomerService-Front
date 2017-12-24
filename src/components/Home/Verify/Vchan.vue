@@ -39,7 +39,7 @@
                 <div class="info1">
                   <span class="name">申请人:{{ item.employee.name }}</span>
                   <span>信息来源:{{ item.source.name }}</span>
-                  <span>所属合同:{{ item.contractc.name }}</span>
+                  <span v-if="item.contractc">所属合同:{{ item.contractc.name }}</span>
                   <span>所选套餐:{{ item.channel_applys[0].contractc_plan.alias }}</span>
                   <span><div class="icon">
                     <Icon type="clock"></Icon>

@@ -28,18 +28,13 @@
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="合同编号" prop="contract_id">
-            <Input v-model.trim="createModel.contract_id" placeholder="请输入"></Input>
-          </FormItem>
           <FormItem label="合同名称" prop="name">
             <Input v-model.trim="createModel.name" placeholder="请输入"></Input>
           </FormItem>
           <NewSearchCompany @on-select="newSelectCompanyForC"></NewSearchCompany>
-
           <FormItem label="合同金额">
             <Input v-model.trim="createModel.money" placeholder="请输入合同总金额"></Input>
           </FormItem>
-
           <FormItem label="合同类型" prop="type1">
             <RadioGroup v-model="createModel.type1" type="button">
               <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
@@ -49,7 +44,6 @@
             <RadioGroup v-model="createModel.type2" type="button">
               <Radio label="销售"></Radio>
               <Radio label="客服"></Radio>
-              <Radio label="临时"></Radio>
             </RadioGroup>
           </FormItem>
           <NewSearchEmps @on-select="newSelectEmpForPMC"></NewSearchEmps>
@@ -96,7 +90,7 @@
         <!--@on-cancel="cancel"-->
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="合同编号" prop="contract_id">
+          <FormItem label="合同编号">
             <Input v-model.trim="updateModel.contract_id" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="合同名称" prop="name">
@@ -118,7 +112,6 @@
             <RadioGroup v-model="updateModel.type2" type="button">
               <Radio label="销售"></Radio>
               <Radio label="客服"></Radio>
-              <Radio label="临时"></Radio>
             </RadioGroup>
           </FormItem>
           <NewSearchEmps @on-select="newSelectEmpForPMU"></NewSearchEmps>
@@ -253,7 +246,6 @@
         <br>
         <i-button type="primary" @click="_toggleAddPlan">新增套餐</i-button>
       </Modal>
-
       <!--添加套餐-->
       <Modal
         v-model="planCreateFlag"
@@ -544,9 +536,6 @@
             coor : null,
           },
           ruleValidate: {
-            contract_id: [
-              {required: true, message: '合同编号不能为空', trigger: 'blur' }
-            ],
             PM: [
               {required: true, message: '项目经理不能为空', trigger: 'blur' }
             ],

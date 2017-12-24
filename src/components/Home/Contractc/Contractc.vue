@@ -29,9 +29,6 @@
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="合同编号" prop="contract_id">
-            <Input v-model.trim="createModel.contract_id" placeholder="请输入"></Input>
-          </FormItem>
           <FormItem label="合同名称" prop="name">
             <Input v-model.trim="createModel.name" placeholder="请输入"></Input>
           </FormItem>
@@ -420,9 +417,6 @@
                document:null,
              },
              ruleValidate:{
-               contract_id: [
-                 {required: true, message: '合同编号不能为空', trigger: 'blur' }
-               ],
                PM: [
                  {required: true, message: '项目经理不能为空', trigger: 'blur' }
                ],

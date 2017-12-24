@@ -37,9 +37,6 @@
           <FormItem label="套餐用量" v-if="_checkPlanForC()">
             <Input v-model.trim="createModel.plan_num" placeholder="套餐用量默认为1"></Input>
           </FormItem>
-          <FormItem label="服务单编号" prop="service_id">
-            <Input v-model.trim="createModel.service_id" placeholder="请输入"></Input>
-          </FormItem>
           <FormItem label="信息来源" prop="source">
             <Select v-model="createModel.source">
               <Option v-for="(s, sk) in sources" :key="sk" :value="s.id">{{s.name}}</Option>
@@ -713,9 +710,6 @@
           allege:null
         },
         ruleValidate: {
-          service_id: [
-            {required: true, message: '服务单编号不能为空', trigger: 'blur'}
-          ],
           contract_id: [
             {type: 'number', required: true, message: '所属合同编号不能为空', trigger: 'blur'}
           ],

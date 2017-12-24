@@ -39,9 +39,6 @@
             <!--fixme 后面再做一个选中套餐后提示剩余时间-->
 
           </FormItem>
-          <FormItem label="服务单编号" prop="channel_id">
-            <Input v-model.trim="createModel.channel_id" placeholder="请输入"></Input>
-          </FormItem>
           <FormItem label="用星类型" prop="type">
             <RadioGroup v-model="createModel.type" type="button">
               <Radio label="外部用星"></Radio>
@@ -533,11 +530,11 @@
               curPlans:[],  //新增/修改因合同id变动请求而来的套餐展示
               zhanTypes : [],
               ruleValidate:{
-                  channel_id: [
-                    {required: true, message: '服务单编号不能为空', trigger: 'blur' }
-                  ],
                   contractc_id: [
                     {type:"number", required: true, message: '合同编号不能为空', trigger: 'blur' }
+                  ],
+                  customer :[
+                    {required: true, message: '联系人不能为空', trigger: 'blur' }
                   ],
                   type: [
                     {required: true, message: '请选择合同类型', trigger: 'blur' }
@@ -786,9 +783,11 @@
           this.updateModel.contractc_id = v
         },
         selectEmpForCus(v){
+          this.createModel.customer = v
           this.createModel.employee_id = v
         },
         selectEmpForCusU(v){
+          this.updateModel.customer = v
           this.updateModel.employee_id = v
         },
         _getData(){
