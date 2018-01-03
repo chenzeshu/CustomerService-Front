@@ -16,7 +16,7 @@ Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
-new Vue({
+export default new Vue({
   el: '#app',
   router,
   store,
@@ -35,5 +35,6 @@ router.beforeEach((to, from, next) => {
   // document.querySelector('meta[name="description"]').setAttribute('content', 'description')
   next()
 })
+
 
 

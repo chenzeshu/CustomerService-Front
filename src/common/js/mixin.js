@@ -92,16 +92,16 @@ export const curdMixin = {
               }
               this.createModel = {}
             }).catch(error=>{
-              let text = error.response.data.errors
-              let content = ''
-              for ( let key in text){
-                content += `${key} : ${text[key]}<br>`
-              }
-              this.$Notice.error({
-                title: '错误通知',
-                desc: content,
-                duration:999
-              });
+              // let text = error.response.data.errors
+              // let content = ''
+              // for ( let key in text){
+              //   content += `${key} : ${text[key]}<br>`
+              // }
+              // this.$Notice.error({
+              //   title: '错误通知',
+              //   desc: content,
+              //   duration:999
+              // });
             })
       })
     },

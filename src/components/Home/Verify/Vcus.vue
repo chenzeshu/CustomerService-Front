@@ -25,21 +25,27 @@
             <div class="list-item">
               <div class="item-left">
                 <div class="avatar">
-                  <img src="/static/avatar.png" alt="" width="64" height="64">
+                  <img src="/static/avatar.png" alt="" width="64" height="64" v-if="item.avatar === null">
+                  <img :src="item.avatar" alt="" width="64" height="64" v-else>
                 </div>
                 <div class="info1">
                   <span class="name">姓名:{{ item.name }}</span>
                   <span>联系方式:{{ item.phone }}</span>
                 </div>
                 <div class="info2" v-if="item.company">
-                  <span>所属公司: {{ item.company.name }}</span>
-                  <span>邮箱:{{ item.email }}</span>
+                  <span>填写公司:
+                    <span>{{ item.company }}</span>
+                  </span>
+                  <span>邮箱:
+                    <span v-if="item.email !== null">{{ item.email }}</span>
+                    <span v-else>未填写</span>
+                  </span>
                 </div>
               </div>
 
               <div class="verify">
-                <i-button type="primary" size="large" @click="_pass(item.id)">通过审核</i-button>
-                <i-button type="error" size="large" @click="_rej(item.id)">拒绝</i-button>
+                <i-button type="primary" size="large" @click="_togglePass(key)">通过审核</i-button>
+                <i-button type="error" size="large" @click="_toggleRej(key)">拒绝</i-button>
               </div>
 
             </div>
@@ -47,12 +53,44 @@
           </div>
         </div>
       </div>
+
+      <!--update-->
+      <Modal
+        v-model="PFlag"
+        title="补充并通过审核"
+        width="400"
+        @on-ok="passUpdate">
+        <!--@on-cancel="cancel"-->
+        <Form :model="passModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
+          <NewSearchCompany @on-select="selectCompanyForReg"></NewSearchCompany>
+        </Form>
+      </Modal>
+
+      <!--rej-->
+      <Modal
+        v-model="RFlag"
+        title="拒绝"
+        width="400"
+        @on-ok="rej">
+        <!--@on-cancel="cancel"-->
+        <Form :model="rejModel" :label-width="80">
+          <FormItem label="拒绝原因" v-if="rejModel">
+            <CheckboxGroup v-model="rejModel.reason">
+              <Checkbox v-for="item in reasons" :label="item.reason" :key="item.id">
+                <span>{{item.reason}}</span>
+              </Checkbox>
+            </CheckboxGroup>
+          </FormItem>
+        </Form>
+      </Modal>
     </div>
 </template>
 
 <script>
   import Split from 'base/Split/Split'
   import {curdMixin} from 'common/js/mixin'
+  import NewSearchCompany from 'base/SearchCompany/NewSearchCompany'
+
   export default {
         mixins:[curdMixin],
         data(){
@@ -60,15 +98,56 @@
               url:"employees",
               total:0,
               dataCount : null,
+              PFlag:false,
+              RFlag:false,
+              passModel:{},
+              ruleValidate:{
+                  company: [
+                    {required : true}
+                  ]
+              },
+              rejModel:{
+                  reason:[]
+              },
+              reasons:[
+                {id:1,reason:"无法联系的手机号码"},
+                {id:2,reason:"无法找到关联公司"},
+                {id:3,reason:"恶意注册"}
+              ]
           }
         },
         created(){
           this._getData()
         },
         methods:{
-          _pass(id){
+          _toggleRej(index){
+            this.RFlag = !this.RFlag
+            this.rejModel.id = this.dataArr[index].id
+          },
+          _togglePass(index){
+              this.PFlag = !this.PFlag
+              this.passModel.id = this.dataArr[index].id
+              this.passModel.name = this.dataArr[index].name
+              this.passModel.phone = this.dataArr[index].phone
+              this.passModel.openid = this.dataArr[index].openid
+              this.passModel.avatar = this.dataArr[index].avatar
+          },
+          rej(){
+            this.$http
+              .post(`/${this.url}/rej/${this.rejModel.id}`, this.rejModel)
+              .then(res=>{
+                if(parseInt(res.data.code) === 200){
+                  this.$Message.success(res.data.msg);
+                  this._getData()
+                }else{
+                  this.$Message.error('失败');
+                }
+                this.rejModel = {}
+              })
+          },
+          passUpdate(){
                 this.$http
-                  .get(`/${this.url}/pass/${id}`)
+                  .post(`/${this.url}/pass/${this.passModel.id}`, this.passModel)
                   .then(res=>{
                       if(parseInt(res.data.code) === 200){
                         this.$Message.success(res.data.msg);
@@ -76,19 +155,11 @@
                       }else{
                         this.$Message.error('失败');
                       }
+                      this.passModel = {}
                 })
           },
-          _rej(id){
-              this.$http
-                .get(`/${this.url}/rej/${id}`)
-                .then(res=>{
-                  if(parseInt(res.data.code) === 200){
-                    this.$Message.success(res.data.msg);
-                    this._getData()
-                  }else{
-                    this.$Message.error('失败');
-                  }
-              })
+          selectCompanyForReg(v){
+                this.passModel.company_id = v
           },
           _getData(){
             this.$http
@@ -107,7 +178,7 @@
           }
         },
         components:{
-            Split
+            Split, NewSearchCompany
         }
     }
 </script>

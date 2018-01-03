@@ -144,7 +144,7 @@
                 saveToLocal('loginFlag', true)
                 this.setLogined(true)
             }else {
-                alert(res.msg)
+//                alert(res.msg)
             }
         })
       },
