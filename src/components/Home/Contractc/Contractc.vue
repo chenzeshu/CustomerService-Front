@@ -8,9 +8,9 @@
         <input type="text" v-model.trim="searchWord" placeholder="合同编号" class="search">
       </div>
 
-      <div v-cloak>
+      <lazy-component>
         <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" v-cloak></i-table>
-      </div>
+      </lazy-component>
 
       <div class="page-wrapper">
         <div class="page">

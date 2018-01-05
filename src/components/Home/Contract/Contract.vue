@@ -10,265 +10,267 @@
         </span>
         <input type="text" v-model.trim="searchWord" placeholder="合同名称" class="search">
       </div>
-
+      <lazy-component>
       <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"></i-table>
-
+      </lazy-component>
       <div class="page-wrapper">
         <div class="page">
           <Page :current="page" :total="total" simple @on-change="onChange"></Page>
         </div>
       </div>
 
-      <!--create-->
-      <Modal
-        v-model="createFlag"
-        title="创建"
-        width="400"
-        @on-ok="_create">
-        <!--@on-cancel="cancel"-->
-        <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
-          <!--自动生成 + 手工填写-->
-          <FormItem label="合同名称" prop="name">
-            <Input v-model.trim="createModel.name" placeholder="请输入"></Input>
-          </FormItem>
-          <NewSearchCompany @on-select="newSelectCompanyForC"></NewSearchCompany>
-          <FormItem label="合同金额">
-            <Input v-model.trim="createModel.money" placeholder="请输入合同总金额"></Input>
-          </FormItem>
-          <FormItem label="合同类型" prop="type1">
-            <RadioGroup v-model="createModel.type1" type="button">
-              <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem label="签约类型" prop="type2">
-            <RadioGroup v-model="createModel.type2" type="button">
-              <Radio label="销售"></Radio>
-              <Radio label="客服"></Radio>
-            </RadioGroup>
-          </FormItem>
-          <NewSearchEmps @on-select="newSelectEmpForPMC"></NewSearchEmps>
-          <NewSearchEmps @on-select="newSelectEmpForTMC" type="TM"></NewSearchEmps>
-          <FormItem label="签订日期" prop="time1">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
-          </FormItem>
-          <FormItem label="验收日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime2"></DatePicker>
-          </FormItem>
-          <FormItem label="失效日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime3"></DatePicker>
-          </FormItem>
-          <FormItem label="上传文件">
-            <Upload
-              ref="upload"
-              multiple
-              type="drag"
-              :action="action"
-              :name="uploadName"
-              :default-file-list="defaultList"
-              :on-success="handleSuccess"
-              :on-error="handleError"
-              :on-remove="handleRemove">
-              <div style="padding: 20px 0">
-                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
-                <p>点击或将文件拖拽到这里上传</p>
+      <lazy-component>
+        <!--create-->
+        <Modal
+          v-model="createFlag"
+          title="创建"
+          width="400"
+          @on-ok="_create">
+          <!--@on-cancel="cancel"-->
+          <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
+            <!--自动生成 + 手工填写-->
+            <FormItem label="合同名称" prop="name">
+              <Input v-model.trim="createModel.name" placeholder="请输入"></Input>
+            </FormItem>
+            <NewSearchCompany @on-select="newSelectCompanyForC"></NewSearchCompany>
+            <FormItem label="合同金额">
+              <Input v-model.trim="createModel.money" placeholder="请输入合同总金额"></Input>
+            </FormItem>
+            <FormItem label="合同类型" prop="type1">
+              <RadioGroup v-model="createModel.type1" type="button">
+                <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="签约类型" prop="type2">
+              <RadioGroup v-model="createModel.type2" type="button">
+                <Radio label="销售"></Radio>
+                <Radio label="客服"></Radio>
+              </RadioGroup>
+            </FormItem>
+            <NewSearchEmps @on-select="newSelectEmpForPMC"></NewSearchEmps>
+            <NewSearchEmps @on-select="newSelectEmpForTMC" type="TM"></NewSearchEmps>
+            <FormItem label="签订日期" prop="time1">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
+            </FormItem>
+            <FormItem label="验收日期">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime2"></DatePicker>
+            </FormItem>
+            <FormItem label="失效日期">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime3"></DatePicker>
+            </FormItem>
+            <FormItem label="上传文件">
+              <Upload
+                ref="upload"
+                multiple
+                type="drag"
+                :action="action"
+                :name="uploadName"
+                :default-file-list="defaultList"
+                :on-success="handleSuccess"
+                :on-error="handleError"
+                :on-remove="handleRemove">
+                <div style="padding: 20px 0">
+                  <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                  <p>点击或将文件拖拽到这里上传</p>
+                </div>
+              </Upload>
+            </FormItem>
+            <FormItem label="协作单位">
+              <Select v-model.trim="createModel.coor" placeholder="请选择">
+                <Option :value="c.id" v-for="(c, ck) in coors" :key="ck">{{c.name}}</Option>
+              </Select>
+            </FormItem>
+          </Form>
+        </Modal>
+        <!--update-->
+        <Modal
+          v-model="updateFlag"
+          title="修改"
+          width="400"
+          @on-ok="update">
+          <!--@on-cancel="cancel"-->
+          <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
+            <!--自动生成 + 手工填写-->
+            <FormItem label="合同编号">
+              <Input v-model.trim="updateModel.contract_id" placeholder="请输入"></Input>
+            </FormItem>
+            <FormItem label="合同名称" prop="name">
+              <Input v-model.trim="updateModel.name" placeholder="请输入"></Input>
+            </FormItem>
+
+            <NewSearchCompany @on-select="newSelectCompanyForU"></NewSearchCompany>
+
+            <FormItem label="合同金额">
+              <Input v-model.trim="updateModel.money" placeholder="请输入合同总金额"></Input>
+            </FormItem>
+
+            <FormItem label="合同类型" prop="type1">
+              <RadioGroup v-model.number="updateModel.type1" type="button">
+                <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="签约类型" prop="type2">
+              <RadioGroup v-model="updateModel.type2" type="button">
+                <Radio label="销售"></Radio>
+                <Radio label="客服"></Radio>
+              </RadioGroup>
+            </FormItem>
+            <NewSearchEmps @on-select="newSelectEmpForPMU"></NewSearchEmps>
+            <NewSearchEmps @on-select="newSelectEmpForTMU" type="TM"></NewSearchEmps>
+            <FormItem label="签订日期" prop="time1">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time1" @on-change="setUTime1"></DatePicker>
+            </FormItem>
+            <FormItem label="验收日期">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time2" @on-change="setUTime2"></DatePicker>
+            </FormItem>
+            <FormItem label="失效日期">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time3" @on-change="setUTime3"></DatePicker>
+            </FormItem>
+            <FormItem label="上传文件">
+              <Upload
+                ref="upload"
+                multiple
+                type="drag"
+                :action="action"
+                :name="uploadName"
+                :default-file-list="editDefaultList"
+                :before-upload="handleUpload"
+                :on-success="handleSuccess"
+                :on-error="handleError"
+                :on-remove="handleRemove">
+                <div style="padding: 20px 0">
+                  <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                  <p>点击或将文件拖拽到这里上传</p>
+                </div>
+              </Upload>
+            </FormItem>
+            <FormItem label="协作单位">
+              <Select v-model.trim="updateModel.coor" placeholder="请选择">
+                <Option :value="c.id" v-for="(c, ck) in coors" :key="ck">{{c.name}}</Option>
+              </Select>
+            </FormItem>
+          </Form>
+        </Modal>
+        <!--delete-->
+        <Modal
+          v-model="deleteFlag"
+          title="删除"
+          @on-ok="_delete">
+          <p>确定要删除合同?</p>
+        </Modal>
+        <!--回款情况-->
+        <Modal
+          v-model="moneyFlag"
+          title="回款情况"
+          :width="MoneyTableWidth + 50">
+          <Tabs>
+            <TabPane label="回款详情" icon="social-apple" v-if="moneyModel">
+              <div v-if="contractMoney">
+                <p class="detail-font">合同金额总计: <span style="font-weight: 700">{{ contractMoney }} </span> 元</p>
+                <p class="detail-font">到款金额总计: <span style="font-weight: 700">{{moneyModel.reach}} </span> 元</p>
+                <p class="detail-font">剩余金额总计: <span style="font-weight: 700">{{moneyModel.left }} </span> 元</p>
+                <p class="detail-font">是否结清: <span style="font-weight: 700">{{moneyModel.finish }} </span></p>
+                <p class="detail-font">分次数目: <span style="font-weight: 700">{{moneyModel.num}} </span> </p>
+                <p class="detail-font" v-if="moneyModel.checker">责任人: <span style="font-weight: 700">{{moneyModel.checker.name}} </span> </p>
+                <p class="detail-font">约定截止日期: <span style="font-weight: 700">{{moneyModel.t1}} </span> </p>
+                <p class="detail-font">实际到款日期: <span style="font-weight: 700">{{moneyModel.t2}} </span> </p>
               </div>
-            </Upload>
-          </FormItem>
-          <FormItem label="协作单位">
-            <Select v-model.trim="createModel.coor" placeholder="请选择">
-              <Option :value="c.id" v-for="(c, ck) in coors" :key="ck">{{c.name}}</Option>
-            </Select>
-          </FormItem>
-        </Form>
-      </Modal>
-      <!--update-->
-      <Modal
-        v-model="updateFlag"
-        title="修改"
-        width="400"
-        @on-ok="update">
-        <!--@on-cancel="cancel"-->
-        <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
-          <!--自动生成 + 手工填写-->
-          <FormItem label="合同编号">
-            <Input v-model.trim="updateModel.contract_id" placeholder="请输入"></Input>
-          </FormItem>
-          <FormItem label="合同名称" prop="name">
-            <Input v-model.trim="updateModel.name" placeholder="请输入"></Input>
-          </FormItem>
-
-          <NewSearchCompany @on-select="newSelectCompanyForU"></NewSearchCompany>
-
-          <FormItem label="合同金额">
-            <Input v-model.trim="updateModel.money" placeholder="请输入合同总金额"></Input>
-          </FormItem>
-
-          <FormItem label="合同类型" prop="type1">
-            <RadioGroup v-model.number="updateModel.type1" type="button">
-              <Radio :label="t.id" v-for="(t, tk) in types" :key="tk">{{t.name}}</Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem label="签约类型" prop="type2">
-            <RadioGroup v-model="updateModel.type2" type="button">
-              <Radio label="销售"></Radio>
-              <Radio label="客服"></Radio>
-            </RadioGroup>
-          </FormItem>
-          <NewSearchEmps @on-select="newSelectEmpForPMU"></NewSearchEmps>
-          <NewSearchEmps @on-select="newSelectEmpForTMU" type="TM"></NewSearchEmps>
-          <FormItem label="签订日期" prop="time1">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time1" @on-change="setUTime1"></DatePicker>
-          </FormItem>
-          <FormItem label="验收日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time2" @on-change="setUTime2"></DatePicker>
-          </FormItem>
-          <FormItem label="失效日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time3" @on-change="setUTime3"></DatePicker>
-          </FormItem>
-          <FormItem label="上传文件">
-            <Upload
-              ref="upload"
-              multiple
-              type="drag"
-              :action="action"
-              :name="uploadName"
-              :default-file-list="editDefaultList"
-              :before-upload="handleUpload"
-              :on-success="handleSuccess"
-              :on-error="handleError"
-              :on-remove="handleRemove">
-              <div style="padding: 20px 0">
-                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
-                <p>点击或将文件拖拽到这里上传</p>
+              <div v-else>
+                <h1 style="font-size:24px">未填写</h1>
               </div>
-            </Upload>
-          </FormItem>
-          <FormItem label="协作单位">
-            <Select v-model.trim="updateModel.coor" placeholder="请选择">
-              <Option :value="c.id" v-for="(c, ck) in coors" :key="ck">{{c.name}}</Option>
-            </Select>
-          </FormItem>
-        </Form>
-      </Modal>
-      <!--delete-->
-      <Modal
-        v-model="deleteFlag"
-        title="删除"
-        @on-ok="_delete">
-        <p>确定要删除合同?</p>
-      </Modal>
-      <!--回款情况-->
-      <Modal
-        v-model="moneyFlag"
-        title="回款情况"
-        :width="MoneyTableWidth + 50">
-        <Tabs>
-          <TabPane label="回款详情" icon="social-apple" v-if="moneyModel">
-            <div v-if="contractMoney">
-              <p class="detail-font">合同金额总计: <span style="font-weight: 700">{{ contractMoney }} </span> 元</p>
-              <p class="detail-font">到款金额总计: <span style="font-weight: 700">{{moneyModel.reach}} </span> 元</p>
-              <p class="detail-font">剩余金额总计: <span style="font-weight: 700">{{moneyModel.left }} </span> 元</p>
-              <p class="detail-font">是否结清: <span style="font-weight: 700">{{moneyModel.finish }} </span></p>
-              <p class="detail-font">分次数目: <span style="font-weight: 700">{{moneyModel.num}} </span> </p>
-              <p class="detail-font" v-if="moneyModel.checker">责任人: <span style="font-weight: 700">{{moneyModel.checker.name}} </span> </p>
-              <p class="detail-font">约定截止日期: <span style="font-weight: 700">{{moneyModel.t1}} </span> </p>
-              <p class="detail-font">实际到款日期: <span style="font-weight: 700">{{moneyModel.t2}} </span> </p>
-            </div>
-            <div v-else>
-              <h1 style="font-size:24px">未填写</h1>
-            </div>
-            <i-button @click="_toggleMoneyEdit" style="margin-left:20px;width:200px">编辑</i-button>
-          </TabPane>
-          <TabPane label="历次回款" icon="social-windows">
-            <i-table border :columns="moneyColumn" :data="moneyDetailModel" :width="MoneyTableWidth" :loading="loading"></i-table>
-            <br>
-            <Button @click="_toggleMoneyDetailCreate" type="primary">新增回款细节</Button>
-          </TabPane>
-        </Tabs>
-      </Modal>
-      <!--回款详情编辑-->
-      <Modal
-        v-model="moneyEditFlag"
-        title="回款情况编辑"
-        width="400"
-        @on-ok="updateMoney">
-        <Form :model="moneyEditModel" :label-width="80">
-          <FormItem label="是否分次" prop="type">
-            <RadioGroup v-model="moneyEditModel.type" type="button">
-              <Radio label="分次付款"></Radio>
-              <Radio label="不分次"></Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem label="分次次数" v-if="moneyEditModel.type === '分次付款'">
-            <Input v-model.number="moneyEditModel.num" placeholder="请输入分次次数"></Input>
-          </FormItem>
-          <FormItem label="是否结清">
-            <RadioGroup v-model="moneyEditModel.finish" type="button">
-              <Radio label="结清"></Radio>
-              <Radio label="未结清"></Radio>
-            </RadioGroup>
-          </FormItem>
-          <SearchChecker @on-select="selectCheckerForMoney"></SearchChecker>
+              <i-button @click="_toggleMoneyEdit" style="margin-left:20px;width:200px">编辑</i-button>
+            </TabPane>
+            <TabPane label="历次回款" icon="social-windows">
+              <i-table border :columns="moneyColumn" :data="moneyDetailModel" :width="MoneyTableWidth" :loading="loading"></i-table>
+              <br>
+              <Button @click="_toggleMoneyDetailCreate" type="primary">新增回款细节</Button>
+            </TabPane>
+          </Tabs>
+        </Modal>
+        <!--回款详情编辑-->
+        <Modal
+          v-model="moneyEditFlag"
+          title="回款情况编辑"
+          width="400"
+          @on-ok="updateMoney">
+          <Form :model="moneyEditModel" :label-width="80">
+            <FormItem label="是否分次" prop="type">
+              <RadioGroup v-model="moneyEditModel.type" type="button">
+                <Radio label="分次付款"></Radio>
+                <Radio label="不分次"></Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="分次次数" v-if="moneyEditModel.type === '分次付款'">
+              <Input v-model.number="moneyEditModel.num" placeholder="请输入分次次数"></Input>
+            </FormItem>
+            <FormItem label="是否结清">
+              <RadioGroup v-model="moneyEditModel.finish" type="button">
+                <Radio label="结清"></Radio>
+                <Radio label="未结清"></Radio>
+              </RadioGroup>
+            </FormItem>
+            <SearchChecker @on-select="selectCheckerForMoney"></SearchChecker>
 
-          <FormItem label="约定日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyEditModel.t1" @on-change="setMoneyTime1"></DatePicker>
-          </FormItem>
-          <FormItem label="结清日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyEditModel.t2" @on-change="setMoneyTime2"></DatePicker>
-          </FormItem>
-        </Form>
-      </Modal>
-      <!--历次回款create-->
-      <Modal
-        v-model="moneyDetailCreateFlag"
-        title="回款记录"
-        width="400"
-        @on-ok="_createMoneyDetail">
-        <Form :model="moneyDetailCreateModel" :label-width="80">
-          <FormItem label="合同金额">
-            <Input v-model.trim="moneyDetailCreateModel.money" placeholder="请输入合同总金额"></Input>
-          </FormItem>
-          <FormItem label="约定日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyDetailCreateModel.t1" @on-change="setMoneyCTime1"></DatePicker>
-          </FormItem>
-          <FormItem label="结清日期">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyDetailCreateModel.t2" @on-change="setMoneyCTime2"></DatePicker>
-          </FormItem>
-        </Form>
-      </Modal>
-      <!--套餐使用情况-->
-      <Modal
-        v-model="planFlag"
-        title="合同套餐详情"
-        width="800"
-     >
-        <i-table border :columns="planColumns" :data="planModel" :loading="loading"></i-table>
-        <br>
-        <i-button type="primary" @click="_toggleAddPlan">新增套餐</i-button>
-      </Modal>
-      <!--添加套餐-->
-      <Modal
-        v-model="planCreateFlag"
-        title="为合同添加套餐"
-        width="400"
-        @on-ok="addPlan">
-        <Form :model="planCreateModel" :label-width="80">
-          <FormItem label="套餐类型">
-            <Select v-model.trim="planCreateModel.plan_id" placeholder="请选择套餐">
-              <Option :value="c.id" v-for="(c, ck) in contract_plans" :key="ck">{{c.name}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="标准/规格描述(别名)">
-            <Input v-model.trim="planCreateModel.desc" placeholder="请输入标准/规格描述(别名)" type="textarea"></Input>
-          </FormItem>
-          <FormItem label="填写次数">
-            <Input v-model.number="planCreateModel.total" placeholder="请输入次数"></Input>
-          </FormItem>
-          <FormItem label="备注">
-            <Input v-model.trim="planCreateModel.remark" placeholder="有备注吗?" type="textarea"></Input>
-          </FormItem>
-        </Form>
-      </Modal>
+            <FormItem label="约定日期">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyEditModel.t1" @on-change="setMoneyTime1"></DatePicker>
+            </FormItem>
+            <FormItem label="结清日期">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyEditModel.t2" @on-change="setMoneyTime2"></DatePicker>
+            </FormItem>
+          </Form>
+        </Modal>
+        <!--历次回款create-->
+        <Modal
+          v-model="moneyDetailCreateFlag"
+          title="回款记录"
+          width="400"
+          @on-ok="_createMoneyDetail">
+          <Form :model="moneyDetailCreateModel" :label-width="80">
+            <FormItem label="合同金额">
+              <Input v-model.trim="moneyDetailCreateModel.money" placeholder="请输入合同总金额"></Input>
+            </FormItem>
+            <FormItem label="约定日期">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyDetailCreateModel.t1" @on-change="setMoneyCTime1"></DatePicker>
+            </FormItem>
+            <FormItem label="结清日期">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyDetailCreateModel.t2" @on-change="setMoneyCTime2"></DatePicker>
+            </FormItem>
+          </Form>
+        </Modal>
+        <!--套餐使用情况-->
+        <Modal
+          v-model="planFlag"
+          title="合同套餐详情"
+          width="800"
+       >
+          <i-table border :columns="planColumns" :data="planModel" :loading="loading"></i-table>
+          <br>
+          <i-button type="primary" @click="_toggleAddPlan">新增套餐</i-button>
+        </Modal>
+        <!--添加套餐-->
+        <Modal
+          v-model="planCreateFlag"
+          title="为合同添加套餐"
+          width="400"
+          @on-ok="addPlan">
+          <Form :model="planCreateModel" :label-width="80">
+            <FormItem label="套餐类型">
+              <Select v-model.trim="planCreateModel.plan_id" placeholder="请选择套餐">
+                <Option :value="c.id" v-for="(c, ck) in contract_plans" :key="ck">{{c.name}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="标准/规格描述(别名)">
+              <Input v-model.trim="planCreateModel.desc" placeholder="请输入标准/规格描述(别名)" type="textarea"></Input>
+            </FormItem>
+            <FormItem label="填写次数">
+              <Input v-model.number="planCreateModel.total" placeholder="请输入次数"></Input>
+            </FormItem>
+            <FormItem label="备注">
+              <Input v-model.trim="planCreateModel.remark" placeholder="有备注吗?" type="textarea"></Input>
+            </FormItem>
+          </Form>
+        </Modal>
+      </lazy-component>
     </div>
 </template>
 

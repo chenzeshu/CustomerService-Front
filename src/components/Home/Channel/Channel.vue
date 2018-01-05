@@ -10,9 +10,9 @@
         </span>
         <input type="text" v-model.trim="searchWord" placeholder="服务单编号" class="search">
       </div>
-
+      <lazy-component>
       <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length"></i-table>
-
+      </lazy-component>
       <div class="page-wrapper">
         <div class="page">
           <Page :current="page" :total="total" simple @on-change="onChange"></Page>

@@ -8,9 +8,11 @@
         <input type="text" v-model.trim="searchWord" placeholder="服务单号" class="search">
       </div>
 
+      <lazy-component>
       <div v-cloak>
         <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"></i-table>
       </div>
+      </lazy-component>
 
       <div class="page-wrapper">
         <div class="page">
@@ -18,255 +20,257 @@
         </div>
       </div>
 
-      <!--create-->
-      <Modal
-        v-model="createFlag"
-        title="创建"
-        width="400"
-        @on-ok="_create">
-        <!--@on-cancel="cancel"-->
-        <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
-          <NewSearchContract @on-select="selectContractForC"></NewSearchContract>
+      <lazy-component>
+        <!--create-->
+        <Modal
+          v-model="createFlag"
+          title="创建"
+          width="400"
+          @on-ok="_create">
+          <!--@on-cancel="cancel"-->
+          <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
+            <NewSearchContract @on-select="selectContractForC"></NewSearchContract>
 
-          <!--自动生成 + 手工填写-->
-          <FormItem label="套餐类型" prop="type">
-            <Select v-model="createModel.type" v-if="curPlans">
-              <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="套餐用量" v-if="_checkPlanForC()">
-            <Input v-model.trim="createModel.plan_num" placeholder="套餐用量默认为1"></Input>
-          </FormItem>
-          <FormItem label="信息来源" prop="source">
-            <Select v-model="createModel.source">
-              <Option v-for="(s, sk) in sources" :key="sk" :value="s.id">{{s.name}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="状态" prop="status">
-            <Select v-model="createModel.status">
-              <Option v-for="(s, sk) in status" :key="sk" :value="s">{{s}}</Option>
-            </Select>
-          </FormItem>
-          <NewSearchEmps @on-select="selectEmpForRefer" type="REFER"></NewSearchEmps>
-          <NewSearchEmps @on-select="selectEmpForCus" type="CUS"></NewSearchEmps>
-          <NewSearchEmps @on-select="selectEmpForMan" type="MAN"></NewSearchEmps>
-          <FormItem label="派单时间" prop="time1">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
-          </FormItem>
-          <FormItem label="解决时间">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime2"></DatePicker>
-          </FormItem>
-          <FormItem label="占用工时">
-            <Input v-model.trim="createModel.day_sum" placeholder="请输入工时"></Input>
-          </FormItem>
-          <FormItem label="是否收费" prop="charge_if">
-            <RadioGroup v-model="createModel.charge_if" type="button">
-              <Radio label="收费"></Radio>
-              <Radio label="不收费"></Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem label="收费数额" v-show="createModel.charge_if==='收费'">
-            <Input v-model.trim="createModel.charge" placeholder="请输入数额"></Input>
-          </FormItem>
-          <FormItem label="是否到款" v-show="createModel.charge_if==='收费'">
-            <RadioGroup v-model="createModel.charge_flag" type="button">
-              <Radio label="到款"></Radio>
-              <Radio label="未到款"></Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem label="到款时间" v-show="createModel.charge_if==='收费'">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="createModel.time4" @on-change="setCTime4"></DatePicker>
-          </FormItem>
-          <FormItem label="问题描述">
-            <Input v-model.trim="createModel.desc1" placeholder="问题描述" type="textarea"></Input>
-          </FormItem>
-          <FormItem label="处理描述">
-            <Input v-model.trim="createModel.desc2" placeholder="处理描述" type="textarea"></Input>
-          </FormItem>
-          <FormItem label="上传文件">
-            <Upload
-              ref="upload"
-              multiple
-              type="drag"
-              :action="action"
-              :name="uploadName"
-              :default-file-list="defaultList"
-              :on-success="handleSuccess"
-              :on-error="handleError"
-              :on-remove="handleRemove">
-              <div style="padding: 20px 0">
-                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
-                <p>点击或将文件拖拽到这里上传</p>
-              </div>
-            </Upload>
-          </FormItem>
-          <FormItem label="申述内容">
-            <Input v-model.trim="createModel.allege" placeholder="申述内容" type="textarea"></Input>
-          </FormItem>
-        </Form>
-      </Modal>
-
-      <!--update-->
-      <Modal
-        v-model="updateFlag"
-        title="修改"
-        width="400"
-        @on-ok="update">
-        <!--@on-cancel="cancel"-->
-        <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
-          <NewSearchContract @on-select="selectContractForU"></NewSearchContract>
-          <!--合同编号自动生成 + 手工填写-->
-          <FormItem label="套餐类型" prop="type">
-            <Select v-model="updateModel.type" v-if="curPlans" disabled>
-              <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="套餐用量" v-if="_checkPlanForC()">
-            <!--做validate时, 一定要做正负判断-->
-            <Input v-model.number="updateModel.plan_num" placeholder="套餐用量默认为1" readonly></Input>
-          </FormItem>
-          <FormItem label="服务单编号" prop="service_id">
-            <Input v-model.trim="updateModel.service_id" placeholder="请输入"></Input>
-          </FormItem>
-          <FormItem label="信息来源" prop="source">
-            <Select v-model="updateModel.source">
-              <Option v-for="(s, sk) in sources" :key="sk" :value="s.id">{{s.name}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="状态" prop="status">
-            <Select v-model="updateModel.status">
-              <Option v-for="(s, sk) in status" :key="sk" :value="s">{{s}}</Option>
-            </Select>
-          </FormItem>
-          <NewSearchEmps @on-select="selectEmpForReferU" type="REFER"></NewSearchEmps>
-          <NewSearchEmps @on-select="selectEmpForCusU" type="CUS"></NewSearchEmps>
-          <NewSearchEmps @on-select="selectEmpForManU" type="MAN"></NewSearchEmps>
-          <FormItem label="派单时间" prop="time1">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time1" @on-change="setUTime1"></DatePicker>
-          </FormItem>
-          <FormItem label="解决时间">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time2" @on-change="setUTime2"></DatePicker>
-          </FormItem>
-          <FormItem label="占用工时">
-            <Input v-model.trim="updateModel.day_sum" placeholder="请输入工时"></Input>
-          </FormItem>
-          <FormItem label="是否收费" prop="charge_if">
-            <RadioGroup v-model="updateModel.charge_if" type="button">
-              <Radio label="收费"></Radio>
-              <Radio label="不收费"></Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem label="收费数额" v-show="updateModel.charge_if==='收费'">
-            <Input v-model.trim="updateModel.charge" placeholder="请输入数额"></Input>
-          </FormItem>
-          <FormItem label="是否到款" v-show="updateModel.charge_if==='收费'">
-            <RadioGroup v-model="updateModel.charge_flag" type="button">
-              <Radio label="到款"></Radio>
-              <Radio label="未到款"></Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem label="到款时间" v-show="updateModel.charge_if==='收费'">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time4" @on-change="setUTime4"></DatePicker>
-          </FormItem>
-          <FormItem label="问题描述">
-            <Input v-model.trim="updateModel.desc1" placeholder="问题描述" type="textarea"></Input>
-          </FormItem>
-          <FormItem label="处理描述">
-            <Input v-model.trim="updateModel.desc2" placeholder="处理描述" type="textarea"></Input>
-          </FormItem>
-          <FormItem label="上传文件">
-            <Upload
-              ref="upload"
-              multiple
-              type="drag"
-              :action="action"
-              :name="uploadName"
-              :default-file-list="editDefaultList"
-              :before-upload="handleUpload"
-              :on-success="handleSuccess"
-              :on-error="handleError"
-              :on-remove="handleRemove">
-              <div style="padding: 20px 0">
-                <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
-                <p>点击或将文件拖拽到这里上传</p>
-              </div>
-            </Upload>
-          </FormItem>
-          <FormItem label="申述内容">
-            <Input v-model.trim="updateModel.allege" placeholder="申述内容" type="textarea"></Input>
-          </FormItem>
-        </Form>
-      </Modal>
-
-      <!--delete-->
-      <Modal
-        v-model="deleteFlag"
-        title="删除"
-        @on-ok="_delete">
-        <p>确定要删除?</p>
-      </Modal>
-
-      <!--showVisit-->
-      <Modal
-        v-model="visitShowFlag"
-        title="回访记录"
-        width="600"
-      >
-        <p>处理结果:{{ visitShowModel.result_deal }}</p>
-        <p>服务评价:{{ result_rating[visitShowModel.result_rating].content }}</p>
-        <p v-if="typeof visitShowModel.employees !== 'undefined' && visitShowModel.employees.length > 0">回访人:{{ visitShowModel.employees[0].name }}</p>
-        <p>回访结果:{{ result_visit[visitShowModel.result_visit].content }}</p>
-        <p>回访时间:{{ visitShowModel.time }}</p>
-      </Modal>
-
-      <!--createOrUpdateVisit-->
-      <Modal
-        v-model="visitFlag"
-        title="回访"
-        width="400"
-        @on-ok="visit">
-        <!--@on-cancel="cancel"-->
-        <Form :model="visitModel" :rules="ruleValidateVisit" ref="visitForm" :label-width="80">
-          <!--自动生成 + 手工填写-->
-          <FormItem label="处理结果" prop="result_deal">
-            <Select v-model="visitModel.result_deal">
-              <Option v-for="s in result_deal" :key="s" :value="s">{{s}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="服务评价" prop="result_rating">
-            <Select v-model="visitModel.result_rating">
-              <Option v-for="s in result_rating" :key="s.id" :value="s.id">{{s.content}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="回访结果" prop="result_visit">
-            <Select v-model="visitModel.result_visit">
-              <Option v-for="s in result_visit" :key="s.id" :value="s.id">{{s.content}}</Option>
-            </Select>
-          </FormItem>
-          <!--回访人-->
-          <NewSearchEmps @on-select="selectEmpForVisit" type="VISITOR"></NewSearchEmps>
-
-          <FormItem label="回访时间" prop="time">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="visitModel.time" @on-change="setVTime"></DatePicker>
-          </FormItem>
-          <FormItem label="备注">
-            <Input v-model.trim="visitModel.remark" placeholder="备注内容" type="textarea"></Input>
-          </FormItem>
-        </Form>
-      </Modal>
-
-      <!--showDetail-->
-      <ShowDetail class="show-man-detail" ref="showDetail">
-         <span class="name">
-                <div class="icon">
-                  <Icon type="person"></Icon>
+            <!--自动生成 + 手工填写-->
+            <FormItem label="套餐类型" prop="type">
+              <Select v-model="createModel.type" v-if="curPlans">
+                <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="套餐用量" v-if="_checkPlanForC()">
+              <Input v-model.trim="createModel.plan_num" placeholder="套餐用量默认为1"></Input>
+            </FormItem>
+            <FormItem label="信息来源" prop="source">
+              <Select v-model="createModel.source">
+                <Option v-for="(s, sk) in sources" :key="sk" :value="s.id">{{s.name}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="状态" prop="status">
+              <Select v-model="createModel.status">
+                <Option v-for="(s, sk) in status" :key="sk" :value="s">{{s}}</Option>
+              </Select>
+            </FormItem>
+            <NewSearchEmps @on-select="selectEmpForRefer" type="REFER"></NewSearchEmps>
+            <NewSearchEmps @on-select="selectEmpForCus" type="CUS"></NewSearchEmps>
+            <NewSearchEmps @on-select="selectEmpForMan" type="MAN"></NewSearchEmps>
+            <FormItem label="派单时间" prop="time1">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
+            </FormItem>
+            <FormItem label="解决时间">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" @on-change="setCTime2"></DatePicker>
+            </FormItem>
+            <FormItem label="占用工时">
+              <Input v-model.trim="createModel.day_sum" placeholder="请输入工时"></Input>
+            </FormItem>
+            <FormItem label="是否收费" prop="charge_if">
+              <RadioGroup v-model="createModel.charge_if" type="button">
+                <Radio label="收费"></Radio>
+                <Radio label="不收费"></Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="收费数额" v-show="createModel.charge_if==='收费'">
+              <Input v-model.trim="createModel.charge" placeholder="请输入数额"></Input>
+            </FormItem>
+            <FormItem label="是否到款" v-show="createModel.charge_if==='收费'">
+              <RadioGroup v-model="createModel.charge_flag" type="button">
+                <Radio label="到款"></Radio>
+                <Radio label="未到款"></Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="到款时间" v-show="createModel.charge_if==='收费'">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="createModel.time4" @on-change="setCTime4"></DatePicker>
+            </FormItem>
+            <FormItem label="问题描述">
+              <Input v-model.trim="createModel.desc1" placeholder="问题描述" type="textarea"></Input>
+            </FormItem>
+            <FormItem label="处理描述">
+              <Input v-model.trim="createModel.desc2" placeholder="处理描述" type="textarea"></Input>
+            </FormItem>
+            <FormItem label="上传文件">
+              <Upload
+                ref="upload"
+                multiple
+                type="drag"
+                :action="action"
+                :name="uploadName"
+                :default-file-list="defaultList"
+                :on-success="handleSuccess"
+                :on-error="handleError"
+                :on-remove="handleRemove">
+                <div style="padding: 20px 0">
+                  <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                  <p>点击或将文件拖拽到这里上传</p>
                 </div>
-            姓名: {{ curDetail.name }}</span>
-        <span><div class="icon">
-                  <Icon type="iphone"></Icon>
+              </Upload>
+            </FormItem>
+            <FormItem label="申述内容">
+              <Input v-model.trim="createModel.allege" placeholder="申述内容" type="textarea"></Input>
+            </FormItem>
+          </Form>
+        </Modal>
+
+        <!--update-->
+        <Modal
+          v-model="updateFlag"
+          title="修改"
+          width="400"
+          @on-ok="update">
+          <!--@on-cancel="cancel"-->
+          <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
+            <NewSearchContract @on-select="selectContractForU"></NewSearchContract>
+            <!--合同编号自动生成 + 手工填写-->
+            <FormItem label="套餐类型" prop="type">
+              <Select v-model="updateModel.type" v-if="curPlans" disabled>
+                <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="套餐用量" v-if="_checkPlanForC()">
+              <!--做validate时, 一定要做正负判断-->
+              <Input v-model.number="updateModel.plan_num" placeholder="套餐用量默认为1" readonly></Input>
+            </FormItem>
+            <FormItem label="服务单编号" prop="service_id">
+              <Input v-model.trim="updateModel.service_id" placeholder="请输入"></Input>
+            </FormItem>
+            <FormItem label="信息来源" prop="source">
+              <Select v-model="updateModel.source">
+                <Option v-for="(s, sk) in sources" :key="sk" :value="s.id">{{s.name}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="状态" prop="status">
+              <Select v-model="updateModel.status">
+                <Option v-for="(s, sk) in status" :key="sk" :value="s">{{s}}</Option>
+              </Select>
+            </FormItem>
+            <NewSearchEmps @on-select="selectEmpForReferU" type="REFER"></NewSearchEmps>
+            <NewSearchEmps @on-select="selectEmpForCusU" type="CUS"></NewSearchEmps>
+            <NewSearchEmps @on-select="selectEmpForManU" type="MAN"></NewSearchEmps>
+            <FormItem label="派单时间" prop="time1">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time1" @on-change="setUTime1"></DatePicker>
+            </FormItem>
+            <FormItem label="解决时间">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time2" @on-change="setUTime2"></DatePicker>
+            </FormItem>
+            <FormItem label="占用工时">
+              <Input v-model.trim="updateModel.day_sum" placeholder="请输入工时"></Input>
+            </FormItem>
+            <FormItem label="是否收费" prop="charge_if">
+              <RadioGroup v-model="updateModel.charge_if" type="button">
+                <Radio label="收费"></Radio>
+                <Radio label="不收费"></Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="收费数额" v-show="updateModel.charge_if==='收费'">
+              <Input v-model.trim="updateModel.charge" placeholder="请输入数额"></Input>
+            </FormItem>
+            <FormItem label="是否到款" v-show="updateModel.charge_if==='收费'">
+              <RadioGroup v-model="updateModel.charge_flag" type="button">
+                <Radio label="到款"></Radio>
+                <Radio label="未到款"></Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="到款时间" v-show="updateModel.charge_if==='收费'">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time4" @on-change="setUTime4"></DatePicker>
+            </FormItem>
+            <FormItem label="问题描述">
+              <Input v-model.trim="updateModel.desc1" placeholder="问题描述" type="textarea"></Input>
+            </FormItem>
+            <FormItem label="处理描述">
+              <Input v-model.trim="updateModel.desc2" placeholder="处理描述" type="textarea"></Input>
+            </FormItem>
+            <FormItem label="上传文件">
+              <Upload
+                ref="upload"
+                multiple
+                type="drag"
+                :action="action"
+                :name="uploadName"
+                :default-file-list="editDefaultList"
+                :before-upload="handleUpload"
+                :on-success="handleSuccess"
+                :on-error="handleError"
+                :on-remove="handleRemove">
+                <div style="padding: 20px 0">
+                  <Icon type="ios-cloud-upload" size="1" style="color: #3399ff"></Icon>
+                  <p>点击或将文件拖拽到这里上传</p>
                 </div>
-            手机: <span>{{ curDetail.phone }}</span></span>
-      </ShowDetail>
+              </Upload>
+            </FormItem>
+            <FormItem label="申述内容">
+              <Input v-model.trim="updateModel.allege" placeholder="申述内容" type="textarea"></Input>
+            </FormItem>
+          </Form>
+        </Modal>
+
+        <!--delete-->
+        <Modal
+          v-model="deleteFlag"
+          title="删除"
+          @on-ok="_delete">
+          <p>确定要删除?</p>
+        </Modal>
+
+        <!--showVisit-->
+        <Modal
+          v-model="visitShowFlag"
+          title="回访记录"
+          width="600"
+        >
+          <p>处理结果:{{ visitShowModel.result_deal }}</p>
+          <p>服务评价:{{ result_rating[visitShowModel.result_rating].content }}</p>
+          <p v-if="typeof visitShowModel.employees !== 'undefined' && visitShowModel.employees.length > 0">回访人:{{ visitShowModel.employees[0].name }}</p>
+          <p>回访结果:{{ result_visit[visitShowModel.result_visit].content }}</p>
+          <p>回访时间:{{ visitShowModel.time }}</p>
+        </Modal>
+
+        <!--createOrUpdateVisit-->
+        <Modal
+          v-model="visitFlag"
+          title="回访"
+          width="400"
+          @on-ok="visit">
+          <!--@on-cancel="cancel"-->
+          <Form :model="visitModel" :rules="ruleValidateVisit" ref="visitForm" :label-width="80">
+            <!--自动生成 + 手工填写-->
+            <FormItem label="处理结果" prop="result_deal">
+              <Select v-model="visitModel.result_deal">
+                <Option v-for="s in result_deal" :key="s" :value="s">{{s}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="服务评价" prop="result_rating">
+              <Select v-model="visitModel.result_rating">
+                <Option v-for="s in result_rating" :key="s.id" :value="s.id">{{s.content}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="回访结果" prop="result_visit">
+              <Select v-model="visitModel.result_visit">
+                <Option v-for="s in result_visit" :key="s.id" :value="s.id">{{s.content}}</Option>
+              </Select>
+            </FormItem>
+            <!--回访人-->
+            <NewSearchEmps @on-select="selectEmpForVisit" type="VISITOR"></NewSearchEmps>
+
+            <FormItem label="回访时间" prop="time">
+              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="visitModel.time" @on-change="setVTime"></DatePicker>
+            </FormItem>
+            <FormItem label="备注">
+              <Input v-model.trim="visitModel.remark" placeholder="备注内容" type="textarea"></Input>
+            </FormItem>
+          </Form>
+        </Modal>
+
+        <!--showDetail-->
+        <ShowDetail class="show-man-detail" ref="showDetail">
+           <span class="name">
+                  <div class="icon">
+                    <Icon type="person"></Icon>
+                  </div>
+              姓名: {{ curDetail.name }}</span>
+          <span><div class="icon">
+                    <Icon type="iphone"></Icon>
+                  </div>
+              手机: <span>{{ curDetail.phone }}</span></span>
+        </ShowDetail>
+      </lazy-component>
     </div>
 </template>
 

@@ -4,14 +4,29 @@ import store from './store'
 //functions
 import {loadFromLocal, saveToLocal} from 'common/js/local'
 import Vue from "./main"
+import base64 from 'common/js/base64'
+
 
 axios.defaults.baseURL = url.url;
 // axios.defaults.headers.post['Content-Type'] = 'json/application'
 //axios 请求拦截器
 axios.interceptors.request.use(
   config => {
-    if (loadFromLocal('token')) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
-      config.headers.Authorization = 'Bearer ' + loadFromLocal('token');
+    let token = loadFromLocal('token')
+    if (token) {  // 判断是否存在token
+      //如果存在的话，解析token, 看是否过期
+      if(checkToken(token)){
+        // 没过期则每个http header都加上token
+        config.headers.Authorization = 'Bearer ' + token;
+      }else{
+        //过期则登出
+        saveToLocal('loginFlag', false)
+        store.commit('SET_LOGINED', false)
+        Vue.$Notice.error({
+          title: '登陆过期',
+          duration:3
+        });
+      }
     }
     return config;
   },
@@ -66,5 +81,13 @@ axios.interceptors.response.use(function (res) {
    }
   return Promise.reject(error);
 });
+
+function checkToken(token) {
+  let time, now
+  time = JSON.parse(base64.decode(token.split(".")[1])).exp * 1000
+  now = new Date().getTime()
+  return time > now ? true : false
+}
+
 
 export default axios
