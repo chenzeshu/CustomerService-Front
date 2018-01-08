@@ -761,7 +761,7 @@
                   this.total = res.total
                   this.coors = res.coors
                   this.types = res.contract_types
-//                  this.contract_plans = res.contract_plans
+                  this.contract_plans = res.contract_plans
                   this.setDataArr(res.data)
                   this._setLoading()
               })

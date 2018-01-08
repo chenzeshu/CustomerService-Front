@@ -10,7 +10,7 @@
         :remote-method="remoteMethod"
         :loading="loading"
         @on-change="wannaUpdate">
-        <i-option v-for="(option, index) in options" :value="option.id" :key="index">{{option.name}}</i-option>
+        <i-option v-for="(option, index) in options" :value="option.id" :key="option.id">{{option.name}}</i-option>
       </i-select>
     </FormItem>
   </div>
@@ -44,7 +44,10 @@
           //switch高阶写法
           let prop = {"TM":"TM", "CUS":"customer", "MAN":"MAN", "VISITOR":"visitor", "REFER":"refer_man"}[this.type] || "PM"
           return prop
-      }
+      },
+      ...mapGetters([
+        'updateObj'
+      ])
     },
     watch:{
       updateObj(newObj){
@@ -98,11 +101,10 @@
     created(){
         this.$watch('query', debounce(()=>{
           //switch高阶写法
-          this.searchType = { 'CUS' : "out"}[this.type] || "inner"
           if(typeof this.query === "object" || !!this.query === false) return;
           this.loading = true;
           this.$http
-            .get(`/employees/se/${this.searchType}/${this.query}`)
+            .get(`/employees/se/inner/${this.query}`)
             .then(res=>{
               this.loading = false;
               res = res.data.data

@@ -9,7 +9,7 @@
         :remote-method="remoteMethod"
         :loading="loading"
         @on-change="wannaUpdate">
-        <i-option v-for="(option, index) in options" :value="option.id" :key="index">{{option.name}}</i-option>
+        <i-option v-for="(option, index) in options" :value="option.id" :key="option.id">{{option.name}}</i-option>
       </i-select>
     </FormItem>
   </div>

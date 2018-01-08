@@ -28,8 +28,11 @@
                   <img src="/static/avatar.png" alt="" width="64" height="64" style="cursor: pointer"
                        @mouseover="showManDetail(key, $event)"
                        @mouseleave="closeDetail">
-                  <p class="name1">提交人</p>
-                  <p class="name2">{{ item.refer_man[0].name }}</p>
+                  <br>
+                  <br>
+                  <p class="name1">提交人：{{ item.refer_man[0].name }}</p>
+                  <p class="name2">{{ item.created_at.substr(0, 10) }}</p>
+                  <p class="name2">{{ item.created_at.substr(11) }}</p>
                 </div>
                 <div class="info1" v-if="item.customer[0]">
                   <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
@@ -221,7 +224,7 @@
               height 64px
               .name1, .name2
                 font-size:14px
-                font-weight 700
+                font-weight 500
               .name2
                 margin-top 6px
             .info1, .info2

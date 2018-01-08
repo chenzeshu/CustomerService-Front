@@ -110,8 +110,6 @@ export const curdMixin = {
       this.setUpdateIndex(index)
       if(this.url === "channelduty"){
         this.setStepObj(this.$lodash.cloneDeep(this.dataArr[index]))
-        console.log(index)
-        console.log(this.stepObj)
       }else{
         this.setUpdateObj(this.$lodash.cloneDeep(this.dataArr[index]))
       }
@@ -119,7 +117,6 @@ export const curdMixin = {
       this.editDefaultList = this.updateModel.document
     },
     update(){
-      console.log(this.updateModel)
       switch (this.url){
         case "contracts":
           this.updateModel.type1 = parseInt(this.updateModel.type1)

@@ -698,7 +698,7 @@
             case 1:
                 //更新运营调配表
                 let obj = this.stepModel.channel_operative
-              console.log(obj)
+//              console.log(obj)
 //              return
                 this.$http.post(`/apply/operative/${this.stepModel.id}`, obj)
                   .then(res=>{

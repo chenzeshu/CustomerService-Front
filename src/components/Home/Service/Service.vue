@@ -120,7 +120,7 @@
             <NewSearchContract @on-select="selectContractForU"></NewSearchContract>
             <!--合同编号自动生成 + 手工填写-->
             <FormItem label="套餐类型" prop="type">
-              <Select v-model="updateModel.type" v-if="curPlans" disabled>
+              <Select v-model="updateModel.type" v-if="curPlans">
                 <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
               </Select>
             </FormItem>

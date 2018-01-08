@@ -19,11 +19,11 @@
         title="创建"
         width="400"
         @on-ok="_create">
-        <Form :model="createModel" :label-width="80">
-          <FormItem label="套餐名称">
+        <Form :model="createModel" :label-width="80" ref="createForm" :rules="ruleValidate">
+          <FormItem label="套餐名称" prop="name">
             <Input v-model.trim="createModel.name" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="计量单位">
+          <FormItem label="计量单位" prop="unit">
             <Input v-model.trim="createModel.unit" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="描述">
@@ -40,12 +40,12 @@
         v-model="updateFlag"
         title="创建"
         width="400"
-        @on-ok="_create">
-        <Form :model="updateModel" :label-width="80">
-          <FormItem label="套餐名称">
+        @on-ok="update">
+        <Form :model="updateModel" :label-width="80" ref="updateForm" :rules="ruleValidate">
+          <FormItem label="套餐名称" prop="name">
             <Input v-model.trim="updateModel.name" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="计量单位">
+          <FormItem label="计量单位" prop="unit">
             <Input v-model.trim="updateModel.unit" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="套餐类型">
@@ -162,7 +162,15 @@
                   }
                 ],
                 createModel:{},
-                updateModel:{}
+                updateModel:{},
+                ruleValidate:{
+                    name : [
+                      {required: true, message: '请填写设备型号', trigger: 'blur'}
+                    ],
+                    unit:[
+                      {required: true, message: '请填写设备型号', trigger: 'blur'}
+                    ]
+                }
             }
         },
         created(){

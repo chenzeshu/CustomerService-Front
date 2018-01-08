@@ -206,7 +206,6 @@
         },
         passUpdate(){
             this.passModel.channel_applys[0] = this.channel_apply
-            console.log(this.passModel)
 
           this.$refs['updateForm'].validate((valid) => {
             if (!valid) {
