@@ -88,11 +88,11 @@
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
           <!--自动生成 + 手工填写-->
           <NewSearchContract @on-select="selectContractForU" type="channel"></NewSearchContract>
-          <FormItem label="套餐">
-            <Select v-model.number="updateModel.id1" style="width:200px">
-              <Option v-for="s in curPlans" :value="s.id" :key="s.id">{{s.alias}}</Option>
-            </Select>
-          </FormItem>
+          <!--<FormItem label="套餐">-->
+            <!--<Select v-model.number="updateModel.id1" style="width:200px">-->
+              <!--<Option v-for="s in curPlans" :value="s.id" :key="s.id">{{s.alias}}</Option>-->
+            <!--</Select>-->
+          <!--</FormItem>-->
           <FormItem label="服务单编号" prop="channel_id">
             <Input v-model.trim="updateModel.channel_id" placeholder="请输入"></Input>
           </FormItem>
@@ -370,10 +370,10 @@
                   }
                 ],
                 filterMultiple:false,
-                filterRemote(value, row){
+                filterRemote: function(value, row){
                   this.filterValueOne = (!!value[0]) === false ? "" : value[0]
                   this._getData()
-                }
+                }.bind(this)
               },
               {
                 title: '客户联系人',
@@ -562,7 +562,7 @@
                   checker:[ {required: true, message: '责任人不能为空', trigger: 'blur' }],  //虽然最后出来的是checker_id, 但是这里保证了checker的存在
                   t1:[{required: true, message: '开始时间不能为空', trigger: 'blur' }],
                   t2:[{required: true, message: '结束时间不能为空', trigger: 'blur' }]
-                },
+                }
           }
       },
       computed:{
@@ -768,7 +768,7 @@
           this.current = this.current == 2 ? 0 :  this.current += 1;
         },
         selectContractForC(v){
-          if(typeof contract_id !== 'object') {
+          if(typeof v !== 'object') {
             this.createModel.contractc_id = v
             this.$http(`contractcs/getContractcPlans/${v}`).then(res => {
               this.curPlans = res.data.data

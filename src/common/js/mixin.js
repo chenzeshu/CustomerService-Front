@@ -114,7 +114,15 @@ export const curdMixin = {
         this.setUpdateObj(this.$lodash.cloneDeep(this.dataArr[index]))
       }
       this.updateModel = this.$lodash.cloneDeep(this.dataArr[index])
-      this.editDefaultList = this.updateModel.document
+      console.log(this.updateModel)
+      if(typeof this.updateModel !== 'undefined' && typeof this.updateModel.document !== 'undefined'){
+        if(this.updateModel.document === null) {
+          this.editDefaultList = []
+        }else{
+          this.editDefaultList = this.updateModel.document
+        }
+      }
+
     },
     update(){
       switch (this.url){
@@ -131,7 +139,6 @@ export const curdMixin = {
         default:
           break
       }
-
       this.$refs['updateForm'].validate((valid) => {
         if (!valid) {
           this.$Message.error('请完善表单!');
@@ -144,8 +151,7 @@ export const curdMixin = {
         if(!!this.fileList){
           this.updateModel.fileList = this.fileList
         }
-        // console.log(this.updateModel)
-        // return
+
         let _url = `/${this.url}/update/${this.updateModel.id}`
         this.$http.post(_url, this.updateModel)
           .then(res => {

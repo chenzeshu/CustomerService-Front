@@ -34,5 +34,9 @@ export default {
   },
   [types.SET_FILE_LIST](state, list){
     state.fileList = list
+  },
+  [types.SET_VISIT_OBJ](state, obj){
+    // console.log(obj)
+    state.visitObj = Object.assign({}, obj)
   }
 }

@@ -13,7 +13,7 @@
     "axios": "^0.16.2",
     "chen-utils": "^1.0.5",
     "create-keyframe-animation": "0.1.0",
-    "iview": "^2.6.0",
+    "iview": "^2.8.0",
     "lodash": "^4.17.4",
     "particles": "^0.3.1",
     "particles.js": "^2.0.0",

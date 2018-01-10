@@ -16,13 +16,13 @@
 
           </div>
         </div>
-        <Row type="flex" >
+        <Row type="flex">
           <!--左边-->
           <Col :span="spanLeft" class="layout-menu-left">
             <Menu :active-name="curMenuName" :theme="theme2" width="auto" @on-select="getCurMenuName">
               <Submenu v-for="(module,mk) in modules" :key="mk" name="module.name">
                 <template slot="title">
-                  <Icon type="ios-paper" :size="iconSize"></Icon>
+                  <Icon type="navicon" :size="iconSize"></Icon>
                   <span class="layout-text">{{ module.title }}</span>
                 </template>
                   <router-link v-for="(child, ck) in module.children" :key="ck" :to="child.path">

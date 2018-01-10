@@ -247,8 +247,8 @@
               </Select>
             </FormItem>
             <!--回访人-->
-            <NewSearchEmps @on-select="selectEmpForVisit" type="VISITOR"></NewSearchEmps>
-
+            <!--<NewSearchEmps @on-select="selectEmpForVisit" type="VISITOR"></NewSearchEmps>-->
+            <SearchVisitor @on-select="selectEmpForVisit"></SearchVisitor>
             <FormItem label="回访时间" prop="time">
               <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="visitModel.time" @on-change="setVTime"></DatePicker>
             </FormItem>
@@ -278,16 +278,20 @@
   import Loading from 'base/Loading/Loading'
   import NewSearchContract from 'base/SearchContract/NewSearchContract'
   import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
+  import SearchVisitor from 'base/SearchEmps/SearchVisitor'
   import {curdMixin, pageMixin} from 'common/js/mixin'
   import {uploadMixin} from 'common/js/baseMixin'
   import Validator from 'common/js/validator'
   import ShowDetail from 'base/Show/ShowDetail'
-
+  import { mapGetters, mapMutations } from 'vuex'
   export default {
     mixins:[curdMixin, pageMixin, uploadMixin],
     data(){
       return {
         url: 'services',
+        creHeader:{
+            'Content-Type' : 'application/x-www-form-urlencoded',
+        },
         curDetail:{
           name:null,
           phone:null,
@@ -314,13 +318,13 @@
         },
         visitFlag : false,
         visitModel:{
-          service_id:null,
-          result_deal:"待解决",
-          result_rating:4,
-          result_visit:4,
-          remark:null,
-          time:null,
-          visitor:null,
+           service_id:null,
+           result_deal:"待解决",
+           result_rating:4,
+           result_visit:4,
+           remark:null,
+           time:null,
+           visitor:null,
         },
         result_deal:["待解决", "未解决", "已解决"],  //默认待解决
         result_rating:[
@@ -391,21 +395,10 @@
               }
             ],
             filterMultiple:false,
-            filterRemote(value, row){
+            filterRemote: function(value, row){
               this.filterValueOne = (!!value[0]) === false ? "" : value[0]
-              this._setLoading()
-              let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
-              this.$http.get(url)
-                .then(res=>{
-                  res = res.data.data
-                  this.total = res.total
-                  this.sources = res.sources
-                  this.types = res.types
-                  this.setDataArr(res.data)
-                  this._setLoading()
-                  return
-                })
-            }
+              this._getData()
+            }.bind(this)
           },
           {
             title: '信息来源',
@@ -519,21 +512,27 @@
             key: 'visit',
             width: 150,
             render: (h, params) => {
+              let style = {
+                props: {
+                  type: 'warning',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on:{}
+              },
+              type = '未回访'
+              if( typeof params.row.visits !== 'undefined' && params.row.visits.length > 0){
+                style.props.type = 'primary'
+                style.on.click = () =>{
+                  this._toggleVisitShow(params.index)
+                }
+                type = '查看回访记录'
+              }
+
               return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this._toggleVisitShow(params.index)
-                    }
-                  }
-                }, '查看回访记录'),
+                h('Button', style, type),
               ]);
             }
           },
@@ -576,10 +575,10 @@
               },
             ],
             filterMultiple:false,
-            filterRemote(value, row){
+            filterRemote: function(value, row){
               this.filterValueTwo = (!!value[0]) === false ? "" : value[0]
               this._getData()
-            }
+            }.bind(this)
           },
           {
             title: '到款时间',
@@ -745,7 +744,7 @@
         },
         ruleValidateVisit:{
           visitor:[
-            {required: true, message: '请选择回访人', trigger: 'blur'}
+            {required: true, type:'number', message: '请选择回访人', trigger: 'blur'}
           ] ,
           result_deal: [
             {required: true, message: '请选择处理结果', trigger: 'blur'}
@@ -761,10 +760,22 @@
           ],
         },
         curPlans:[],//用于承载根据合同id检索到的合同下的套餐
+        defaultFileList:[],
+        editDefaultFileList:[]
       }
     },
     created(){
       this._getData()
+    },
+    computed:{
+      ...mapGetters([
+          'visitObj'
+      ])
+    },
+    watch:{
+      visitModel(newModel){
+          this.setVisitObj(newModel)
+      }
     },
     methods:{
         //校验是否是金钱套餐
@@ -793,16 +804,25 @@
           this.visitShowFlag = !this.visitShowFlag
       },
       _toggleVisit(index){  //createOrUpdateVisit
-          this.visitModel = Object.assign({}, this.dataArr[index].visits[0])
+          if(this.dataArr[index].visits.length > 0) {
+            this.visitModel = Object.assign({}, this.dataArr[index].visits[0])
+            //判断this.visitModel的visitor是否存在, 不存在就装上去  ==> 针对提交后刷新页面再打开时没有visitor
+          }else{
+            this.visitModel = {service_id:this.dataArr[index].id}
+          }
+
+          this.setVisitObj(this.visitModel)
           this.visitFlag = !this.visitFlag
+
       },
       selectEmpForVisit(v){
-          this.visitModel.visitor = v
+        this.visitModel.visitor = v
       },
       setVTime(v){
-          this.visitModel.time = v
+        this.visitModel.time = v
       },
       visit(){
+          console.log(this.visitModel)
         this.$refs['visitForm'].validate((valid) => {
           if (!valid) {
             this.$Message.error('请完善表单!');
@@ -811,8 +831,7 @@
             }, 500)
             return
           }
-
-          let _url = `/${this.url}/visit/${this.visitModel.id}`
+          let _url = `/${this.url}/visit/${this.visitModel.service_id}`
           this.$http.post(_url, this.visitModel)
             .then(res => {
               res = res.data
@@ -889,10 +908,13 @@
             this.setDataArr(res.data)
             this._setLoading()
           })
-      }
+      },
+      ...mapMutations({
+        'setVisitObj' : 'SET_VISIT_OBJ'
+      })
     },
     components:{
-        Loading, NewSearchEmps, NewSearchContract, ShowDetail
+        Loading, NewSearchEmps, NewSearchContract, ShowDetail, SearchVisitor
     }
   }
 </script>

@@ -63,7 +63,7 @@ export const uploadMixin = {
       this.$Message.success('上传成功')
     },
     handleError(err, file, fileList){
-      this.$Message.error(file.name+"上传失败")
+      this.$Message.error("上传失败")
     },
     handleRemove(file, fileList){
       let files = {
