@@ -10,6 +10,10 @@
             <div class="left-title">
                 待审核服务单({{total}})
             </div>
+            <div class="middle-title">
+              <Button class="select-button" @click="setStatus('待审核')" :type="type1">申请审核</Button>
+              <Button class="select-button" @click="setStatus('申请完成')" :type="type2">申请完成</Button>
+            </div>
             <div class="right-title">
               <a href="#" style="color:#2d8cf0" @click.prevent="_getData">
                 <Icon type="ios-loop-strong"></Icon>
@@ -76,6 +80,8 @@
         </div>
       </div>
 
+      <Loading :loading="loading"></Loading>
+
       <ShowDetail class="show-man-detail" ref="showDetail">
          <span class="name">
                 <div class="icon">
@@ -98,7 +104,7 @@
   import Split from 'base/Split/Split'
   import {curdMixin} from 'common/js/mixin'
   import ShowDetail from 'base/Show/ShowDetail'
-
+  import Loading from 'base/Loading/Loading'
   export default {
         mixins:[curdMixin],
         data(){
@@ -112,6 +118,9 @@
                 email:null,
                 company:{}
               },
+            status:"待审核",
+            type1:'primary',
+            type2:null
           }
         },
         created(){
@@ -151,9 +160,21 @@
                 }
               })
           },
+          setStatus(status){
+              this.status = status
+              if(status === "申请完成"){
+                  this.type1 = null
+                this.type2 = "primary"
+              }else{
+                this.type1 = "primary"
+                this.type2 = null
+              }
+              this._getData()
+          },
           _getData(){
+            this._setLoading()
             this.$http
-              .get(`/${this.url}/verify`)
+              .get(`/${this.url}/verify/${this.status}`)
               .then( res => {
                 res = res.data.data
                 this.$nextTick(()=>{
@@ -168,7 +189,7 @@
           }
         },
         components:{
-            Split, ShowDetail
+            Split, ShowDetail, Loading
         }
     }
 </script>
@@ -199,6 +220,9 @@
         .left-title
            flex 0 0 150px
            font-weight: 700
+        .middle-title
+           .select-button
+             margin-left 50px
         .right-title
            flex 0 0 150px
       .content
