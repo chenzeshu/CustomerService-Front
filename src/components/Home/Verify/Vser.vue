@@ -475,7 +475,7 @@
             .info2
               flex 0 0 300px
           .verify
-            flex 0 0 260px
+            flex 1 0 260px
             width 105px
             margin-top 10px
     .show-man-detail

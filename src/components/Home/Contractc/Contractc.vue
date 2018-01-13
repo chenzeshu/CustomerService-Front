@@ -79,8 +79,8 @@
         <!--@on-cancel="cancel"-->
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="合同编号" prop="contract_id">
-            <Input v-model.trim="updateModel.contract_id" placeholder="请输入"></Input>
+          <FormItem label="合同编号" prop="contractc_id">
+            <Input v-model.trim="updateModel.contractc_id" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="合同名称" prop="name">
             <Input v-model.trim="updateModel.name" placeholder="请输入"></Input>
@@ -162,7 +162,6 @@
           </TabPane>
         </Tabs>
       </Modal>
-
       <!--回款详情编辑-->
       <Modal
         v-model="moneyEditFlag"
@@ -211,6 +210,39 @@
           </FormItem>
           <FormItem label="结清日期">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="moneyDetailCreateModel.t2" @on-change="setMoneyCTime2"></DatePicker>
+          </FormItem>
+        </Form>
+      </Modal>
+      <!--套餐使用情况-->
+      <Modal
+        v-model="planFlag"
+        title="合同套餐详情"
+        width="800"
+      >
+        <i-table border :columns="planColumns" :data="planModel" :loading="loading"></i-table>
+        <br>
+        <i-button type="primary" @click="_toggleAddPlan">新增套餐</i-button>
+      </Modal>
+      <!--添加套餐-->
+      <Modal
+        v-model="planCreateFlag"
+        title="为合同添加套餐"
+        width="400"
+        @on-ok="addPlan">
+        <Form :model="planCreateModel" :label-width="80">
+          <FormItem label="套餐类型">
+            <Select v-model.trim="planCreateModel.plan_id" placeholder="请选择套餐">
+              <Option :value="c.id" v-for="(c, ck) in contractc_plans" :key="ck">{{c.name}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="套餐名">
+            <Input v-model.trim="planCreateModel.alias" placeholder="请输入标准/规格描述(别名)" type="textarea"></Input>
+          </FormItem>
+          <FormItem label="填写总分钟数">
+            <Input v-model.number="planCreateModel.total" placeholder="请输入分钟数"></Input>
+          </FormItem>
+          <FormItem label="备注">
+            <Input v-model.trim="planCreateModel.remark" placeholder="有备注吗?" type="textarea"></Input>
           </FormItem>
         </Form>
       </Modal>
@@ -343,10 +375,29 @@
                {
                  title:"操作",
                  align: "center",
-                 width: 200,
+                 width: 250,
                  fixed:'right',
                  render: (h, params) => {
+                   let planNum = 0
+                     if(typeof params.row.contractc_plans !== "undefined"){
+                        planNum = params.row.contractc_plans.length
+                     }
+
                    return h('div', [
+                     h('Button', {
+                       props: {
+                         type: 'default',
+                         size: 'small'
+                       },
+                       style: {
+                         marginRight: '5px'
+                       },
+                       on: {
+                         click: () => {
+                           this._togglePlans(params.index)
+                         }
+                       }
+                     }, `${planNum}个套餐`),
                      h('Button', {
                        props: {
                          type: 'default',
@@ -394,7 +445,7 @@
                name: null,  //合同名称
                company:null,
                company_id:null,
-               contract_id:null,  //合同编号
+               contractc_id:null,  //合同编号
                PM:null,
                time:null,
                beginline:null,
@@ -407,7 +458,7 @@
                name: null,  //合同id
                company:null,
                company_id:null,
-               contract_id:null,  //合同编号
+               contractc_id:null,  //合同编号
                PM:null,
                time:null,
                beginline:null,
@@ -490,6 +541,77 @@
              //回款细节
              moneyDetailCreateFlag:false,
              moneyDetailCreateModel:{},
+             //套餐详情
+             contractc_plans:[],
+             planFlag:false,
+             planCreateFlag:false,
+             contractc_id : null, //用于存储打开时的合同id便于ORM
+             planIndex:null,  //用于更新planModel
+             planChanged:0,
+             planColumns:[
+               {
+                 title:"#",
+                 key:"id",
+                 width:60,
+               },
+               {
+                 title:"描述(别名)",
+                 key:"alias",
+                 width:150,
+               },
+               {
+                 title:"套餐原名",
+                 key:"name",
+                 width:120,
+                 render: (h, params) => {
+                   return params.row.plan.name
+                 }
+               },
+               {
+                 title:"总数(分钟)",
+                 key:"total",
+                 width:100,
+                 render: (h, params) => {
+                   return params.row.total * 15
+                 }
+               },
+               {
+                 title:"已使用(分钟)",
+                 key:"use",
+                 width:100,
+                 render: (h, params) => {
+                   return params.row.use * 15
+                 }
+               },
+               {
+                 title:"备注",
+                 key:"remark",
+                 width:150,
+               },
+               {
+                 title:"操作",
+                 align: "center",
+                 width: 100,
+                 fixed:'right',
+                 render: (h, params) => {
+                   return h('div', [
+                     h('Button', {
+                       props: {
+                         type: 'error',
+                         size: 'small'
+                       },
+                       on: {
+                         click: () => {
+                           this._togglePlanDelete(params.row.id)
+                         }
+                       }
+                     }, '删除')
+                   ]);
+                 }
+               }
+             ],
+             planModel:[],
+             planCreateModel:{}
            }
        },
        created(){
@@ -505,9 +627,41 @@
            if(this.index !== null){
              this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[this.index].channel_money.channel_money_details)
            }
+           if(this.planIndex !== null){
+             this.planModel = this.$lodash.cloneDeep(this.dataArr[this.planIndex].contractc_plans)
+           }
          }
        },
        methods:{
+         //套餐详情
+         _togglePlans(index){
+           this.planIndex = index
+           this.contractc_id = this.dataArr[index].id
+           this.planModel = this.$lodash.cloneDeep(this.dataArr[index].contractc_plans)
+           this.planFlag = !this.planFlag
+         },
+         _toggleAddPlan(){
+           this.planCreateFlag = !this.planCreateFlag
+         },
+         addPlan(){
+           let url = `/${this.url}/addPlan/${this.contractc_id}`
+           this.$http.post(url, this.planCreateModel)
+             .then(res=>{
+               if(parseInt(res.data.code) === 2004){
+                 this._getData()
+               }
+             })
+         },
+         _togglePlanDelete(id){
+           let url = `/${this.url}/deletePlan/${id}`
+           this.$http
+             .get(url)
+             .then(res=>{
+               if(parseInt(res.data.code) === 2006){
+                 this._getData()
+               }
+             })
+         },
          //回款的一些组件暴露的选择方法, 不放入moneyMixin
          setMoneyCTime1(v){
            this.moneyDetailCreateModel.t1 = v
@@ -563,6 +717,7 @@
                 res = res.data.data
                 this.total = res.total
                 this.setDataArr(res.data)
+                this.contractc_plans = res.contractc_plans
                 this._setLoading()
               })
           },
