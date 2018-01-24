@@ -576,6 +576,9 @@
             ],
             filterMultiple:false,
             filterRemote: function(value, row){
+                if(this.filterValueOne === ""){
+                  this.filterValueOne = "待派单"
+                }
               this.filterValueTwo = (!!value[0]) === false ? "" : value[0]
               this._getData()
             }.bind(this)
@@ -822,7 +825,7 @@
         this.visitModel.time = v
       },
       visit(){
-          console.log(this.visitModel)
+//          console.log(this.visitModel)
         this.$refs['visitForm'].validate((valid) => {
           if (!valid) {
             this.$Message.error('请完善表单!');
@@ -905,6 +908,16 @@
             this.total = res.total
             this.sources = res.sources
             this.types = res.types
+
+            //假设无数据
+            if(res.data.length === 0){
+              this.$Message.info({
+                'content': `没有数据`,
+                'duration':3
+              })
+              res.data = [{}]
+            }
+
             this.setDataArr(res.data)
             this._setLoading()
           })

@@ -41,7 +41,7 @@ export const curdMixin = {
       this.setUpdateIndex(null)
     },
     _create(){
-      // console.log(this.createModel)
+      console.log(this.createModel)
       // return
       switch (this.url){
         // case "contracts":

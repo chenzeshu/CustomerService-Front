@@ -63,6 +63,14 @@
           </FormItem>
         </Form>
       </Modal>
+
+      <!--delete-->
+      <Modal
+        v-model="deleteFlag"
+        title="删除"
+        @on-ok="_delete">
+        <p>确定删除排班?</p>
+      </Modal>
     </div>
 </template>
 
@@ -91,7 +99,7 @@
                         h('Button', {
                           props: {size: 'small'},
                           style: {margin: '3px'},
-                        }, customer.name)
+                        }, typeof customer !=="undefined" && customer.name)
                       ]);
                     }
                   },

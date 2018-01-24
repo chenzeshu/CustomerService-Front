@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import {mapGetters} from 'vuex'
+  import {mapGetters, mapMutations} from 'vuex'
   import {debounce} from 'common/js/utils'
   import {selectMixin} from 'common/js/baseMixin'
 
@@ -46,12 +46,17 @@
         }
       },
       cname(){
-          if(typeof this.stepObj.checker !== 'undefined'){
-            return this.stepObj.checker.name
+          if(this.updateIndex === null && this.options.length === 0){  //用于关闭update打开create时, 避免出现残留痕迹
+            return null
+          }else{
+            if(typeof this.stepObj.checker !== 'undefined' && this.stepObj.checker !== null){
+              return this.stepObj.checker.name
+            }
           }
+
       },
       ...mapGetters([
-          'stepObj'
+          'stepObj', 'updateIndex'
       ])
     },
     watch:{
@@ -60,6 +65,9 @@
           return
         }
         this.cid =  this.stepObj.checker.id
+      },
+      updateIndex(newIndex){
+          this.options = []
       }
     },
     created(){
@@ -80,7 +88,10 @@
     methods: {
       wannaUpdate(v){
         this.$emit('on-select', v)
-      }
+      },
+      ...mapMutations({
+        'setStepObj':"SET_STEP_OBJ"
+      })
     }
   }
 </script>

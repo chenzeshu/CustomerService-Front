@@ -337,10 +337,10 @@
                 },
               ],
               filterMultiple:false,
-              filterRemote(value, row){
+              filterRemote:function(value, row){
                 this.filterValueOne = (!!value[0]) === false ? "" : value[0]
                 this._getData()
-              }
+              }.bind(this)
             },
             {
               title: '合同类型',
@@ -762,6 +762,16 @@
                   this.coors = res.coors
                   this.types = res.contract_types
                   this.contract_plans = res.contract_plans
+
+                  //假设无数据
+                  if(res.data.length === 0){
+                    this.$Message.info({
+                      'content': `没有数据`,
+                      'duration':3
+                    })
+                    res.data = [{}]
+                  }
+
                   this.setDataArr(res.data)
                   this._setLoading()
               })

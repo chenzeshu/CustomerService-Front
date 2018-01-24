@@ -79,8 +79,8 @@
         <!--@on-cancel="cancel"-->
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="合同编号" prop="contractc_id">
-            <Input v-model.trim="updateModel.contractc_id" placeholder="请输入"></Input>
+          <FormItem label="合同编号" prop="contract_id">
+            <Input v-model.trim="updateModel.contract_id" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="合同名称" prop="name">
             <Input v-model.trim="updateModel.name" placeholder="请输入"></Input>
@@ -445,7 +445,7 @@
                name: null,  //合同名称
                company:null,
                company_id:null,
-               contractc_id:null,  //合同编号
+               contract_id:null,  //合同编号
                PM:null,
                time:null,
                beginline:null,
@@ -458,7 +458,7 @@
                name: null,  //合同id
                company:null,
                company_id:null,
-               contractc_id:null,  //合同编号
+               contract_id:null,  //合同编号
                PM:null,
                time:null,
                beginline:null,
@@ -716,8 +716,18 @@
               .then(res=>{
                 res = res.data.data
                 this.total = res.total
-                this.setDataArr(res.data)
                 this.contractc_plans = res.contractc_plans
+                //假设无数据
+                if(res.data.length === 0){
+                  this.$Message.info({
+                    'content': `没有数据`,
+                    'duration':3
+                  })
+                  res.data = [{}]
+                }
+
+                this.setDataArr(res.data)
+
                 this._setLoading()
               })
           },

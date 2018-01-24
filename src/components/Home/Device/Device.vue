@@ -43,22 +43,25 @@
             <Input v-model.trim="createModel.ip" placeholder="请输入"></Input>
           </FormItem>
           <NewSearchCompany @on-select="newSelectCompanyForC"></NewSearchCompany>
+          <FormItem label="状态" prop="status">
+            <Select v-model="createModel.status">
+              <Option v-for="s in status" :key="s" :value="s">{{s}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="站类型" prop="id5">
+            <Select v-model.number="createModel.id5">
+              <Option v-for="s in info2s" :key="s.id" :value="s.id">{{s.name}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="安装时间" prop="built_at">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="createModel.built_at" @on-change="setCTime"></DatePicker>
+          </FormItem>
           <FormItem label="S/N码">
             <Input v-model.trim="createModel.sn" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="行业">
             <Select v-model="createModel.profession_id">
               <Option v-for="s in pros" :key="s.id" :value="s.id">{{s.name}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="状态">
-            <Select v-model="createModel.status">
-              <Option v-for="s in status" :key="s" :value="s">{{s}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="站类型">
-            <Select v-model="createModel.id5">
-              <Option v-for="s in info2s" :key="s.id" :value="s.id">{{s.name}}</Option>
             </Select>
           </FormItem>
           <FormItem label="天线">
@@ -70,9 +73,7 @@
           <FormItem label="lnb">
             <Input v-model.trim="createModel.lnb" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="安装时间" prop="built_at">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="createModel.built_at" @on-change="setCTime"></DatePicker>
-          </FormItem>
+
           <FormItem label="备注">
             <Input v-model.trim="createModel.remark" placeholder="备注内容" type="textarea"></Input>
           </FormItem>
@@ -99,22 +100,25 @@
             <Input v-model.trim="updateModel.ip" placeholder="请输入"></Input>
           </FormItem>
           <NewSearchCompany @on-select="newSelectCompanyForU"></NewSearchCompany>
+          <FormItem label="状态" prop="status">
+            <Select v-model="updateModel.status">
+              <Option v-for="s in status" :key="s" :value="s">{{s}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="站类型" prop="id5">
+            <Select v-model.number="updateModel.id5">
+              <Option v-for="s in info2s" :key="s.id" :value="s.id">{{s.name}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="安装时间" prop="built_at">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.built_at" @on-change="setCTime"></DatePicker>
+          </FormItem>
           <FormItem label="S/N码">
             <Input v-model.trim="updateModel.sn" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="行业">
             <Select v-model="updateModel.profession_id">
               <Option v-for="s in pros" :key="s.id" :value="s.id">{{s.name}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="状态">
-            <Select v-model="updateModel.status">
-              <Option v-for="s in status" :key="s" :value="s">{{s}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem label="站类型">
-            <Select v-model="updateModel.id5">
-              <Option v-for="s in info2s" :key="s.id" :value="s.id">{{s.name}}</Option>
             </Select>
           </FormItem>
           <FormItem label="天线">
@@ -126,9 +130,7 @@
           <FormItem label="lnb">
             <Input v-model.trim="updateModel.lnb" placeholder="请输入"></Input>
           </FormItem>
-          <FormItem label="安装时间" prop="built_at">
-            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.built_at" @on-change="setCTime"></DatePicker>
-          </FormItem>
+
           <FormItem label="备注">
             <Input v-model.trim="updateModel.remark" placeholder="备注内容" type="textarea"></Input>
           </FormItem>
@@ -289,7 +291,7 @@
                 aerial:null,
                 pa:null,
                 lnb:null,
-                build_at:null,
+                built_at:null,
                 remark:null
             },
             updateModel:{
@@ -304,7 +306,7 @@
                 aerial:null,
                 pa:null,
                 lnb:null,
-                build_at:null,
+                built_at:null,
                 remark:null
             },
             ruleValidate:{
@@ -317,11 +319,17 @@
               ip:[
                 {required: true, message: '请填写ip', trigger: 'blur'}
               ],
+              status:[
+                {required: true, message: '请选择状态', trigger: 'blur'}
+              ],
+              id5:[
+                {type:'number', required: true, message: '请选择站类型', trigger: 'blur'}
+              ],
               company_id:[
-                {type:'number', required: true, message: '请选择公司', trigger: 'blur'}
+                {type:'number', required: true, message: '请选择单位', trigger: 'blur'}
               ],
               built_at:[
-                {required: true, message: '请填写ip', trigger: 'blur'}
+                {required: true, message: '请填写安装时间', trigger: 'blur'}
               ]
             }
           }
@@ -331,7 +339,7 @@
       },
       methods:{
           setCTime(v){
-              this.createModel.build_at = v
+              this.createModel.built_at = v
           },
           newSelectCompanyForC(v){
               this.createModel.company_id = v

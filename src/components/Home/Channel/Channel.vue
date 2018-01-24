@@ -797,13 +797,22 @@
             .then(res=>{
               res = res.data.data
               this.total = res.total
-              this.setDataArr(res.data)
               //utils
               this.sources = res.service_sources
               this.plans = res.plans
               this.jihuas = res.jihuas
               this.tongxins = res.tongxins
               this.zhanTypes = res.zhantypes
+
+              //假设无数据
+              if(res.data.length === 0){
+                this.$Message.info({
+                  'content': `没有数据`,
+                  'duration':3
+                })
+                res.data = [{}]
+              }
+              this.setDataArr(res.data)
               this._setLoading()
             })
         },
