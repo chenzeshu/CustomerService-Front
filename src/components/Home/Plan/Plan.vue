@@ -35,12 +35,12 @@
         </FormItem>
         <FormItem label="网络类型" prop="t1">
           <RadioGroup v-model="createModel.t1" type="button">
-            <Radio v-for="s in info1s"  :key="s.id" :label="s.name"></Radio>
+            <Radio v-for="s in info6s"  :key="s.id" :label="s.name"></Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="带宽类型" prop="t2">
           <RadioGroup v-model="createModel.t2" type="button">
-            <Radio v-for="s in info6s"  :key="s.id" :label="s.name"></Radio>
+            <Radio v-for="s in info1s"  :key="s.id" :label="s.name"></Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="是否独享" prop="t3">
@@ -127,6 +127,11 @@
             title: `带宽类型`,
             key: 't2',
             width: 160,
+          },
+          {
+            title:`是否独享`,
+            key:'t3',
+            width:160
           },
           {
             title:"操作",

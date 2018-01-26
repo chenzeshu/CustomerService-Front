@@ -1,5 +1,5 @@
 <template>
-  <div class="signin" id="particles">
+  <div class="signin" id="particles"  @keyup.enter="login">
     <span class="logo">中网客服管理平台</span>
     <div class="signin-wrapper" ref="signinWrapper">
       <form autocomplete="off" class="input">

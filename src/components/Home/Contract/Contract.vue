@@ -754,8 +754,14 @@
         selectCompanyIdForU(v){this.updateModel.company_id = v},
         _getData(){
             this._setLoading()
-            let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
-            this.$http.get(url)
+            let url = `/${this.url}/page/${this.page}/${this.pageSize}`,
+            data = {
+              value1:this.filterValueOne,
+              value2:this.filterValueTwo,
+              value3:this.filterValueThree,
+              value4:this.filterValueFour
+            }
+            this.$http.post(url, data)
               .then(res=>{
                   res = res.data.data
                   this.total = res.total

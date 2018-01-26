@@ -4,13 +4,26 @@
         <Icon type="plus-circled"></Icon>
       </div>
 
+
       <div class="service-search">
-        <input type="text" v-model.trim="searchWord" placeholder="服务单号" class="search">
+        <input type="text" v-model.trim="searchWord" placeholder="服务单号" class="search" @keyup.down="showSearch" @keyup.up="showSearch">
       </div>
+
+      <div class="service-search-company" v-if="searchFlag">
+        <input type="text" v-model.trim="filterValueThree" placeholder="公司名" class="search" @keyup.enter="_getData()">
+      </div>
+
+      <div class="service-search-emp" v-if="searchFlag">
+        <input type="text" v-model.trim="filterValueFour" placeholder="员工名" class="search" @keyup.enter="_getData()">
+      </div>
+
+      <!--导出csv-->
+      <Button type="primary" size="small" @click="exportData" class="csv-button"><Icon type="ios-download-outline"></Icon>导出本页</Button>
 
       <lazy-component>
       <div v-cloak>
-        <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"></i-table>
+        <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"
+        ref="table"></i-table>
       </div>
       </lazy-component>
 
@@ -289,9 +302,6 @@
     data(){
       return {
         url: 'services',
-        creHeader:{
-            'Content-Type' : 'application/x-www-form-urlencoded',
-        },
         curDetail:{
           name:null,
           phone:null,
@@ -351,6 +361,7 @@
           {
             title: '所属单位',
             width: 200,
+            key:"company",
             fixed: 'left',
             render: (h, params) => {
               if (this.dataArr[params.index].contract) {
@@ -764,7 +775,8 @@
         },
         curPlans:[],//用于承载根据合同id检索到的合同下的套餐
         defaultFileList:[],
-        editDefaultFileList:[]
+        editDefaultFileList:[],
+        searchFlag:false
       }
     },
     created(){
@@ -781,6 +793,9 @@
       }
     },
     methods:{
+      showSearch(){
+        this.searchFlag = !this.searchFlag
+      },
         //校验是否是金钱套餐
       _checkPlanForC(){
           let id = this.createdModel && this.createdModel.type
@@ -899,10 +914,50 @@
       selectEmpForCusU(v){
         this.updateModel.customer = v
       },
+      exportData(){
+        this.$refs.table.exportCsv({
+          filename: '原始数据.xlsx',
+          data: this.dataArr.map((item, index)=>{
+              //信息来源
+              item.source = typeof this.sources[item.source] !=="undefined" && this.sources[item.source].name
+              //服务类型
+              item.source = typeof this.types[item.type] !=="undefined" && this.types[item.type].name
+              //所属合同
+              item.company = item.contract.company.name
+              //申请人
+              let name = ""
+              for(let i in item.refer_man){
+                  name += item.refer_man[i].name +" "
+              }
+              item.refer_man = name
+              //服务员工
+              name = ""
+              for(let i in item.man){
+                name += item.man[i].name +" "
+              }
+              item.man = name
+              //客户联系人
+              name = ""
+              for(let i in item.customer){
+                name += item.customer[i].name +" "
+              }
+              item.customer= name
+              return item
+          })
+        });
+      },
       _getData(){
         this._setLoading()
-        let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
-        this.$http.get(url)
+        //1=>状态 2=>是否到款 3=>公司 =>员工
+        let url = `/${this.url}/page/${this.page}/${this.pageSize}`,
+            data = {
+              value1:this.filterValueOne,
+              value2:this.filterValueTwo,
+              value3:this.filterValueThree,
+              value4:this.filterValueFour
+            }
+
+        this.$http.post(url, data)
           .then(res=>{
             res = res.data.data
             this.total = res.total
@@ -917,7 +972,14 @@
               })
               res.data = [{}]
             }
-
+            let arr = []
+            //不知道为什么, 当进行筛选时, 返回变成对象了
+            if(typeof res.data === "object"){
+                for(let i in res.data){
+                  arr.push(res.data[i])
+                }
+                res.data = arr
+            }
             this.setDataArr(res.data)
             this._setLoading()
           })
@@ -945,7 +1007,7 @@
       left 40px
       color #39f
       z-index 50
-    .service-search
+    .service-search, .service-search-company, .service-search-emp
       position absolute
       top 117px
       left 45px
@@ -965,4 +1027,12 @@
           font-size 12px
           font-weight 700
           color #657180
+    .service-search-company
+      top 142px
+    .service-search-emp
+      top 162px
+    .csv-button
+      position absolute
+      top: 66px;
+      left: 240px;
 </style>

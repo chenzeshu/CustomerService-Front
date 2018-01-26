@@ -700,7 +700,8 @@
                 let obj = this.stepModel.channel_operative
 //              console.log(obj)
 //              return
-                this.$http.post(`/apply/operative/${this.stepModel.id}`, obj)
+//                this.$http.post(`/apply/operative/${this.stepModel.id}`, obj)
+                this.$http.post(`/apply/operative`, obj)
                   .then(res=>{
                     res = res.data
                     if (parseInt(res.code) === 2003) {
@@ -719,9 +720,9 @@
             case 2:
                 //更新实际表
                 let obj2 = this.stepModel.channel_real
-              console.log(obj2)
+//              console.log(obj2)
 //              return
-                this.$http.post(`/apply/real/${this.stepModel.id}`, obj2)
+                this.$http.post(`/apply/real`, obj2)
                   .then(res=>{
                     res = res.data
                     if (parseInt(res.code) === 2003) {
@@ -792,8 +793,15 @@
         },
         _getData(){
           this._setLoading()
-          let url = `/${this.url}/page/${this.page}/${this.pageSize}/${this.filterValueOne}/${this.filterValueTwo}`
-          this.$http.get(url)
+          let url = `/${this.url}/page/${this.page}/${this.pageSize}`,
+            data = {
+              value1:this.filterValueOne,
+              value2:this.filterValueTwo,
+              value3:this.filterValueThree,
+              value4:this.filterValueFour
+            }
+
+          this.$http.post(url, data)
             .then(res=>{
               res = res.data.data
               this.total = res.total

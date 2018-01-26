@@ -194,7 +194,7 @@
         _getData(){
             this._setLoading()
             this.$http
-                .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+                .post(`/${this.url}/page/${this.page}/${this.pageSize}`)
                 .then(res=>{
                   if(parseInt(res.data.code) === 2000){
                     res = res.data.data

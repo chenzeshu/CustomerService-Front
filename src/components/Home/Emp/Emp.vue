@@ -232,8 +232,15 @@
           },
           _getData(){
               this._setLoading()
-              this.$http
-                  .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+            let url = `/${this.url}/page/${this.page}/${this.pageSize}`,
+              data = {
+                value1:this.filterValueOne,
+                value2:this.filterValueTwo,
+                value3:this.filterValueThree,
+                value4:this.filterValueFour
+              }
+
+            this.$http.post(url, data)
                   .then( res => {
                       res = res.data.data
                       this.$nextTick(()=>{
