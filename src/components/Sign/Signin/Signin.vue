@@ -2,7 +2,7 @@
   <div class="signin" id="particles"  @keyup.enter="login">
     <span class="logo">中网客服管理平台</span>
     <div class="signin-wrapper" ref="signinWrapper">
-      <form autocomplete="off" class="input">
+      <div autocomplete="off" class="input" onsubmit="login">
         <div class="icon">
           <Icon type="person-stalker"></Icon>
         </div>
@@ -10,8 +10,8 @@
         <Poptip trigger="hover" title="提示标题" placement="right" v-model="userFlag">
           <div slot="title">{{ userPlcehd }}不能为空</div>
         </Poptip>
-      </form>
-      <form autocomplete="off" class="input">
+      </div>
+      <div autocomplete="off" class="input" onsubmit="login">
         <div class="icon">
           <Icon type="ios-locked"></Icon>
         </div>
@@ -19,7 +19,7 @@
         <Poptip trigger="hover" title="提示标题" placement="right" v-model="passFlag">
           <div slot="title" class="my-danger">{{ passPlcehd }}不能为空</div>
         </Poptip>
-      </form>
+      </div>
       <!--登陆失败超过3次显示验证码-->
       <div class="code" v-show="loginFalse">
           <input type="text" :placeholder="codePlcehd" v-model="code">
