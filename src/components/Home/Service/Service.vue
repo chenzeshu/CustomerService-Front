@@ -960,7 +960,6 @@
         this.$http.post(url, data)
           .then(res=>{
             res = res.data.data
-            this.total = res.total
             this.sources = res.sources
             this.types = res.types
 
@@ -981,6 +980,7 @@
                 res.data = arr
             }
             this.setDataArr(res.data)
+            this.setTotal(res.total)
             this._setLoading()
           })
       },
@@ -1034,5 +1034,5 @@
     .csv-button
       position absolute
       top: 66px;
-      left: 240px;
+      left: 300px;
 </style>

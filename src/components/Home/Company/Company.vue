@@ -199,7 +199,7 @@
                   if(parseInt(res.data.code) === 2000){
                     res = res.data.data
                     this.$nextTick(()=>{
-                      this.total = res.total
+                      this.setTotal(res.total)
                       this.professions = res.pros
                       this.setDataArr(res.data)
                       this.loading = false

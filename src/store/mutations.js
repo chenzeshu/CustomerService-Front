@@ -38,5 +38,9 @@ export default {
   [types.SET_VISIT_OBJ](state, obj){
     // console.log(obj)
     state.visitObj = Object.assign({}, obj)
+  },
+  [types.SET_TOTAL](state, total){
+    state.total = total
   }
+
 }

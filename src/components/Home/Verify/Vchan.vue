@@ -163,7 +163,6 @@
     data () {
       return {
           url:'apply',
-          total:0,
           dataCount : null,
           PFlag:false,           //通过审核ModelFlag
           contentIndex:null,
@@ -259,7 +258,7 @@
               res = res.data.data
               this.$nextTick(()=>{
                 this.$Message.info(`有${res.total}条数据`);
-                this.total = res.total
+                this.setTotal(res.total)
                 this.setDataArr(res.data)
                 this.tongxin = res.tongxin
                 this.jihua = res.jihua

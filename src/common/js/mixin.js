@@ -13,11 +13,12 @@ export const curdMixin = {
       // updateIndex:null, 放进vuex了
       deleteIndex:null,
       searchWord:null,
+      modalShow:true,  //用来控制checker搜索框的销毁与重建
     }
   },
   computed:{
     ...mapGetters([
-      'dataArr', 'updateIndex', 'updateObj', 'stepObj'
+      'dataArr', 'updateIndex', 'updateObj', 'stepObj', 'total'
     ])
   },
   mounted(){
@@ -38,10 +39,15 @@ export const curdMixin = {
   methods:{
     _toggleCreate(){
       this.createFlag = ! this.createFlag
+      this.createModel = {}
       this.setUpdateIndex(null)
     },
     _create(){
-      console.log(this.createModel)
+      this.modalShow = false
+      this.$nextTick(()=>{
+        this.modalShow = true
+      })
+      // console.log(this.createModel)
       // return
       switch (this.url){
         // case "contracts":
@@ -114,7 +120,7 @@ export const curdMixin = {
         this.setUpdateObj(this.$lodash.cloneDeep(this.dataArr[index]))
       }
       this.updateModel = this.$lodash.cloneDeep(this.dataArr[index])
-      console.log(this.updateModel)
+      // console.log(this.updateModel)
       if(typeof this.updateModel !== 'undefined' && typeof this.updateModel.document !== 'undefined'){
         if(this.updateModel.document === null) {
           this.editDefaultList = []
@@ -208,13 +214,29 @@ export const curdMixin = {
                 content:`共检索到${parseInt(res.total)}个数据, 仅展示最前10个数据`,
                 duration:3
               })
-              // this.total = res.total
-              this.total = null  //仅展示前10个搜索结果, 因为如果要展示所有, 需要做2个分页, 不好做啊!
-              this.setDataArr(res.data)
+              this.setTotal(res.total)  //仅展示前10个搜索结果, 因为如果要展示所有, 需要做2个分页, 不好做啊!
+
+              if(this.url === "company"){
+                this._esCbStore(res)
+              }else{
+                this._normalCbStore(res)
+              }
+
               this.loading = false
             })
-        }, 1000)
+        }, 1500)
       )
+    },
+    _esCbStore(res){
+      let data = []
+      res.data.forEach((item, index)=>{
+        data.push(item._source)
+      })
+      this.setDataArr(data)
+    },
+    _normalCbStore(res){
+      this.setDataArr(res.data)
+      console.log(res.data)
     },
     _setLoading(){
       this.loading = !this.loading
@@ -224,7 +246,8 @@ export const curdMixin = {
       setStepObj:'SET_STEP_OBJ',
       setUpdateIndex:'SET_UPDATEINDEX',
       spliceDataArr:'SPLICE_DATAARR',
-      setUpdateObj:'SET_UPDATE_OBJ'
+      setUpdateObj:'SET_UPDATE_OBJ',
+      setTotal : 'SET_TOTAL',//数据总数
     }),
   },
 }
@@ -235,7 +258,6 @@ export const pageMixin = {
     return {
       page:1,  //当前页码
       pageSize:10, //单页数目
-      total:100,   //数组总数
       filterValueOne:"",
       filterValueTwo:"",
       filterValueThree:"",

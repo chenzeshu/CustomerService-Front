@@ -30,7 +30,7 @@
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" :rules="ruleValidate" ref="createForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="设备编号" prop="device_id">
+          <FormItem label="设备型号" prop="device_id">
             <Input v-model.trim="createModel.device_id" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="设备类型" prop="type">
@@ -88,7 +88,7 @@
         <!--@on-cancel="cancel"-->
         <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <FormItem label="设备编号" prop="device_id">
+          <FormItem label="设备型号" prop="device_id">
             <Input v-model.trim="updateModel.device_id" placeholder="请输入"></Input>
           </FormItem>
           <FormItem label="设备类型" prop="type">
@@ -352,7 +352,7 @@
             this.$http.get(`/${this.url}/page/${this.page}/${this.pageSize}`)
               .then(res=>{
                 res = res.data.data
-                this.total = res.total
+                this.setTotal(res.total)
                 this.pros = res.professions
                 this.setDataArr(res.data)
                 this.info2s = res.info2s

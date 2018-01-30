@@ -27,12 +27,12 @@
         @on-ok="_create">
         <!--@on-cancel="cancel"-->
         <Form :model="createModel" ref="createForm" :label-width="80">
-          <SearchChecker @on-select="selectEmpForMan" type="MAN"></SearchChecker>
+          <SearchChecker @on-select="selectEmpForMan" type="MAN" v-if="modalShow"></SearchChecker>
           <FormItem label="开始时间">
-            <DatePicker type="datetime" placeholder="选择日期" style="width: 200px" @on-change="setCTime1"></DatePicker>
+            <DatePicker type="datetime" placeholder="选择日期" style="width: 200px" :value="createModel.t1" @on-change="setCTime1"></DatePicker>
           </FormItem>
           <FormItem label="结束时间">
-            <DatePicker type="datetime" placeholder="选择日期" style="width: 200px" @on-change="setCTime2"></DatePicker>
+            <DatePicker type="datetime" placeholder="选择日期" style="width: 200px" :value="createModel.t2" @on-change="setCTime2"></DatePicker>
           </FormItem>
           <FormItem label="备注">
             <Input v-model.trim="createModel.remark" placeholder="备注" type="textarea"></Input>
@@ -45,11 +45,13 @@
         v-model="updateFlag"
         title="修改"
         width="400"
-        @on-ok="update">
+        @on-ok="update"
+        @on-cancel="rebuild"
+      >
         <!--@on-cancel="cancel"-->
         <Form :model="updateModel" ref="updateForm" :label-width="80">
           <!--自动生成 + 手工填写-->
-          <SearchChecker @on-select="selectEmpForManU" type="MAN"></SearchChecker>
+          <SearchChecker @on-select="selectEmpForManU" type="MAN" ref="searchCheckForU"></SearchChecker>
           <FormItem label="开始时间">
             <DatePicker type="datetime" placeholder="选择日期" style="width: 200px"
                         :value="updateModel.t1" @on-change="setUTime1"></DatePicker>
@@ -165,6 +167,9 @@
             this._getData()
         },
         methods:{
+          rebuild(){
+            this.$refs.searchCheckForU.rebuild()
+          },
           selectEmpForMan(v){
             this.createModel.employee_id = v
           },
@@ -189,7 +194,7 @@
             this.$http.get(url)
               .then(res=>{
                 res = res.data.data
-                this.total = res.total
+                this.setTotal(res.total)
                 this.setDataArr(res.data)
                 this._setLoading()
               })

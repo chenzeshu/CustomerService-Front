@@ -721,7 +721,6 @@
             this.$http.post(url, data)
               .then(res=>{
                 res = res.data.data
-                this.total = res.total
                 this.contractc_plans = res.contractc_plans
                 //假设无数据
                 if(res.data.length === 0){
@@ -735,6 +734,7 @@
                 this.setDataArr(res.data)
 
                 this._setLoading()
+                this.setTotal(res.total)
               })
           },
          ...mapMutations({

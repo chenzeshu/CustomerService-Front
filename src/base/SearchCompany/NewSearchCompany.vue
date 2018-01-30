@@ -34,7 +34,7 @@
     },
     created(){
         this.$watch('query', debounce(()=>{
-          if(typeof this.query === "object" || !!this.query === false) return;
+          if(typeof this.query === "object" || !!this.query === false || (typeof this.updateObj.company !== 'undefined' && this.query === this.updateObj.company.name && !!this.updateIndex)) return;
           this.loading = true;
           this.$http
             .get(`/employees/sc/${this.query}`)

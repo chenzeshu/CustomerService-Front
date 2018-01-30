@@ -163,7 +163,6 @@
     data () {
       return {
           url:'applyTemp',
-          total:0,
           dataCount : null,
           PFlag:false,           //通过审核ModelFlag
           contentIndex:null,
@@ -262,15 +261,15 @@
               res = res.data.data
               this.$nextTick(()=>{
                 if(parseInt(res.code) === -4001){
-                  this.total = 0;
+                  this.setTotal(0)
                   this.serverRes = "你没有权限"
                 }else if(parseInt(res.total) === 0){
-                  this.total = 0;
+                  this.setTotal(0)
                   this.serverRes = "暂时没有新申请"
                 }
                 else{
                   this.$Message.info(`有${res.total}条数据`);
-                  this.total = res.total
+                  this.setTotal(res.total)
                   this.setDataArr(res.data)
                   this.tongxin = res.tongxin
                   this.jihua = res.jihua

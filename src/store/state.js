@@ -3,6 +3,7 @@ const state = {
   username:null,
   logined:false,
   dataArr:[],  //用于承接各个模块的AJAX数据
+  total:null,
   updateIndex:null,
   updateObj:[],
   stepObj:{},

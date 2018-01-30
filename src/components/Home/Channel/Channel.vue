@@ -129,7 +129,9 @@
         v-model="stepFlag"
         title="步骤详情"
         width="450"
-        @on-ok="_updateStep">
+        @on-ok="_updateStep"
+        @on-cancel="rebuild"
+      >
         <div class="step-title">
           <Steps :current="current">
             <Step title="待审核" style="margin-left:2%"></Step>
@@ -210,7 +212,7 @@
         <div class="third" v-show="current === 2"
              v-if="stepModel.channel_real">
           <Form :model="stepModel" :label-width="80" :rules="ruleValidate3" ref="thirdForm">
-            <SearchChecker @on-select="selectCheckerForStep"></SearchChecker>
+            <SearchChecker @on-select="selectCheckerForStep" ref="searchCheckForU"></SearchChecker>
             <FormItem label="套餐" prop="plan">
               <Select v-model.number="stepModel.channel_real.id1" style="width:200px">
                 <Option v-for="item in plans" :value="item.plan_id" :key="item.id">{{ item.alias }}</Option>
@@ -226,11 +228,6 @@
                 <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
               </Select>
             </FormItem>
-            <!--<FormItem label="频率" prop="pinlv">-->
-              <!--<Select v-model.number="stepModel.channel_real.id4" style="width:200px">-->
-                <!--<Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>-->
-              <!--</Select>-->
-            <!--</FormItem>-->
             <FormItem label="开始时间" prop="t1">
               <DatePicker type="datetime" placeholder="选择日期" style="width: 200px"
                           :value="stepModel.channel_real.t1" @on-change="setRTime1"></DatePicker>
@@ -581,6 +578,9 @@
           this._getData()
       },
       methods:{
+        rebuild(){
+          this.$refs.searchCheckForU.rebuild()
+        },
 //          客户联系人弹窗
         showManDetail(key, e){
           let emp = this.dataArr[key].customer[0]
@@ -804,7 +804,7 @@
           this.$http.post(url, data)
             .then(res=>{
               res = res.data.data
-              this.total = res.total
+
               //utils
               this.sources = res.service_sources
               this.plans = res.plans
@@ -820,6 +820,7 @@
                 })
                 res.data = [{}]
               }
+              this.setTotal(res.total)
               this.setDataArr(res.data)
               this._setLoading()
             })

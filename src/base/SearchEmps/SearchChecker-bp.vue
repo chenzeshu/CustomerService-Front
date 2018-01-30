@@ -9,7 +9,7 @@
         :remote-method="remoteMethod"
         :loading="loading"
         @on-change="wannaUpdate"
-      >
+        >
         <i-option v-for="(option, index) in options" :value="option.id" :key="index">{{option.name}}</i-option>
       </i-select>
     </FormItem>
@@ -48,29 +48,29 @@
         }
       },
       cname(){
-        if(this.finalName){
-          return this.finalName
-        }
-        if(this.updateIndex === null && this.options.length === 0){  //用于关闭update打开create时, 避免出现残留痕迹
-          return null
-        }
-        else if(typeof this.stepObj.checker !== 'undefined' && this.stepObj.checker !== null){
-          return this.stepObj.checker.name
-        }
+          if(this.finalName){
+            return this.finalName
+          }
+          if(this.updateIndex === null && this.options.length === 0){  //用于关闭update打开create时, 避免出现残留痕迹
+            return null
+          }
+          else if(typeof this.stepObj.checker !== 'undefined' && this.stepObj.checker !== null){
+            return this.stepObj.checker.name
+          }
       },
       ...mapGetters([
-        'stepObj', 'updateIndex'
+          'stepObj', 'updateIndex'
       ])
     },
     watch:{
       cname(newname){
         if(typeof this.stepObj.checker === 'undefined'){
-          return
+            return
         }
         this.cid =  this.stepObj.checker.id
       },
       updateIndex(newIndex){
-        this.options = []
+          this.options = []
       }
     },
     created(){
@@ -90,15 +90,15 @@
     },
     methods: {
       wannaUpdate(v){
-        this.options.forEach((item, index)=>{
-          if(item.id === v){
-            this.finalName = item.name
-          }
-        })
+          this.options.forEach((item, index)=>{
+              if(item.id === v){
+                  this.finalName = item.name
+              }
+          })
         this.$emit('on-select', v)
       },
       rebuild(){
-        this.finalName = null
+          this.finalName = null
       }
     }
   }

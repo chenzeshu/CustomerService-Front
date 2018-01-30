@@ -9,3 +9,4 @@ export const SET_STEP_OBJ = 'SET_STEP_OBJ'
 export const SET_COMPANY_ID = 'SET_COMPANY_ID'
 export const SET_FILE_LIST = 'SET_FILE_LIST'
 export const SET_VISIT_OBJ = 'SET_VISIT_OBJ'
+export const SET_TOTAL = 'SET_TOTAL' //总个数

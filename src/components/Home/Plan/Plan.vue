@@ -205,7 +205,7 @@
             this.info1s = res.info1s
             this.info6s = res.info6s
             this.setDataArr(res.data)
-            this.total = res.total
+            this.setTotal(res.total)
             this._setLoading()
           })
       }

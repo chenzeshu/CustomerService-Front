@@ -45,7 +45,7 @@
               <Breadcrumb>
                 <BreadcrumbItem href="#">首页</BreadcrumbItem>
                 <BreadcrumbItem href="#">应用中心</BreadcrumbItem>
-                <BreadcrumbItem>{{ curMenuName }}</BreadcrumbItem>
+                <BreadcrumbItem>{{ curMenuName }}（{{total}}个）</BreadcrumbItem>
               </Breadcrumb>
             </div>
           </div>
@@ -166,7 +166,7 @@
            return this.spanLeft === 5 ? 14 : 24;
          },
          ...mapGetters([
-             'logined' , 'username'
+             'logined' , 'username', 'total'
            ])
        },
        mounted(){},

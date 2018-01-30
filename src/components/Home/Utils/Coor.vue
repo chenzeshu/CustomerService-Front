@@ -171,7 +171,7 @@
           this.$http.get(`/${this.url}/page/${this.page}/${this.pageSize}`)
             .then(res=>{
               res = res.data.data
-              this.total = res.total
+              this.setTotal(res.total)
               this.setDataArr(res.data)
               this._setLoading()
             })

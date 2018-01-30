@@ -244,7 +244,7 @@
                   .then( res => {
                       res = res.data.data
                       this.$nextTick(()=>{
-                        this.total = res.total
+                        this.setTotal(res.total)
                         this.setDataArr(res.data)
                         this.loading = false
                       })
