@@ -22,6 +22,7 @@
       <Loading :loading="loading"></Loading>
 
       <!--create-->
+      <!--form已经可以reset了-->
       <Modal
         v-model="createFlag"
         title="创建"
