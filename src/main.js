@@ -6,7 +6,7 @@ import router from './router'
 import axios from './axios'
 import iView from 'iview'
 import store from './store'
-import lodash from 'lodash'
+import {cloneDeep} from 'lodash'
 import 'iview/dist/styles/iview.css';
 import "common/stylus/index.styl"
 import VueLazyload from 'vue-lazyload'
@@ -15,7 +15,7 @@ Vue.use(VueLazyload, {
   lazyComponent:true
 })
 Vue.use(iView)
-Vue.prototype.$lodash = lodash
+Vue.prototype.$lodash = {cloneDeep}
 Vue.prototype.$http = axios
 
 Vue.config.productionTip = false

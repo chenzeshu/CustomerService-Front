@@ -51,7 +51,6 @@
   import {mapGetters, mapMutations} from 'vuex'
   import Clock from 'base/Clock/Clock'
   import url from 'common/js/url'
-  import Chen from 'chen-utils'
   import particles from 'particles.js';
 
   export default {
@@ -165,10 +164,6 @@
           this.codeFlag = true
           return
         }
-      },
-      test(){
-          let time = Chen.formatDate(new Date(), 'yMd')
-//          this.loginFalse = !this.loginFalse
       },
       ...mapMutations({
         setLogined:'SET_LOGINED'
