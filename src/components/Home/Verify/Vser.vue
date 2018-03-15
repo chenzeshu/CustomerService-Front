@@ -35,11 +35,13 @@
                        @mouseleave="closeDetail">
                   <br>
                   <br>
-                  <p class="name1">提交人：{{ item.refer_man[0].name }}</p>
-                  <p class="name2">{{ item.updated_at.substr(0, 10) }}</p>
-                  <p class="name2">{{ item.updated_at.substr(11) }}</p>
+                  <p class="name1">提交人：{{ (item.refer_man && item.refer_man[0]) && item.refer_man[0].name }}</p>
+                  <div v-if="item.updated_at">
+                    <p class="name2">{{ item.updated_at.substr(0, 10) }}</p>
+                    <p class="name2">{{ item.updated_at.substr(11) }}</p>
+                  </div>
                 </div>
-                <div class="info1" v-if="item.customer[0]">
+                <div class="info1" v-if="item.customer && item.customer[0]">
                   <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
                   <span>
                     <div class="icon">

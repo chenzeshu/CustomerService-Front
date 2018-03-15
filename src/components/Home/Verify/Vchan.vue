@@ -204,7 +204,7 @@
           this.$refs.showDetail.closeDetail()
         },
         passUpdate(){
-            this.passModel.channel_applys[0] = this.channel_apply
+          this.passModel.channel_applys[0] = this.channel_apply
 
           this.$refs['updateForm'].validate((valid) => {
             if (!valid) {
