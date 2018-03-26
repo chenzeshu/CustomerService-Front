@@ -28,11 +28,14 @@
     import {mapGetters} from 'vuex'
     import MyCard from 'base/MyCard/MyCard'
     import Split from 'base/Split/Split'
+
+    var delayKeyFrame
+
     export default {
         data(){
           return {
               calData:{},
-            loginInfo:{}
+              loginInfo:{created_at:"...", ip:"..."}
           }
         },
         computed:{
@@ -41,11 +44,25 @@
           ])
         },
         mounted(){
+          let code = "■", repeat = 1
+          delayKeyFrame = setInterval(()=> {
+            this.loginInfo = {
+              created_at: code.repeat(repeat),
+              ip: code.repeat(repeat)
+            }
+            if(repeat > 6){
+              repeat = 1
+            }else{
+              repeat++
+            }
+          }, 100)
+
           setTimeout(this._getBasicData, 1500)
         },
         methods:{
           _getBasicData(){
               this.$http.get("/calculate/basic").then(res=>{
+                  clearInterval(delayKeyFrame)
                   res = res.data
                   if(parseInt(res.code) === 200){
                       this.calData = res.data.calData
