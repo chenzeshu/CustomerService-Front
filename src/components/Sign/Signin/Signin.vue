@@ -102,7 +102,7 @@
     }
   },
   created(){
-      this._checkToken()
+      
   },
   mounted(){
     particlesJS.load('particles','static/particles.json', function() {
@@ -115,20 +115,6 @@
     ])
   },
   methods:{
-      _checkToken(){
-          //todo 第一步检查本地flag, 为真时跳转到home页面的主页开始访问
-          let loginFlag = loadFromLocal('loginFlag')
-          if(loginFlag){
-                this.setLogined(true)
-                return
-          }
-          else{
-            //todo 若flag为false, 则返回登陆页面
-            this.$Message.warning('登陆过期')
-            this.$router.push('/signin')
-          }
-
-      },
       login(){
         this._checkInput()
         let postData = {
@@ -140,7 +126,6 @@
             if(parseInt(res.code) === 1000){
                 //todo 将token存入localStorage
                 saveToLocal('token', res.data.token)
-                saveToLocal('loginFlag', true)
                 this.setLogined(true)
             }else {
 //                alert(res.msg)

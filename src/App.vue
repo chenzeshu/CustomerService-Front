@@ -10,6 +10,7 @@
   import {mapGetters, mapMutations} from 'vuex'
   import {saveToLocal, loadFromLocal} from 'common/js/local'
   import Logo from 'base/Logo/Logo.vue'
+  import base64 from 'common/js/base64'
 
   export default {
     data(){
@@ -18,9 +19,11 @@
         }
     },
     created(){
-        if(loadFromLocal('loginFlag')){
-            this.setLogined(true)
-        }
+      let token = loadFromLocal('token')
+          token = JSON.parse(base64.decode(token.split(".")[1])).exp * 1000
+      let exp = parseInt(token) * 1000,
+          now = Date.now()
+      this.setLogined( exp > now ? true : false )
     },
     computed:{
       ...mapGetters([
@@ -38,7 +41,6 @@
       },
     },
     methods:{
-
       ...mapMutations({
         setLogined:'SET_LOGINED'
       })

@@ -6,7 +6,6 @@ import {loadFromLocal, saveToLocal} from 'common/js/local'
 import Vue from "./main"
 import base64 from 'common/js/base64'
 
-
 axios.defaults.baseURL = url.url;
 // axios.defaults.headers.post['Content-Type'] = 'json/application'
 //axios 请求拦截器
@@ -14,20 +13,7 @@ axios.interceptors.request.use(
   config => {
     let token = loadFromLocal('token')
     if (token) {  // 判断是否存在token
-      //如果存在的话，解析token, 看是否过期
-      if(checkToken(token)){
-        // 没过期则每个http header都加上token
-        config.headers.Authorization = 'Bearer ' + token;
-      }else{
-        //过期则登出
-        saveToLocal('loginFlag', false)
-        store.commit('SET_LOGINED', false)
-        Vue.$Notice.error({
-          title: '登陆过期',
-          duration:3
-        });
-      }
-      axios.options.emulateJSON = true;
+      config.headers.Authorization = 'Bearer ' + token;
     }
     return config;
   },
@@ -55,7 +41,6 @@ axios.interceptors.response.use(function (res) {
        case 401:
          console.log('请勿频繁刷新页面')
          //如果是401权限问题, 不一定是登陆失败, 可能是权限不足, 不该踢出, 但是由于状态码有限, 又不想在版本1中对一个状态码分不通的code, 所以尽量避免401
-         saveToLocal('loginFlag', false)
          store.commit('SET_LOGINED', false)
          break
        case 404:
@@ -85,6 +70,7 @@ axios.interceptors.response.use(function (res) {
 function checkToken(token) {
   let time, now
   time = JSON.parse(base64.decode(token.split(".")[1])).exp * 1000
+  console.log(time)
   now = new Date().getTime()
   return time > now ? true : false
 }

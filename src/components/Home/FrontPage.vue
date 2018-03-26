@@ -40,8 +40,8 @@
               'username'
           ])
         },
-        created(){
-            this._getBasicData()
+        mounted(){
+          setTimeout(this._getBasicData, 1500)
         },
         methods:{
           _getBasicData(){
