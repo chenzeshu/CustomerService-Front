@@ -1,7 +1,13 @@
 <template>
     <div class="contract">
-      <div class="contract-plus" @click="_toggleCreate">
-        <Icon type="plus-circled"></Icon>
+      <div class="topbar-item">
+          <Button type="primary" size="small" class="item-button" @click="_toggleCreate">
+            <Icon type="android-add-circle" class="item-button-icon"></Icon><span class="item-button-text">新增</span>
+          </Button>
+
+          <Button type="ghost" size="small" class="item-button" @click="_toggleSearch">
+            <Icon type="search" class="item-button-icon"></Icon><span class="item-button-text">筛选</span>
+          </Button>
       </div>
 
       <div class="contract-search">
@@ -10,6 +16,8 @@
         </span>
         <input type="text" v-model.trim="searchWord" placeholder="合同名称" class="search">
       </div>
+
+
       <lazy-component>
       <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"></i-table>
       </lazy-component>
@@ -20,6 +28,28 @@
       </div>
 
       <lazy-component>
+        <!--筛选-->
+        <Modal
+          v-model="searchFlag"
+          @on-ok="_beginSearch"
+        >
+          <Form :model="searchObj" :label-width="80">
+            <FormItem label="所属单位">
+              <Select
+                v-model="searchObj.company.id"
+                clearable
+                filterable
+                remote
+                :loading="searchLoading"
+                :loading-text="searchCompanyLoadingText"
+                :remote-method="getCompanyQuery"
+                @keyup.enter.native="searchCompany"
+              >
+                <Option v-for="(option, index) in companies" :value="option.id" :key="index">{{option.name}}</Option>
+              </Select>
+            </FormItem>
+          </Form>
+        </Modal>
         <!--create-->
         <Modal
           v-model="createFlag"
@@ -291,6 +321,17 @@
           types:[],
           coors:[],
           contract_plans:[],
+          //筛选搜索
+          searchFlag:false,
+          searchObj:{
+            contract:{},
+            company:{}
+          },
+            //公司
+            companies:[],
+            searchLoading: false,
+            searchCompanyQuery: "",
+            searchCompanyLoadingText:"",
           columns:[
             {
               title: `　合同编号`,
@@ -701,6 +742,55 @@
       }
     },
     methods:{
+        //搜索
+      //搜索
+      _toggleSearch(){
+        this.searchFlag = !this.searchFlag
+      },
+      getCompanyQuery(query){
+        this.searchCompanyQuery = query
+        this.searchLoading = true
+        this.searchCompanyLoadingText = "按回车进行搜索"
+      },
+      searchCompany(){
+        this.$http
+          .get(`company/s/${this.searchCompanyQuery}/${this.page}/${this.pageSize}`)
+          .then(res=>{
+            this.companies = res.data.data.data
+            this.searchLoading = false
+          })
+      },
+      _beginSearch(){
+        let body = Object.assign({}, this.searchObj)
+        body.searchCondition = {
+          page: this.page,
+          pageSize: this.pageSize,
+          company_id : body.company.id,
+        }
+        this._setLoading()
+        this.$http.post(`contracts/newpage`, body).then(res=>{
+          this.$Message.success(res.msg)
+          res = res.data.data
+          this.coors = res.coors
+          this.types = res.contract_types
+          this.contract_plans = res.contract_plans
+
+          //假设无数据
+          if(res.data.length === 0){
+            this.$Message.info({
+              'content': `没有数据`,
+              'duration':3
+            })
+            res.data = [{}]
+          }
+
+          this.setDataArr(res.data)
+          this.setTotal(res.total)
+
+          this._setLoading()
+        })
+
+      },
       //套餐详情
         _togglePlans(index){
             this.planIndex = index
@@ -798,14 +888,21 @@
     width: 90%;
   .contract
     width 100%
+    .topbar-item
+      width 100%
+      position absolute
+      top 15px
+      left 85px
+      .item-button
+        float:left
+        width 80px
+        padding 4px 6px
+        margin-left 8px
+        .item-button-text, .item-button-icon
+          vertical-align baseline
+          margin-left 4px
     .page-wrapper
       margin 10px auto
-    .contract-plus
-      position absolute
-      top 117px
-      left 40px
-      color #39f
-      z-index 50
     .contract-search
       position absolute
       top 117px

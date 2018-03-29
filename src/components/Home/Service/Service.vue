@@ -3,19 +3,34 @@
       <div class="service-plus" @click="_toggleCreate">
         <Icon type="plus-circled"></Icon>
       </div>
+      <div class="topbar-item">
+        <Button type="primary" size="small" class="item-button" @click="_toggleCreate">
+          <Icon type="android-add-circle" class="item-button-icon"></Icon><span class="item-button-text">新增</span>
+        </Button>
 
+        <Button type="ghost" size="small" class="item-button" @click="showSearch">
+          <Icon type="search" class="item-button-icon"></Icon><span class="item-button-text">筛选</span>
+        </Button>
+      </div>
+
+      <Modal
+      v-model="searchFlag">
+        <Form :label-width="80">
+          <FormItem label="所属单位">
+            <Input type="text" v-model.trim="filterValueThree" placeholder="公司名" class="search" @keyup.enter.native="_getData()"></Input>
+          </FormItem>
+
+          <FormItem label="服务员工">
+            <Input type="text" v-model.trim="filterValueFour" placeholder="员工名可能会因目标有空格而搜索失败" class="search" @keyup.enter.native="_getData()"></Input>
+          </FormItem>
+        </Form>
+      </Modal>
 
       <div class="service-search">
-        <input type="text" v-model.trim="searchWord" placeholder="服务单号" class="search" @keyup.down="showSearch" @keyup.up="showSearch">
+        <input type="text" v-model.trim="searchWord" placeholder="服务单号" class="search">
       </div>
 
-      <div class="service-search-company" v-if="searchFlag">
-        <input type="text" v-model.trim="filterValueThree" placeholder="公司名" class="search" @keyup.enter="_getData()">
-      </div>
 
-      <div class="service-search-emp" v-if="searchFlag">
-        <input type="text" v-model.trim="filterValueFour" placeholder="员工名" class="search" @keyup.enter="_getData()">
-      </div>
 
       <!--导出csv-->
       <Button type="primary" size="small" @click="exportData" class="csv-button"><Icon type="ios-download-outline"></Icon>导出本页</Button>
@@ -302,6 +317,8 @@
     data(){
       return {
         url: 'services',
+        //筛选搜索
+          searchFlag:false,
         curDetail:{
           name:null,
           phone:null,
@@ -374,9 +391,9 @@
             key: 'contract_id',
             width: 150,
             render : (h, params)=>{
-                if(this.dataArr[params.index].contract){
-                    return `${this.dataArr[params.index].contract.contract_id}`
-                }
+              if(this.dataArr[params.index].contract){
+                return `${this.dataArr[params.index].contract.contract_id}`
+              }
             }
           },
           {
@@ -416,8 +433,8 @@
             key: 'source',
             width: 100,
             render: (h, params) => {
-                let index = params.row.source
-                return typeof this.sources[index] !== 'undefined' ? this.sources[index].name : '其他'
+              let index = params.row.source
+              return typeof this.sources[index] !== 'undefined' ? this.sources[index].name : '其他'
             }
           },
           {
@@ -425,8 +442,8 @@
             key: 'type',
             width: 100,
             render: (h, params) => {
-                let index = params.row.type
-                return typeof this.types[index] !== 'undefined' ? this.types[index].name : '其他'
+              let index = params.row.type
+              return typeof this.types[index] !== 'undefined' ? this.types[index].name : '其他'
             }
           },
           {
@@ -524,16 +541,16 @@
             width: 150,
             render: (h, params) => {
               let style = {
-                props: {
-                  type: 'warning',
-                  size: 'small'
+                  props: {
+                    type: 'warning',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on:{}
                 },
-                style: {
-                  marginRight: '5px'
-                },
-                on:{}
-              },
-              type = '未回访'
+                type = '未回访'
               if( typeof params.row.visits !== 'undefined' && params.row.visits.length > 0){
                 style.props.type = 'primary'
                 style.on.click = () =>{
@@ -557,11 +574,11 @@
             key: 'charge',
             width: 100,
             render: (h, params)=>{
-                if(params.row.charge_if === '收费'){
-                    return params.row.charge
-                }else{
-                    return '无'
-                }
+              if(params.row.charge_if === '收费'){
+                return params.row.charge
+              }else{
+                return '无'
+              }
             }
           },
           {
@@ -587,9 +604,9 @@
             ],
             filterMultiple:false,
             filterRemote: function(value, row){
-                if(this.filterValueOne === ""){
-                  this.filterValueOne = "待派单"
-                }
+              if(this.filterValueOne === ""){
+                this.filterValueOne = "待派单"
+              }
               this.filterValueTwo = (!!value[0]) === false ? "" : value[0]
               this._getData()
             }.bind(this)
@@ -793,6 +810,7 @@
       }
     },
     methods:{
+      //
       showSearch(){
         this.searchFlag = !this.searchFlag
       },
@@ -999,6 +1017,19 @@
     width: 90%;
   .service
     width 100%
+    .topbar-item
+      width 100%
+      position absolute
+      top 15px
+      left 85px
+      .item-button
+        float:left
+        width 80px
+        padding 4px 6px
+        margin-left 8px
+        .item-button-text, .item-button-icon
+          vertical-align baseline
+          margin-left 4px
     .page-wrapper
       margin 10px auto
     .service-plus
