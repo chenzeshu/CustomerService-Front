@@ -38,6 +38,11 @@ import Vser from 'comp/Home/Verify/Vser'
 import Vchan from 'comp/Home/Verify/Vchan'
 import VserTemp from 'comp/Home/Verify/VserTemp'
 import VchanTemp from 'comp/Home/Verify/VchanTemp'
+//Problem
+import Problem from 'comp/Home/Problem/Problem'
+import ProblemType from 'comp/Home/Problem/ProblemType'
+import ProblemRecord from 'comp/Home/Problem/ProblemRecord'
+
 
 Vue.use(Router)
 
@@ -85,6 +90,10 @@ export default new Router({
         {path:'vchan', component: Vchan},
         {path:'vserTemp', component: VserTemp},
         {path:'vchanTemp', component: VchanTemp},
+        //Problem
+        {path:'problems', component: Problem},
+        {path:'ProblemType', component: ProblemType},
+        {path:'ProblemRecord', component: ProblemRecord},
       ]
     }
   ]

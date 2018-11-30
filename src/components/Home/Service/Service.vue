@@ -30,8 +30,6 @@
         <input type="text" v-model.trim="searchWord" placeholder="服务单号" class="search">
       </div>
 
-
-
       <!--导出csv-->
       <Button type="primary" size="small" @click="exportData" class="csv-button"><Icon type="ios-download-outline"></Icon>导出本页</Button>
 
@@ -61,7 +59,7 @@
 
             <!--自动生成 + 手工填写-->
             <FormItem label="套餐类型" prop="type">
-              <Select v-model="createModel.type" v-if="curPlans">
+              <Select v-model="createModel.contract_plan_id" v-if="curPlans">
                 <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
               </Select>
             </FormItem>
@@ -90,29 +88,71 @@
             <FormItem label="占用工时">
               <Input v-model.trim="createModel.day_sum" placeholder="请输入工时"></Input>
             </FormItem>
+
             <FormItem label="是否收费" prop="charge_if">
               <RadioGroup v-model="createModel.charge_if" type="button">
                 <Radio label="收费"></Radio>
                 <Radio label="不收费"></Radio>
               </RadioGroup>
             </FormItem>
-            <FormItem label="收费数额" v-show="createModel.charge_if==='收费'">
-              <Input v-model.trim="createModel.charge" placeholder="请输入数额"></Input>
-            </FormItem>
-            <FormItem label="是否到款" v-show="createModel.charge_if==='收费'">
-              <RadioGroup v-model="createModel.charge_flag" type="button">
-                <Radio label="到款"></Radio>
-                <Radio label="未到款"></Radio>
+
+            <div v-show="createModel.charge_if === '收费'">
+              <FormItem label="收费数额">
+                <Input v-model.trim="createModel.charge" placeholder="请输入数额"></Input>
+              </FormItem>
+              <FormItem label="是否到款">
+                <RadioGroup v-model="createModel.charge_flag" type="button">
+                  <Radio label="到款"></Radio>
+                  <Radio label="未到款"></Radio>
+                </RadioGroup>
+              </FormItem>
+              <FormItem label="到款时间">
+                <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="createModel.time4" @on-change="setCTime4"></DatePicker>
+              </FormItem>
+            </div>
+
+            <FormItem label="同步故障" prop="charge_if">
+              <RadioGroup v-model="createModel.problem_if" type="button">
+                <Radio :label="parseInt(1)">
+                  <span>同步</span>
+                </Radio>
+                <Radio :label="parseInt(0)">
+                  <span>不同步</span>
+                </Radio>
               </RadioGroup>
             </FormItem>
-            <FormItem label="到款时间" v-show="createModel.charge_if==='收费'">
-              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="createModel.time4" @on-change="setCTime4"></DatePicker>
-            </FormItem>
-            <FormItem label="问题描述">
+
+            <div v-show="createModel.problem_if == 1">
+              <FormItem label="选择设备">
+                <SearchDevice @select-device="getCreateModelDevice"></SearchDevice>
+              </FormItem>
+              <FormItem label="故障类型">
+                <Select v-model="createModel.problem_type">
+                  <Option v-for="(type, key) in problem_types" :key="key" :value="type.ptype_id">{{type.ptype_name}}</Option>
+                </Select>
+              </FormItem>
+              <FormItem label="故障进展">
+                <Select v-model="createModel.problem_step">
+                  <Option v-for="(step, key) in problem_steps" :key="key" :value="step">{{step}}</Option>
+                </Select>
+              </FormItem>
+              <FormItem label="紧急程度">
+                <Select v-model="createModel.problem_urgency">
+                  <Option v-for="(urgency, key) in problem_urgencies" :key="key" :value="urgency">{{urgency}}</Option>
+                </Select>
+              </FormItem>
+              <FormItem label="重要程度">
+                <Select v-model="createModel.problem_importance">
+                  <Option v-for="(importance, key) in problem_importances" :key="key" :value="importance">{{importance}}</Option>
+                </Select>
+              </FormItem>
+            </div>
+
+            <FormItem label="问题描述" prop="desc1">
               <Input v-model.trim="createModel.desc1" placeholder="问题描述" type="textarea"></Input>
             </FormItem>
-            <FormItem label="处理描述">
-              <Input v-model.trim="createModel.desc2" placeholder="处理描述" type="textarea"></Input>
+            <FormItem label="解决方法">
+              <Input v-model.trim="createModel.desc2" placeholder="解决方法" type="textarea"></Input>
             </FormItem>
             <FormItem label="上传文件">
               <Upload
@@ -148,7 +188,7 @@
             <NewSearchContract @on-select="selectContractForU"></NewSearchContract>
             <!--合同编号自动生成 + 手工填写-->
             <FormItem label="套餐类型" prop="type">
-              <Select v-model="updateModel.type" v-if="curPlans">
+              <Select v-model="updateModel.contract_plan_id" v-if="curPlans">
                 <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
               </Select>
             </FormItem>
@@ -181,30 +221,75 @@
             <FormItem label="占用工时">
               <Input v-model.trim="updateModel.day_sum" placeholder="请输入工时"></Input>
             </FormItem>
+
             <FormItem label="是否收费" prop="charge_if">
               <RadioGroup v-model="updateModel.charge_if" type="button">
                 <Radio label="收费"></Radio>
                 <Radio label="不收费"></Radio>
               </RadioGroup>
             </FormItem>
-            <FormItem label="收费数额" v-show="updateModel.charge_if==='收费'">
-              <Input v-model.trim="updateModel.charge" placeholder="请输入数额"></Input>
-            </FormItem>
-            <FormItem label="是否到款" v-show="updateModel.charge_if==='收费'">
-              <RadioGroup v-model="updateModel.charge_flag" type="button">
-                <Radio label="到款"></Radio>
-                <Radio label="未到款"></Radio>
+
+            <div v-show="updateModel.charge_if === '收费'">
+              <FormItem label="收费数额">
+                <Input v-model.trim="updateModel.charge" placeholder="请输入数额"></Input>
+              </FormItem>
+              <FormItem label="是否到款">
+                <RadioGroup v-model="updateModel.charge_flag" type="button">
+                  <Radio label="到款"></Radio>
+                  <Radio label="未到款"></Radio>
+                </RadioGroup>
+              </FormItem>
+              <FormItem label="到款时间">
+                <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time4" @on-change="setUTime4"></DatePicker>
+              </FormItem>
+            </div>
+
+            <FormItem label="同步故障" prop="charge_if">
+              <RadioGroup v-model="updateModel.problem_if" type="button">
+                <Radio :label="parseInt(1)">
+                  <span>同步</span>
+                </Radio>
+                <Radio :label="parseInt(0)">
+                  <span>不同步</span>
+                </Radio>
               </RadioGroup>
             </FormItem>
-            <FormItem label="到款时间" v-show="updateModel.charge_if==='收费'">
-              <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.time4" @on-change="setUTime4"></DatePicker>
-            </FormItem>
-            <FormItem label="问题描述">
+
+            <div v-show="updateModel.problem_if == 1">
+              <FormItem label="选择设备" v-if="updateModel.problem">
+                <SearchDevice @select-device="getUpdateModelDevice"
+                              :deviceProp="updateModel.problem.device">
+                </SearchDevice>
+              </FormItem>
+              <FormItem label="故障类型">
+                <Select v-model="updateModel.problem_type">
+                  <Option v-for="(type, key) in problem_types" :key="key" :value="type.ptype_id">{{type.ptype_name}}</Option>
+                </Select>
+              </FormItem>
+              <FormItem label="故障进展">
+                <Select v-model="updateModel.problem_step">
+                  <Option v-for="(step, key) in problem_steps" :key="key" :value="step">{{step}}</Option>
+                </Select>
+              </FormItem>
+              <FormItem label="紧急程度">
+                <Select v-model="updateModel.problem_urgency">
+                  <Option v-for="(urgency, key) in problem_urgencies" :key="key" :value="urgency">{{urgency}}</Option>
+                </Select>
+              </FormItem>
+              <FormItem label="重要程度">
+                <Select v-model="updateModel.problem_importance">
+                  <Option v-for="(importance, key) in problem_importances" :key="key" :value="importance">{{importance}}</Option>
+                </Select>
+              </FormItem>
+            </div>
+
+            <FormItem label="问题描述" prop="desc1">
               <Input v-model.trim="updateModel.desc1" placeholder="问题描述" type="textarea"></Input>
             </FormItem>
             <FormItem label="处理描述">
               <Input v-model.trim="updateModel.desc2" placeholder="处理描述" type="textarea"></Input>
             </FormItem>
+
             <FormItem label="上传文件">
               <Upload
                 ref="upload"
@@ -306,12 +391,14 @@
   import Loading from 'base/Loading/Loading'
   import NewSearchContract from 'base/SearchContract/NewSearchContract'
   import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
+  import SearchDevice from 'base/SearchDevice/SearchDevice'
   import SearchVisitor from 'base/SearchEmps/SearchVisitor'
   import {curdMixin, pageMixin} from 'common/js/mixin'
   import {uploadMixin} from 'common/js/baseMixin'
   import Validator from 'common/js/validator'
   import ShowDetail from 'base/Show/ShowDetail'
   import { mapGetters, mapMutations } from 'vuex'
+
   export default {
     mixins:[curdMixin, pageMixin, uploadMixin],
     data(){
@@ -327,6 +414,10 @@
         },
         types: [],
         sources: [],
+        problem_types: [],
+        problem_steps: ['未解决', '运维解决中', '技术或厂商解决中', '专家解决中', '已解决'],
+        problem_urgencies: ['一般', '紧急', '非常紧急'],
+        problem_importances: ['一般', '重要', '非常重要'],
         status:["待审核", "拒绝", "待派单", "已派单", "申请完成", "已完成", "申述中"],
         visitShowFlag:false,
         visitShowModel:{
@@ -717,7 +808,15 @@
           desc2:null,
           remark:null,
           document:null,
-          allege:null
+          allege:null,
+          problem_if: 0,
+          device_id: null,
+          problem_step: null,
+          problem_type: null,
+          problem_desc: null,
+          problem_solution: null,
+          problem_urgency: null,
+          problem_importance: null
         },
         updateModel: {
           plan_num : 1, //套餐用量
@@ -741,7 +840,13 @@
           desc2:null,
           remark:null,
           document:null,
-          allege:null
+          allege:null,
+          problem_step: null,
+          problem_type: null,
+          problem_desc: null,
+          problem_solution: null,
+          problem_urgency: null,
+          problem_importance: null
         },
         ruleValidate: {
           contract_id: [
@@ -771,6 +876,9 @@
           ],
           plan_num : [
               //  做validate时, 一定要做正负判断, 不然被恶意增加了负数就杯具了
+          ],
+          desc1: [
+            {required: true, message: '请填写问题描述', trigger: 'blur'}
           ]
         },
         ruleValidateVisit:{
@@ -964,15 +1072,23 @@
           })
         });
       },
+      //todo 得到设备id的监听函数
+      getCreateModelDevice(device_id){
+        this.createModel.device_id = device_id
+      },
+      getUpdateModelDevice(device_id){
+        this.updateModel.device_id = device_id
+      },
       _getData(){
         this._setLoading()
-        //1=>状态 2=>是否到款 3=>公司 =>员工
+        //1=>状态 2=>是否到款 3=>公司 4=>员工
         let url = `/${this.url}/page/${this.page}/${this.pageSize}`,
             data = {
               value1:this.filterValueOne,
               value2:this.filterValueTwo,
               value3:this.filterValueThree,
-              value4:this.filterValueFour
+              value4:this.filterValueFour,
+              // value5:this.filterValueFive
             }
 
         this.$http.post(url, data)
@@ -980,7 +1096,7 @@
             res = res.data.data
             this.sources = res.sources
             this.types = res.types
-
+            this.problem_types = res.problem_types
             //假设无数据
             if(res.data.length === 0){
               this.$Message.info({
@@ -1007,7 +1123,8 @@
       })
     },
     components:{
-        Loading, NewSearchEmps, NewSearchContract, ShowDetail, SearchVisitor
+        Loading, NewSearchEmps, NewSearchContract, ShowDetail, SearchVisitor,
+        SearchDevice
     }
   }
 </script>

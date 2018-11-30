@@ -42,6 +42,10 @@
         <button class="button-button" @click="login">登陆</button>
       </div>
     </div>
+    <div class="icp">
+      <p class="icp-p"><a>版权归中网卫星通信股份有限公司所有</a></p>
+      <p><a href="http://www.miitbeian.gov.cn" target="_blank">icp备案号：苏ICP备13015215号-3</a></p>
+    </div>
     <!--<clock></clock>-->
   </div>
 </template>
@@ -102,7 +106,7 @@
     }
   },
   created(){
-      
+
   },
   mounted(){
     particlesJS.load('particles','static/particles.json', function() {
@@ -165,6 +169,8 @@
   @import "~common/stylus/variable"
   #particles
     position: absolute;
+    margin 0
+    padding 0
     width: 100%;
     height: 100%;
     margin-bottom -20px
@@ -174,14 +180,14 @@
     background-position: 50% 50%;
   .signin
     position absolute
-    top 0vh
+    top 0
     height 50vh
     width 100%
     .logo
       display block
       position fixed
       left 41.5vw
-      top 0vh
+      top 0
       margin-top 6vh
       font-size 32px
       letter-spacing 8px
@@ -266,4 +272,14 @@
             background $color-button-blue-hignlight
             cursor pointer
 
+    .icp
+      position fixed
+      bottom 14px
+      width 100%
+      margin 0 auto
+      font-size:16px;
+      z-index:101
+      color: red
+      .icp-p
+        margin-bottom 6px;
 </style>

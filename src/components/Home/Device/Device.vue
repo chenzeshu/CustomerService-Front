@@ -350,7 +350,7 @@
           },
           _getData(){
             this._setLoading()
-            this.$http.get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+            this.$http.post(`/${this.url}/page/${this.page}/${this.pageSize}`)
               .then(res=>{
                 res = res.data.data
                 this.setTotal(res.total)

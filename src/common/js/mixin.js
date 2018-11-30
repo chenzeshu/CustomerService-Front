@@ -29,10 +29,8 @@ export const curdMixin = {
   },
   watch:{
     dataArr(newdataArr){
-      if(newdataArr){
-        if(!newdataArr.length){
+      if(newdataArr && !newdataArr.length){
           this._setLoading()
-        }
       }
     },
   },
@@ -43,6 +41,8 @@ export const curdMixin = {
       this.setUpdateIndex(null)
     },
     _create(){
+      // console.log(this.createModel)
+      // return
       this.modalShow = false
       this.$nextTick(()=>{
         this.modalShow = true
@@ -206,8 +206,19 @@ export const curdMixin = {
           }
           this._setLoading()
 
-          this.$http
-            .get(`/${this.url}/s/${newS}/${this.page}/${this.pageSize}`)
+          let url, method, data
+          if(this.url === 'services'){
+             url = `/${this.url}/page/${this.page}/${this.pageSize}`
+             method = 'post'
+             data = {
+               'service_id': newS
+             }
+          } else {
+             url = `/${this.url}/s/${newS}/${this.page}/${this.pageSize}`
+             method = 'get'
+          }
+
+          this.$http[method](url, data)
             .then(res=>{
               res = res.data.data
               this.$Message.info({
@@ -236,7 +247,6 @@ export const curdMixin = {
     },
     _normalCbStore(res){
       this.setDataArr(res.data)
-      console.log(res.data)
     },
     _setLoading(){
       this.loading = !this.loading
@@ -320,6 +330,7 @@ export const moneyMixin = {
     }
   },
   methods:{
+    //提交/更新回款详情
     updateMoney(){
       let url = `${this.url}/updateMoney/${this.moneyId}`
       if(this.moneyEditModel.type === "不分次"){
@@ -345,11 +356,10 @@ export const moneyMixin = {
       this.moneyId = this.dataArr[index].id   //不是money表而是contract表的id, 用于orm
       this.contractMoney = this.dataArr[index].money
       this.moneyFlag = !this.moneyFlag
-
       switch (this.url){
         case "contracts":
-          this.moneyModel = this.$lodash.cloneDeep(this.dataArr[index].service_money)
-          this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[index].service_money.service_money_details)
+          this.moneyModel = this.dataArr[index].service_money === null ? [] : this.$lodash.cloneDeep(this.dataArr[index].service_money)
+          this.moneyDetailModel = this.dataArr[index].service_money === null ? {} : this.$lodash.cloneDeep(this.dataArr[index].service_money.service_money_details)
           break
         default : //contractcs
           this.moneyModel = this.$lodash.cloneDeep(this.dataArr[index].channel_money)
@@ -357,9 +367,7 @@ export const moneyMixin = {
           break
       }
 
-
-      if(typeof this.moneyModel !== 'undefined'){
-        this.moneyModel.reach = 0
+      if(typeof this.moneyModel !== 'undefined' || this.moneyModel != null){
         this.moneyDetailModel.map((item)=>{
           this.moneyModel.reach += parseInt(item.money)
         })
@@ -375,6 +383,10 @@ export const moneyMixin = {
     },
     //回款细节
     _toggleMoneyDetailCreate(){
+      if(this.moneyDetailModel === null) {
+        this.moneyDetailCreateFlag = !this.moneyDetailCreateFlag
+        return
+      }
       //校验是否超过次数
       if(this.moneyDetailModel.length >= this.moneyModel.num){
         this.$Message.error({
@@ -396,6 +408,10 @@ export const moneyMixin = {
               'content':res.msg
             })
             this._getData()
+          } else {
+            this.$Message.warning({
+              'content':res.msg
+            })
           }
         })
     },

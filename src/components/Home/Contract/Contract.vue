@@ -732,8 +732,8 @@
       ])
     },
     watch:{
-      dataArr(){
-        if(this.index !== null){
+      dataArr(newD, oldD){
+        if(this.index !== null && this.dataArr[this.index].service_money.service_money_details){
           this.moneyDetailModel = this.$lodash.cloneDeep(this.dataArr[this.index].service_money.service_money_details)
         }
         if(this.planIndex !== null){
@@ -742,7 +742,6 @@
       }
     },
     methods:{
-        //搜索
       //搜索
       _toggleSearch(){
         this.searchFlag = !this.searchFlag

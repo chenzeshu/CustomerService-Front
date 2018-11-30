@@ -3,7 +3,7 @@
       <Alert type="warning">提示: 尊敬的 {{ username }} ， 欢迎您的使用， 您上次的登陆时间为{{loginInfo.created_at}}， 登陆IP为{{ loginInfo.ip }}</Alert>
       <Row :gutter="16">
         <i-col span="24">
-          <MyCard title="平台单位总数"></MyCard>
+          <MyCard title="平台单位总数" :num="calData.company_count"></MyCard>
         </i-col>
       </Row>
       <Split type="xi" style="margin:10px 0"></Split>
@@ -57,7 +57,7 @@
             }
           }, 100)
 
-          setTimeout(this._getBasicData, 1500)
+          setTimeout(this._getBasicData, 500)
         },
         methods:{
           _getBasicData(){

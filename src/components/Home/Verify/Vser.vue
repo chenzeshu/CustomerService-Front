@@ -41,7 +41,8 @@
                     <p class="name2">{{ item.updated_at.substr(11) }}</p>
                   </div>
                 </div>
-                <div class="info1" v-if="item.customer && item.customer[0]">
+                <div class="info1" v-if="item.type && item.customer[0]">
+                  <span class="name">服务类型： {{item.type.name}} </span>
                   <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
                   <span>
                     <div class="icon">
@@ -74,7 +75,8 @@
 
               </div>
               <div class="verify">
-                <i-button type="primary" size="large" @click="_pass(item.id)">通过审核</i-button>
+                <!--<i-button type="primary" size="large" @click="_pass(item.id)">通过审核</i-button>-->
+                <i-button type="primary" size="large" @click="_toggleVerify(key)">通过审核</i-button>
                 <i-button type="error" size="large" @click="_rej(item.id)">拒绝</i-button>
               </div>
             </div>
@@ -98,7 +100,8 @@
                     <p class="name2">{{ item.updated_at.substr(0, 10) }}</p>
                     <p class="name2">{{ item.updated_at.substr(11) }}</p>
                   </div>
-                  <div class="info1" v-if="item.customer[0]">
+                  <div class="info1" v-if="item.customer[0] && item.type">
+                    <span class="name">服务类型： {{item.type.name}} </span>
                     <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
                     <span>
                       <div class="icon">
@@ -152,11 +155,12 @@
                          @mouseleave="closeDetail">
                     <br>
                     <br>
-                    <p class="name1">申述人：[{{item.customer[0].name}}]</p>
+                    <p class="name1" v-if="item.customer[0]">申述人：[{{item.customer[0].name}}]</p>
                     <p class="name2">{{ item.updated_at.substr(0, 10) }}</p>
                     <p class="name2">{{ item.updated_at.substr(11) }}</p>
                   </div>
-                  <div class="info1" v-if="item.customer[0]">
+                  <div class="info1" v-if="item.customer[0] && item.type">
+                    <span class="name">服务类型： {{item.type.name}} </span>
                     <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
                     <span>
                       <div class="icon">
@@ -218,6 +222,23 @@
                 </div>
             手机: <span>{{ curDetail.phone }}</span></span>
       </ShowDetail>
+
+      <!--通过服务申请时为其选择，但是不增加次数，直到派单时才结算次数-->
+      <Modal
+        v-model="veriFlag"
+        width="400"
+        @on-ok="_pass"
+      >
+        <h1>选择套餐</h1>
+        <br>
+        <Form :model="veriModel" :rules="veriRuleValidate" ref="veriForm" :label-width="80">
+          <FormItem label="具体套餐" prop="plan_id">
+            <Select v-model="veriModel.plan_id" v-if="curPlans">
+              <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
+            </Select>
+          </FormItem>
+        </Form>
+      </Modal>
 
       <!--显示申请完成详情-->
       <Modal
@@ -287,13 +308,39 @@
             imgUrl:"",
             desc1:"",
             desc2:"",
-            allege:""
+            allege:"",
+            //弹出套餐选择
+            veriFlag: false,
+            veriModel: {
+                plan_id: null
+            },
+            curPlans: [],
+            veriRuleValidate: {
+              plan_id: [
+                {type: 'number', required: true, message: '请选择套餐', trigger: 'blur'}
+              ],
+            }
           }
         },
         created(){
           this._getData()
         },
         methods:{
+          //弹出套餐选择
+          _toggleVerify(key){
+            this.veriFlag = !this.veriFlag
+            Reflect.set(this.veriModel, 'plan_id', null)
+            Reflect.set(this.veriModel, 'service_id', this.dataArr[key].id)
+            //todo 同时进行套餐选择
+            let contract_id = this.dataArr[key].contract.id
+            this.$http(`contracts/getContractPlans/${contract_id}`).then(res=>{
+              this.curPlans = res.data.data
+              this.$Message.info({
+                'content': `所属合同下有${this.curPlans.length}个套餐`,
+                'duration':3
+              })
+            })
+          },
           showManDetail(key, e){
             let emp = this.dataArr[key].refer_man[0]
             this.curDetail = Object.assign({}, emp)
@@ -340,17 +387,26 @@
                 }
               })
           },
-          _pass(id){
+          _pass(){
+            this.$refs['veriForm'].validate((valid) => {
+              if(!valid){
+                this.$Message.error('请完善表单!');
+                setTimeout(() => {
+                  this.veriFlag = !this.veriFlag
+                }, 500)
+                return
+              }
               this.$http
-                .get(`/${this.url}/pass/${id}`)
+                .post(`/${this.url}/pass`, this.veriModel)
                 .then(res=>{
-                    if(parseInt(res.data.code) === 200){
-                      this.$Message.success(res.data.msg);
-                      this._getData()
-                    }else{
-                      this.$Message.error('失败');
-                    }
+                  if(parseInt(res.data.code) === 200){
+                    this.$Message.success(res.data.msg);
+                    this._getData()
+                  }else{
+                    this.$Message.error('失败');
+                  }
                 })
+            })
           },
           _rej(id){
             this.$http
