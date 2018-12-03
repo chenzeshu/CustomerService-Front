@@ -4,6 +4,7 @@
       :label="label"
       filterable
       remote
+      multiple
       :remote-method="searchDevice"
       :loading="loading"
       :loading-text="loadingText"
@@ -21,19 +22,24 @@
   export default {
       props:{
         deviceProp: {
-          type: Object
+          type: Array
         }
       },
     mounted(){
-        if(this.deviceProp){
-          this.device_id = this.deviceProp.id
-          this.label = `${this.deviceProp.device_id} - [ip:${this.deviceProp.ip}]`
+        if(this.deviceProp && this.deviceProp.length !== 0){
+          this.device_id = this.deviceProp.map(device => {
+            return device.id
+          })
+
+          this.label = this.deviceProp.map(device => {
+            return `${device.device_id} - [ip:${device.ip}]`
+          })
         }
     },
       data(){
         return {
-          device_id: null,
-          label: null,
+          device_id: [],
+          label: [],
           loading: false,
           devices: [],
           total:0,
@@ -75,6 +81,7 @@
             })
           },
         selectDevice(device_id){
+            console.log(device_id)
             this.$emit('select-device', device_id)
         },
         loadingTextChange(text){

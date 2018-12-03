@@ -128,7 +128,7 @@ export const curdMixin = {
           this.editDefaultList = this.updateModel.document
         }
       }
-
+      console.log(this.updateModel)
     },
     update(){
       switch (this.url){

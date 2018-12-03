@@ -258,26 +258,26 @@
             <div v-show="updateModel.problem_if == 1">
               <FormItem label="选择设备" v-if="updateModel.problem">
                 <SearchDevice @select-device="getUpdateModelDevice"
-                              :deviceProp="updateModel.problem.device">
+                              :deviceProp="updateModel.problem.devices">
                 </SearchDevice>
               </FormItem>
               <FormItem label="故障类型">
-                <Select v-model="updateModel.problem_type">
+                <Select v-model="updateModel.problem && updateModel.problem.problem_type">
                   <Option v-for="(type, key) in problem_types" :key="key" :value="type.ptype_id">{{type.ptype_name}}</Option>
                 </Select>
               </FormItem>
               <FormItem label="故障进展">
-                <Select v-model="updateModel.problem_step">
+                <Select v-model="updateModel.problem && updateModel.problem.problem_step">
                   <Option v-for="(step, key) in problem_steps" :key="key" :value="step">{{step}}</Option>
                 </Select>
               </FormItem>
               <FormItem label="紧急程度">
-                <Select v-model="updateModel.problem_urgency">
+                <Select v-model="updateModel.problem && updateModel.problem.problem_urgency">
                   <Option v-for="(urgency, key) in problem_urgencies" :key="key" :value="urgency">{{urgency}}</Option>
                 </Select>
               </FormItem>
               <FormItem label="重要程度">
-                <Select v-model="updateModel.problem_importance">
+                <Select v-model="updateModel.problem && updateModel.problem.problem_importance">
                   <Option v-for="(importance, key) in problem_importances" :key="key" :value="importance">{{importance}}</Option>
                 </Select>
               </FormItem>
@@ -405,7 +405,7 @@
       return {
         url: 'services',
         //筛选搜索
-          searchFlag:false,
+        searchFlag: false,
         curDetail:{
           name:null,
           phone:null,
@@ -1074,10 +1074,10 @@
       },
       //todo 得到设备id的监听函数
       getCreateModelDevice(device_id){
-        this.createModel.device_id = device_id
+        this.createModel.device_id = new Array(device_id)[0]
       },
       getUpdateModelDevice(device_id){
-        this.updateModel.device_id = device_id
+        this.updateModel.device_id = new Array(device_id)[0]
       },
       _getData(){
         this._setLoading()
