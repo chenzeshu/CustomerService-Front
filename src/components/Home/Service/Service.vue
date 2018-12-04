@@ -58,7 +58,7 @@
             <NewSearchContract @on-select="selectContractForC"></NewSearchContract>
 
             <!--自动生成 + 手工填写-->
-            <FormItem label="套餐类型" prop="type">
+            <FormItem label="套餐类型" prop="contract_plan_id">
               <Select v-model="createModel.contract_plan_id" v-if="curPlans">
                 <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
               </Select>
@@ -183,11 +183,10 @@
           title="修改"
           width="400"
           @on-ok="update">
-          <!--@on-cancel="cancel"-->
           <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
             <NewSearchContract @on-select="selectContractForU"></NewSearchContract>
             <!--合同编号自动生成 + 手工填写-->
-            <FormItem label="套餐类型" prop="type">
+            <FormItem label="套餐类型" prop="contract_plan_id">
               <Select v-model="updateModel.contract_plan_id" v-if="curPlans">
                 <Option v-for="(s, sk) in curPlans" :key="sk" :value="s.id">{{s.desc}}</Option>
               </Select>
@@ -256,10 +255,8 @@
             </FormItem>
 
             <div v-show="updateModel.problem_if == 1">
-              <FormItem label="选择设备" v-if="updateModel.problem">
-                <SearchDevice @select-device="getUpdateModelDevice"
-                              :deviceProp="updateModel.problem.devices">
-                </SearchDevice>
+              <FormItem label="选择设备">
+                <SearchDevice @select-device="getUpdateModelDevice" />
               </FormItem>
               <FormItem label="故障类型">
                 <Select v-model="updateModel.problem && updateModel.problem.problem_type">
@@ -398,6 +395,8 @@
   import Validator from 'common/js/validator'
   import ShowDetail from 'base/Show/ShowDetail'
   import { mapGetters, mapMutations } from 'vuex'
+
+  import ServiceModel from './ServiceModel'
 
   export default {
     mixins:[curdMixin, pageMixin, uploadMixin],
@@ -786,69 +785,12 @@
             }
           }
         ],
-        createModel: {
-          plan_num : 1,
-          contract_id: null,  //合同id
-          service_id:null,
-          status:null,
-          source:null,
-          type:null,
-          refer_man:null,
-          man:null,
-          customer:null,
-          charge_if:null,
-          charge:null,
-          charge_flag:null,
-          time4:null,  //到账时间
-          time1:null,
-          time2:null,
-          time3:null,
-          day_sum:null,
-          desc1:null,
-          desc2:null,
-          remark:null,
-          document:null,
-          allege:null,
-          problem_if: 0,
-          device_id: null,
-          problem_step: null,
-          problem_type: null,
-          problem_desc: null,
-          problem_solution: null,
-          problem_urgency: null,
-          problem_importance: null
-        },
-        updateModel: {
-          plan_num : 1, //套餐用量
-          contract_id: null,  //合同id
-          service_id:null,
-          status:null,
-          source:null,
-          type:null,
-          refer_man:null,
-          man:null,
-          customer:null,
-          charge_if:null,
-          charge:null,
-          charge_flag:null,
-          time4:null,  //到账时间
-          time1:null,
-          time2:null,
-          time3:null,
-          day_sum:null,
-          desc1:null,
-          desc2:null,
-          remark:null,
-          document:null,
-          allege:null,
-          problem_step: null,
-          problem_type: null,
-          problem_desc: null,
-          problem_solution: null,
-          problem_urgency: null,
-          problem_importance: null
-        },
+        createModel: new ServiceModel(),
+        updateModel: new ServiceModel(),
         ruleValidate: {
+          contract_plan_id:[
+            {type: 'number', required: true, message: '请选择套餐', trigger: 'blur'}
+          ],
           contract_id: [
             {type: 'number', required: true, message: '所属合同编号不能为空', trigger: 'blur'}
           ],
@@ -881,7 +823,7 @@
             {required: true, message: '请填写问题描述', trigger: 'blur'}
           ]
         },
-        ruleValidateVisit:{
+        ruleValidateVisit: {
           visitor:[
             {required: true, type:'number', message: '请选择回访人', trigger: 'blur'}
           ] ,
@@ -918,7 +860,6 @@
       }
     },
     methods:{
-      //
       showSearch(){
         this.searchFlag = !this.searchFlag
       },
@@ -966,7 +907,6 @@
         this.visitModel.time = v
       },
       visit(){
-//          console.log(this.visitModel)
         this.$refs['visitForm'].validate((valid) => {
           if (!valid) {
             this.$Message.error('请完善表单!');
@@ -1073,11 +1013,11 @@
         });
       },
       //todo 得到设备id的监听函数
-      getCreateModelDevice(device_id){
-        this.createModel.device_id = new Array(device_id)[0]
+      getCreateModelDevice(device_ids){
+        this.createModel.device_ids = new Array(device_ids)[0]
       },
-      getUpdateModelDevice(device_id){
-        this.updateModel.device_id = new Array(device_id)[0]
+      getUpdateModelDevice(device_ids){
+        this.updateModel.device_ids = new Array(device_ids)[0]
       },
       _getData(){
         this._setLoading()

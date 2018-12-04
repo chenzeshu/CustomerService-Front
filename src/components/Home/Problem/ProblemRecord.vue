@@ -43,7 +43,7 @@
     mixins:[curdMixin, pageMixin],
     data(){
       return {
-        url:"precords",
+        url:"precord",
         columns:[
           {
             title: `　报警id`,

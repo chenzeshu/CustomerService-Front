@@ -69,25 +69,30 @@
       @on-ok="update">
       <!--@on-cancel="cancel"-->
       <Form :model="updateModel" :rules="ruleValidate" ref="updateForm" :label-width="80">
-        <FormItem label="故障类型" >
+        <FormItem label="故障类型" prop="problem_type">
           <Select v-model.trim="updateModel.problem_type">
             <Option v-for="(type,key) in types" :key="key" :value="type.ptype_id">{{type.ptype_name}}</Option>
           </Select>
         </FormItem>
-        <FormItem label="紧急程度" >
+        <FormItem label="故障进度" prop="problem_step">
+          <Select v-model.trim="updateModel.problem_step">
+            <Option v-for="(step, key) in steps" :key="key" :value="step">{{step}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="紧急程度">
           <Select v-model.trim="updateModel.problem_urgency">
             <Option v-for="urgency in urgencies" :key="urgency" :value="urgency">{{urgency}}</Option>
           </Select>
         </FormItem>
-        <FormItem label="重要程度" >
+        <FormItem label="重要程度">
           <Select v-model.trim="updateModel.problem_importance">
             <Option v-for="importance in importances" :key="importance" :value="importance">{{importance}}</Option>
           </Select>
         </FormItem>
-        <FormItem label="故障描述" >
+        <FormItem label="故障描述" prop="problem_desc">
           <Input v-model.trim="updateModel.problem_desc" placeholder="请输入" type="textarea"></Input>
         </FormItem>
-        <FormItem label="解决方法" >
+        <FormItem label="解决方法">
           <Input v-model.trim="updateModel.problem_solution" placeholder="请输入" type="textarea"></Input>
         </FormItem>
         <FormItem label="备注" >
@@ -117,11 +122,11 @@
     mixins:[curdMixin, pageMixin],
     data(){
       return {
+        url:"problem",
         types: [],
         steps: ['未解决', '运维解决中', '技术或厂商解决中', '专家解决中', '已解决'],
         urgencies: ['一般', '紧急', '非常紧急'],
         importances: ['一般', '重要', '非常重要'],
-        url:"problems",
         columns:[
           {
             title: `　故障id`,
@@ -232,9 +237,6 @@
         }
       }
     },
-    computed:{
-
-    },
     created(){
       this._getData()
     },
@@ -246,14 +248,6 @@
         this.updateModel = this.$lodash.cloneDeep(this.dataArr[index])
         this.updateModel.problem_type = this.updateModel.problem_type.ptype_id
 
-        // console.log(this.updateModel)
-        if(typeof this.updateModel !== 'undefined' && typeof this.updateModel.document !== 'undefined'){
-          if(this.updateModel.document === null) {
-            this.editDefaultList = []
-          }else{
-            this.editDefaultList = this.updateModel.document
-          }
-        }
       },
       _getData(){
         this._setLoading()

@@ -77,7 +77,7 @@
     mixins:[curdMixin, pageMixin],
     data(){
       return {
-        url:"ptypes",
+        url:"ptype",
         columns:[
           {
             title: `　类型id`,

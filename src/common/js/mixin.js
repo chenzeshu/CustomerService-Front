@@ -41,14 +41,10 @@ export const curdMixin = {
       this.setUpdateIndex(null)
     },
     _create(){
-      // console.log(this.createModel)
-      // return
       this.modalShow = false
       this.$nextTick(()=>{
         this.modalShow = true
       })
-      // console.log(this.createModel)
-      // return
       switch (this.url){
         // case "contracts":
         //   this.createModel.type1 = parseInt(this.createModel.type1)
@@ -112,6 +108,7 @@ export const curdMixin = {
       })
     },
     _toggleUpdate(index){
+      this.$refs['updateForm'].resetFields();
       this.updateFlag = !this.updateFlag
       this.setUpdateIndex(index)
       if(this.url === "channelduty"){
@@ -128,7 +125,6 @@ export const curdMixin = {
           this.editDefaultList = this.updateModel.document
         }
       }
-      console.log(this.updateModel)
     },
     update(){
       switch (this.url){
@@ -145,6 +141,7 @@ export const curdMixin = {
         default:
           break
       }
+
       this.$refs['updateForm'].validate((valid) => {
         if (!valid) {
           this.$Message.error('请完善表单!');
@@ -154,11 +151,17 @@ export const curdMixin = {
           return
         }
 
+
         if(!!this.fileList){
           this.updateModel.fileList = this.fileList
         }
 
         let _url = `/${this.url}/update/${this.updateModel.id}`
+        if(this.url.indexOf('problem') > -1){
+          let _id = Reflect.get(this.updateModel, this.url+'_id')
+          _url = `/${this.url}/update/${_id}`
+        }
+
         this.$http.post(_url, this.updateModel)
           .then(res => {
             res = res.data

@@ -27,7 +27,7 @@ export const selectMixin = {
   methods:{
     remoteMethod (query) {
       if (query != null) {
-        if(this.names.length>0 &&  query[0] === ""){  //坑点:这个query在输入东西后是个对象
+        if(this.names.length>0 && query[0] === ""){  //坑点:这个query在输入东西后是个对象
           return
         }
         this.query = query
