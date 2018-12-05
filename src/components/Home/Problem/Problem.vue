@@ -4,18 +4,17 @@
       <Icon type="plus-circled"></Icon>
     </div>
 
-    <div class="problem-search">
-        <span class="search-icon">
-          <Icon type="search"></Icon>
-        </span>
-      <input type="text" v-model.trim="searchWord" placeholder="故障描述" class="search">
+    <div class="search">
+      <Button type="primary" size="small"
+              style="width: 80px"
+      @click="showSearch">筛选</Button>
     </div>
 
     <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length"></i-table>
 
     <div class="page-wrapper">
       <div class="page">
-        <Page :current="page" :total="total" simple @on-change="onChange"></Page>
+        <Page :current="page" :total="total" simple @on-change="_getData"></Page>
       </div>
     </div>
 
@@ -107,6 +106,43 @@
       title="删除"
       @on-ok="_delete">
       <p>确定要删除该故障信息?</p>
+    </Modal>
+
+    <!--search-->
+    <Modal
+      v-model="searchFlag"
+      width="400"
+      title="筛选"
+      @on-ok="_getData"
+    >
+      <Form inline  :label-width="80">
+        <FormItem label="故障类型">
+          <Select
+            v-model="searchObj.problem_type && searchObj.problem_type.ptype_id"
+            clearable
+            >
+            <Option v-for="(type, key) of types" :key="type.ptype_id" :value="type.ptype_id">{{type.ptype_name}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="故障进度">
+          <Select v-model.trim="searchObj.problem_step" clearable>
+            <Option v-for="(step, key) in steps" :key="key" :value="step">{{step}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="紧急程度">
+          <Select v-model.trim="searchObj.problem_urgency" clearable>
+            <Option v-for="urgency in urgencies" :key="urgency" :value="urgency">{{urgency}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="重要程度">
+          <Select v-model.trim="searchObj.problem_importance" clearable>
+            <Option v-for="importance in importances" :key="importance" :value="importance">{{importance}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="故障描述">
+          <Input v-model.trim="searchObj.problem_desc" placeholder="请输入" type="textarea"></Input>
+        </FormItem>
+      </Form>
     </Modal>
   </div>
 </template>
@@ -234,13 +270,23 @@
           problem_desc: [
             {required: true, message: '必须填写故障描述', trigger: 'blur' }
           ]
-        }
+        },
+        searchObj:{
+          problem_type:{
+            ptype_id:null,
+            ptype_name: null,
+          }
+        },
+        searchFlag: false,
       }
     },
     created(){
       this._getData()
     },
     methods:{
+      showSearch(){
+        this.searchFlag = true
+      },
       _toggleUpdate(index){
         this.updateFlag = !this.updateFlag
         this.setUpdateIndex(index)
@@ -250,9 +296,13 @@
 
       },
       _getData(){
+        console.log(this.page)
         this._setLoading()
+
         this.$http
-          .post(`/${this.url}/page/${this.page}/${this.pageSize}`)
+          .post(`/${this.url}/page/${this.page}/${this.pageSize}`, {
+            'searchObj':this.searchObj
+          })
           .then(res=>{
             res = res.data.data
             this.types = res.types
@@ -265,6 +315,7 @@
             this._setLoading()
           })
       },
+
     },
     components:{
       Loading
@@ -305,4 +356,8 @@
           font-size 12px
           font-weight 700
           color #657180
+    .search
+      position absolute
+      top 66px
+      left 316px
 </style>
