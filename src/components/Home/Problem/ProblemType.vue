@@ -88,23 +88,62 @@
           {
             title: `类型名称`,
             key: 'ptype_name',
-            width: 200,
-            fixed: 'left'
-          },
-          {
-            title: `本类型故障数`,
-            key: '',
             width: 150,
-            render(h, params){
-              return 15
+            fixed: 'left',
+            render: (h, params) => {
+              let p = this.dataArr[params.index]
+
+              return h('Button', {
+                on: {
+                  click: () => {
+                    this.$router.push({name: 'problems', params: {'ptype_id':p.ptype_id}})
+                  }
+                }
+              }, p.ptype_name)
             }
           },
           {
-            title: `本类型关联设备数`,
+            title: `故障记录条数`,
             key: '',
             width: 150,
-            render(h, params){
-              return 30
+            render: (h, params) => {
+              let p = this.dataArr[params.index]
+
+              return p.problems_count
+            }
+          },
+          {
+            title: `关联设备数`,
+            key: '',
+            width: 150,
+            render: (h, params) => {
+              let p = this.dataArr[params.index]
+              let sum = 0
+              p.problems &&
+              p.problems.forEach(problem => {
+                sum += problem.devices_count
+              })
+              return sum
+            }
+          },
+          {
+            title: `故障率（本故障占总故障数）`,
+            key: '',
+            width: 150,
+            render: (h, params) => {
+              let p = this.dataArr[params.index]
+
+              return Math.round(p.problems_count/this.problem_count * 100)  + '%'
+            }
+          },
+          {
+            title: `解决率`,
+            key: '',
+            width: 150,
+            render: (h, params) => {
+              //解决数占本类问题的总数
+              let p = this.dataArr[params.index]
+              return Math.round(p.problems_finished_count/p.problems_count * 100)  + '%'
             }
           },
           {
@@ -160,7 +199,8 @@
           ptype_name: [
             {required: true, message: '类型名称不能为空', trigger: 'blur' }
           ]
-        }
+        },
+        problem_count: 0
       }
     },
     computed:{
@@ -180,6 +220,7 @@
               this._setLoading()
               return
             }
+            this.problem_count = res.problem_count
             this.setTotal(res.total)
             this.setDataArr(res.data)
             this._setLoading()

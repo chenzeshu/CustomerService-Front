@@ -144,13 +144,32 @@
         </FormItem>
       </Form>
     </Modal>
+
+    <!--report-->
+    <Modal
+      v-model="reportFlag"
+      title="报警"
+      width="600"
+    >
+      <Form inline  :label-width="80" :model="reportModel">
+        <FormItem label="关联设备">
+          <SearchDevice @select-device="selectDevices"/>
+        </FormItem>
+        <NewSearchEmps @on-select="selectEmps" type="CUS"></NewSearchEmps>
+      </Form>
+      1. 关联设备
+      2. 联系人电话
+      3. 同步problemRecord : 被报警人、报警内容、报警人、时间、（报警方式）？
+
+    </Modal>
   </div>
 </template>
 
 <script>
   import Loading from 'base/Loading/Loading'
   import {curdMixin, pageMixin} from 'common/js/mixin'
-
+  import SearchDevice from 'base/SearchDevice/SearchDevice'
+  import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
   let docWidth = document.documentElement.clientWidth
   let cellWidth = docWidth > 1200 ? 900 : 331
 
@@ -204,8 +223,9 @@
             key: '',
             width: 150,
             render: (h, params) => {
-              return `这里还要做个ORM和null判断`
-              // return this.dataArr[params.index].service_id && this.dataArr[params.index].problem_type.ptype_name
+              return true === !!this.dataArr[params.index].service
+                ?  `对应服务单：${this.dataArr[params.index].service.service_id}`
+                :  '不对应服务单'
             }
           },
           {
@@ -215,6 +235,20 @@
             fixed:'right',
             render: (h, params) => {
               return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'default',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      this.showReport(params.index)
+                    }
+                  }
+                }, '报警'),
                 h('Button', {
                   props: {
                     type: 'primary',
@@ -278,12 +312,26 @@
           }
         },
         searchFlag: false,
+        reportFlag: false,
+        reportModel: {
+          device_ids: null,
+          emp_ids: null
+        }
       }
     },
-    created(){
+    mounted(){
       this._getData()
     },
     methods:{
+      selectDevices(device_ids){
+        this.reportModel.device_ids = device_ids
+      },
+      selectEmps(emp_ids){
+        this.reportModel.emp_ids = emp_ids
+      },
+      showReport(){
+        this.reportFlag = true
+      },
       showSearch(){
         this.searchFlag = true
       },
@@ -293,11 +341,12 @@
         this.setUpdateObj(this.$lodash.cloneDeep(this.dataArr[index]))
         this.updateModel = this.$lodash.cloneDeep(this.dataArr[index])
         this.updateModel.problem_type = this.updateModel.problem_type.ptype_id
-
       },
       _getData(){
-        console.log(this.page)
         this._setLoading()
+        if(this.$route.params.ptype_id){
+          this.searchObj.problem_type.ptype_id = this.$route.params.ptype_id
+        }
 
         this.$http
           .post(`/${this.url}/page/${this.page}/${this.pageSize}`, {
@@ -318,7 +367,7 @@
 
     },
     components:{
-      Loading
+      Loading, SearchDevice, NewSearchEmps
     }
   }
 </script>

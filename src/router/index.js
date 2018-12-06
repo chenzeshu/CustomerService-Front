@@ -82,7 +82,6 @@ export default new Router({
         // {path:'info4', component: Info4}, //频率
         {path:'info5', component: Info5},
         {path:'info6', component: Info6},
-        {path:'device', component: Device},
         {path:'plan', component: Plan},
         //Verify
         {path:'vcus', component: Vcus},
@@ -91,9 +90,10 @@ export default new Router({
         {path:'vserTemp', component: VserTemp},
         {path:'vchanTemp', component: VchanTemp},
         //Problem
-        {path:'problems', component: Problem},
+        {path:'problems', component: Problem, name:'problems'},
         {path:'ProblemType', component: ProblemType},
         {path:'ProblemRecord', component: ProblemRecord},
+        {path:'device', component: Device},
       ]
     }
   ]

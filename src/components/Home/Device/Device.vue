@@ -145,6 +145,22 @@
         @on-ok="_delete">
         <p>确定要删除?</p>
       </Modal>
+
+     <Modal
+      v-model="problemFlag"
+      title="故障历史记录"
+      width="960"
+     >
+       <i-table border :columns="problemColumns" :data="problemDataArr" width="900" v-if="problemDataArr.length"></i-table>
+     </Modal>
+
+      <Modal
+        v-model="reportFlag"
+        title="报警"
+        width="700"
+      >
+        选择故障
+      </Modal>
     </div>
 </template>
 
@@ -247,10 +263,47 @@
               {
                 title:"操作",
                 align: "center",
-                width: 200,
+                width: 280,
                 fixed:'right',
                 render: (h, params) => {
+                  let problemType = 'default'
+                  let problemText = '暂无故障'
+                  let problemLength = this.dataArr[params.index].problems
+                                      && this.dataArr[params.index].problems.length
+                  if(problemLength > 0){
+                    problemType = 'warning'
+                    problemText = `故障记录：${problemLength}`
+                  }
+
                   return h('div', [
+                    h('Button', {
+                      props: {
+                        type: problemType,
+                        size: 'small'
+                      },
+                      style: {
+                        marginRight: '5px'
+                      },
+                      on: {
+                        click: () => {
+                          problemLength > 0 && this.showProblems(params.index)
+                        }
+                      }
+                    }, problemText),
+                    h('Button', {
+                      props: {
+                        type: 'default',
+                        size: 'small'
+                      },
+                      style: {
+                        marginRight: '5px'
+                      },
+                      on: {
+                        click: () => {
+                          this.showReport(params.index)
+                        }
+                      }
+                    }, '报警'),
                     h('Button', {
                       props: {
                         type: 'primary',
@@ -332,13 +385,65 @@
               built_at:[
                 {required: true, message: '请填写安装时间', trigger: 'blur'}
               ]
-            }
+            },
+            problemFlag: false, //故障记录
+            problemColumns: [
+              {
+                title: `故障id`,
+                key: 'problem_id',
+                width: 60,
+                fixed: 'left'
+              },
+              {
+                title: `故障类型`,
+                key: 'problem_type',
+                width: 100,
+                fixed: 'left',
+                render: (h, params) => {
+                  return this.problemDataArr[params.index].problem_type && this.problemDataArr[params.index].problem_type.ptype_name
+                }
+              },
+              {
+                title: `故障描述`,
+                key: 'problem_desc',
+                width: 300,
+              },
+              {
+                title: `解决办法`,
+                key: 'problem_solution',
+                width: 300,
+              },
+              {
+                title: `紧急程度`,
+                key: 'problem_urgency',
+                width: 120,
+              },
+              {
+                title: `重要程度`,
+                key: 'problem_importance',
+                width: 120,
+              },
+              {
+                title: '发生时间',
+                key: 'created_at',
+                width: 120
+              }
+            ],
+            problemDataArr: [],
+            reportFlag: false, //报警
           }
       },
       created(){
         this._getData()
       },
       methods:{
+          showProblems(index){
+            this.problemFlag = true
+            this.problemDataArr = this.dataArr[index].problems
+          },
+          showReport(index){
+            this.reportFlag = false
+          },
           setCTime(v){
               this.createModel.built_at = v
           },

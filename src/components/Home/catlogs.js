@@ -26,6 +26,7 @@ export const catlogs = [
       {title:"故障信息列表", path:'/home/problems', name:"故障信息列表"},
       {title:"故障类型列表", path:'/home/ProblemType', name:"故障类型列表"},
       {title:"报警记录列表", path:'/home/ProblemRecord', name:"报警记录列表"},
+      {title:"设备列表", path:'/home/device', name:"设备列表"},
     ]
   },
   {
@@ -68,7 +69,6 @@ export const catlogs = [
     name:"8",
     children:[
       {title:"信道值班表", path:'/home/channelDuty', name:"信道值班表"},
-      {title:"设备列表", path:'/home/device', name:"设备列表"},
       {title:"套餐列表", path:'/home/plan', name:"套餐列表"},
       {title:"带宽列表", path:'/home/info1', name:"带宽列表"},
       {title:"站类型表", path:'/home/info2', name:"站类型列表"},
