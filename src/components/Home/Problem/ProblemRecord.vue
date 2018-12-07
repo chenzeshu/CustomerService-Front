@@ -46,26 +46,35 @@
         url:"precord",
         columns:[
           {
-            title: `　报警id`,
+            title: `id`,
             key: 'precord_id',
-            width: 100,
+            width: 80,
             fixed: 'left'
           },
           {
-            title: `设备id`,
+            title: `设备`,
             key: 'precord_type',
-            width: 100,
-            fixed: 'left'
+            width: 120,
+            fixed: 'left',
+            render: (h, params)=>{
+              return this.dataArr[params.index].device && this.dataArr[params.index].device.device_id
+            }
           },
           {
-            title: `故障描述`,
+            title: `预警描述`,
             key: 'precord_desc',
             width: 500,
+            render: (h, params)=>{
+              return this.dataArr[params.index].problem && this.dataArr[params.index].problem.problem_desc
+            }
           },
           {
             title: `解决办法`,
             key: 'precord_solution',
             width: 500,
+            render: (h, params)=>{
+              return this.dataArr[params.index].problem && this.dataArr[params.index].problem.problem_solution
+            }
           },
           {
             title: `报警时间`,
@@ -80,20 +89,6 @@
             fixed:'right',
             render: (h, params) => {
               return h('div', [
-                // h('Button', {
-                //   props: {
-                //     type: 'primary',
-                //     size: 'small'
-                //   },
-                //   style: {
-                //     marginRight: '5px'
-                //   },
-                //   on: {
-                //     click: () => {
-                //       this._toggleUpdate(params.index)
-                //     }
-                //   }
-                // }, '编辑'),
                 h('Button', {
                   props: {
                     type: 'error',

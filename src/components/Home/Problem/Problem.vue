@@ -150,6 +150,7 @@
       v-model="reportFlag"
       title="报警"
       width="600"
+      @on-ok="report"
     >
       <Form inline  :label-width="80" :model="reportModel">
         <FormItem label="关联设备">
@@ -160,7 +161,6 @@
       1. 关联设备
       2. 联系人电话
       3. 同步problemRecord : 被报警人、报警内容、报警人、时间、（报警方式）？
-
     </Modal>
   </div>
 </template>
@@ -314,6 +314,7 @@
         searchFlag: false,
         reportFlag: false,
         reportModel: {
+          problem_id: null,
           device_ids: null,
           emp_ids: null
         }
@@ -323,14 +324,30 @@
       this._getData()
     },
     methods:{
+      report(){
+        this.reportModel.emp_ids = this.reportModel.emp_ids.split(',').map(id=>parseInt(id))
+
+        let url = `${this.url}/report`
+
+        this.$http
+          .post(url, this.reportModel)
+          .then(res=>{
+            res = res.data
+            if(res.code === 2002){
+              this.$Message.success(res.msg)
+            }
+          })
+
+      },
       selectDevices(device_ids){
         this.reportModel.device_ids = device_ids
       },
       selectEmps(emp_ids){
         this.reportModel.emp_ids = emp_ids
       },
-      showReport(){
+      showReport(index){
         this.reportFlag = true
+        this.reportModel.problem_id = this.dataArr[index].problem_id
       },
       showSearch(){
         this.searchFlag = true

@@ -159,7 +159,9 @@
         title="报警"
         width="700"
       >
-        选择故障
+        1. 选择故障（单选）
+        2. 选择用户
+        3. 附上device_id（为了复用，做成数组）
       </Modal>
     </div>
 </template>
