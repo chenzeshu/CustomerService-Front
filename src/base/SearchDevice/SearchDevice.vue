@@ -26,8 +26,6 @@
       },
       watch: {
         updateObj: function(newObj){
-          let labels, device_ids
-
           this.device_ids = []
           this.labels = []
 

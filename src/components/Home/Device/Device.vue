@@ -154,14 +154,20 @@
        <i-table border :columns="problemColumns" :data="problemDataArr" width="900" v-if="problemDataArr.length"></i-table>
      </Modal>
 
+
+      <!--报警-->
       <Modal
         v-model="reportFlag"
         title="报警"
-        width="700"
+        width="500"
+        @on-ok="report"
       >
-        1. 选择故障（单选）
-        2. 选择用户
-        3. 附上device_id（为了复用，做成数组）
+        <Form :model="reportModel" :label-width="80" inline>
+          <SearchProblem @on-select="selectProblem"/>
+
+          <NewSearchEmps type="CUS" @on-select="selectEmps"/>
+        </Form>
+
       </Modal>
     </div>
 </template>
@@ -169,6 +175,9 @@
 <script>
     import Loading from 'base/Loading/Loading'
     import NewSearchCompany from 'base/SearchCompany/NewSearchCompany'
+    import NewSearchEmps from 'base/SearchEmps/NewSearchEmps'
+    import SearchProblem from 'base/SearchProblem/SearchProblem'
+
     import {curdMixin, pageMixin} from 'common/js/mixin'
 
     export default {
@@ -433,18 +442,45 @@
             ],
             problemDataArr: [],
             reportFlag: false, //报警
+            reportModel: {
+              device_id: null,
+              problem_id: null,
+              emp_ids: null
+            }
           }
       },
       created(){
         this._getData()
       },
       methods:{
+          report(){
+            this.reportModel.emp_ids = this.reportModel.emp_ids.split(',').map(id=>parseInt(id))
+
+            let url = `${this.url}/report`
+
+            this.$http
+              .post(url, this.reportModel)
+              .then(res=>{
+                res = res.data
+                if(res.code === 2002){
+                  this.$Message.success(res.msg)
+                }
+              })
+
+          },
+          selectEmps(v){
+              this.reportModel.emp_ids = v
+          },
+          selectProblem(v){
+              this.reportModel.problem_id = v
+          },
+          showReport(index){
+            this.reportFlag = true
+            this.reportModel.device_id = this.dataArr[index].id
+          },
           showProblems(index){
             this.problemFlag = true
             this.problemDataArr = this.dataArr[index].problems
-          },
-          showReport(index){
-            this.reportFlag = false
           },
           setCTime(v){
               this.createModel.built_at = v
@@ -469,7 +505,7 @@
           }
       },
       components:{
-        Loading, NewSearchCompany
+        Loading, NewSearchCompany, NewSearchEmps, SearchProblem
       }
     }
 </script>

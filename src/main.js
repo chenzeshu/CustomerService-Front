@@ -10,11 +10,13 @@ import {cloneDeep} from 'lodash'
 import 'iview/dist/styles/iview.css';
 import "common/stylus/index.styl"
 import VueLazyload from 'vue-lazyload'
+import VCharts from 'v-charts'
 
 Vue.use(VueLazyload, {
   lazyComponent:true
 })
 Vue.use(iView)
+Vue.use(VCharts)
 Vue.prototype.$lodash = {cloneDeep}
 Vue.prototype.$http = axios
 

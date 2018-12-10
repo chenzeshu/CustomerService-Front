@@ -2,23 +2,44 @@
     <div class="front-page">
       <Alert type="warning">提示: 尊敬的 {{ username }} ， 欢迎您的使用， 您上次的登陆时间为{{loginInfo.created_at}}， 登陆IP为{{ loginInfo.ip }}</Alert>
       <Row :gutter="16">
-        <i-col span="24">
-          <MyCard title="平台单位总数" :num="calData.company_count"></MyCard>
+        <i-col span="8">
+          <Card>
+            <h1 slot="title">单位签约情况</h1>
+            <ve-pie :data="companies" :settings="settings.company_setting"></ve-pie>
+          </Card>
+        </i-col>
+        <i-col span="8">
+          <Card>
+            <h1 slot="title">客服合同结清情况</h1>
+            <ve-ring :data="contracts"></ve-ring>
+          </Card>
+        </i-col>
+        <i-col span="8">
+          <Card>
+            <h1 slot="title">信道合同结清情况</h1>
+            <ve-ring :data="contractcs"></ve-ring>
+          </Card>
         </i-col>
       </Row>
       <Split type="xi" style="margin:10px 0"></Split>
-      <Row :gutter="16">
-        <i-col span="6">
-          <MyCard title="未结清普通合同" :num="calData.contract_count"></MyCard>
+      <Row :gutter="24">
+        <i-col span="8">
+          <Card>
+            <h1 slot="title">客户服务单统计</h1>
+            <ve-ring :data="services"></ve-ring>
+          </Card>
         </i-col>
-        <i-col span="6">
-          <MyCard color="green" title="未结清信道合同" :num="calData.contractc_count"></MyCard>
+        <i-col span="8">
+          <Card>
+            <h1 slot="title">信道服务单统计</h1>
+            <ve-ring :data="channels"></ve-ring>
+          </Card>
         </i-col>
-        <i-col span="6">
-          <MyCard color="red" title="待审批普通服务" :num="calData.service_count"></MyCard>
-        </i-col>
-        <i-col span="6">
-          <MyCard color="purple" title="待审批信道服务" :num="calData.channel_count"></MyCard>
+        <i-col span="8">
+          <Card>
+            <h1 slot="title">故障率统计</h1>
+            <ve-ring :data="problem_count"></ve-ring>
+          </Card>
         </i-col>
       </Row>
     </div>
@@ -28,6 +49,7 @@
     import {mapGetters} from 'vuex'
     import MyCard from 'base/MyCard/MyCard'
     import Split from 'base/Split/Split'
+    import params from './params'
 
     var delayKeyFrame
 
@@ -35,7 +57,18 @@
         data(){
           return {
               calData:{},
-              loginInfo:{created_at:"...", ip:"..."}
+              loginInfo:{created_at:"...", ip:"..."},
+              companies:{columns: params.company_param, rows: []},
+              services: {columns: params.other_param, rows: []},
+              channels: {columns: params.other_param, rows: []},
+              contracts: {columns: params.finish_param, rows: []},
+              contractcs: {columns: params.finish_param, rows: []},
+              problem_count:  {columns: params.problem_param, rows: []},
+              settings: {
+                company_setting: {
+                  label: '单位统计'
+                }
+              }
           }
         },
         computed:{
@@ -66,6 +99,12 @@
                   res = res.data
                   if(parseInt(res.code) === 200){
                       this.calData = res.data.calData
+                      this.companies.rows = this.calData.company_count
+                      this.contracts.rows = this.calData.contract_count
+                      this.contractcs.rows = this.calData.contractc_count
+                      this.services.rows = this.calData.service_count
+                      this.channels.rows = this.calData.channel_count
+                      this.problem_count.rows = this.calData.problem_count
                       this.loginInfo = res.data.loginInfo
                   }
               })
