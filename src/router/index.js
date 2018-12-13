@@ -10,7 +10,7 @@ import Contract from 'comp/Home/Contract/Contract'
 import Service from 'comp/Home/Service/Service'
 import Contractc from 'comp/Home/Contractc/Contractc'
 import Channel from 'comp/Home/Channel/Channel'
-import Test from 'comp/Home/Test/test'
+// import Test from 'comp/Home/Test/test'
 //utils
 import Coor from 'comp/Home/Utils/Coor'
 import ContractType from 'comp/Home/Utils/ContractType'
@@ -65,7 +65,7 @@ export default new Router({
         {path:'service', component: Service},
         {path:'contractc', component: Contractc},
         {path:'channel', component: Channel},
-        {path:'test', component: Test},
+        // {path:'test', component: Test},
         //utils
         {path:'coor', component: Coor},
         {path:'contractType', component: ContractType},

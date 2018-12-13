@@ -1,27 +1,6 @@
 <template>
     <div class="front-page">
       <Alert type="warning">提示: 尊敬的 {{ username }} ， 欢迎您的使用， 您上次的登陆时间为{{loginInfo.created_at}}， 登陆IP为{{ loginInfo.ip }}</Alert>
-      <Row :gutter="16">
-        <i-col span="8">
-          <Card>
-            <h1 slot="title">单位签约情况</h1>
-            <ve-pie :data="companies" :settings="settings.company_setting"></ve-pie>
-          </Card>
-        </i-col>
-        <i-col span="8">
-          <Card>
-            <h1 slot="title">客服合同结清情况</h1>
-            <ve-ring :data="contracts"></ve-ring>
-          </Card>
-        </i-col>
-        <i-col span="8">
-          <Card>
-            <h1 slot="title">信道合同结清情况</h1>
-            <ve-ring :data="contractcs"></ve-ring>
-          </Card>
-        </i-col>
-      </Row>
-      <Split type="xi" style="margin:10px 0"></Split>
       <Row :gutter="24">
         <i-col span="8">
           <Card>
@@ -39,6 +18,27 @@
           <Card>
             <h1 slot="title">故障率统计</h1>
             <ve-ring :data="problem_count"></ve-ring>
+          </Card>
+        </i-col>
+      </Row>
+      <Split type="xi" style="margin:10px 0"></Split>
+      <Row :gutter="24">
+        <i-col span="8">
+          <Card>
+            <h1 slot="title">单位签约情况</h1>
+            <ve-pie :data="companies" :settings="settings.company_setting"></ve-pie>
+          </Card>
+        </i-col>
+        <i-col span="8">
+          <Card>
+            <h1 slot="title">客服合同结清情况</h1>
+            <ve-ring :data="contracts"></ve-ring>
+          </Card>
+        </i-col>
+        <i-col span="8">
+          <Card>
+            <h1 slot="title">信道合同结清情况</h1>
+            <ve-ring :data="contractcs"></ve-ring>
           </Card>
         </i-col>
       </Row>

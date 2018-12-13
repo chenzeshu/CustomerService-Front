@@ -16,18 +16,19 @@
 
           </div>
         </div>
+
         <Row type="flex">
           <!--左边-->
           <Col :span="spanLeft" class="layout-menu-left">
             <Menu :active-name="curMenuName" :theme="theme2" width="auto" @on-select="getCurMenuName">
-              <Submenu v-for="(module,mk) in modules" :key="mk" name="module.name">
+              <Submenu v-for="(module,mk) in modules" :key="mk" :name="module.name">
                 <template slot="title">
                   <Icon type="navicon" :size="iconSize"></Icon>
                   <span class="layout-text">{{ module.title }}</span>
                 </template>
-                  <router-link v-for="(child, ck) in module.children" :key="ck" :to="child.path">
-                    <MenuItem :name="child.name">{{ child.title }}</MenuItem>
-                  </router-link>
+                <router-link v-for="(child, ck) in module.children" :key="ck" :to="child.path">
+                  <MenuItem :name="child.name">{{ child.title }}</MenuItem>
+                </router-link>
               </Submenu>
             </Menu>
           </Col>
@@ -111,9 +112,6 @@
          logout(){
              this.setLogined(false)
              this.setDataArr([])
-         },
-         test(){
-             this.$router.push('/home/test')
          },
          ...mapMutations({
            setLogined:'SET_LOGINED',
