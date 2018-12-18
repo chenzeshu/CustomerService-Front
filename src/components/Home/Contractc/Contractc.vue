@@ -281,7 +281,7 @@
                  width: 200,
                  render: (h, params) => {
                    if(this.dataArr[params.index].company){
-                     return `${this.dataArr[params.index].company.name}`
+                     return h('div', this.dataArr[params.index].company.name)
                    }
                  }
                },
@@ -294,9 +294,21 @@
                  title: '是否结清',
                  width: 150,
                  render: (h, params) => {
-                   if(this.dataArr[params.index].channel_money){
-                     return `${this.dataArr[params.index].channel_money.finish}`
-                   }
+                   let cm = this.dataArr[params.index].channel_money
+                   let selfProp = {}
+
+                   true === !!cm
+                     ? cm.finish === '结清'
+                     ? selfProp = {type: 'success', word: cm.finish}
+                     : selfProp = {type: 'error', word: cm.finish}
+                     : selfProp = {type : "warning", word : "未填写"}
+
+                   return h('Button',{
+                     props:{
+                       type: selfProp.type,
+                       size: 'small'
+                     }
+                   }, selfProp.word)
                  },
                  filters:[
                    {

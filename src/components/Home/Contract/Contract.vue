@@ -17,9 +17,8 @@
         <input type="text" v-model.trim="searchWord" placeholder="合同名称" class="search">
       </div>
 
-
       <lazy-component>
-      <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"></i-table>
+        <i-table border :columns="columns" :data="dataArr" :width="curWidth" v-if="dataArr.length" :loading="loading"></i-table>
       </lazy-component>
       <div class="page-wrapper">
         <div class="page">
@@ -347,10 +346,11 @@
             },
             {
               title: '所属单位',
+              key: 'company',
               width: 200,
               render: (h, params) => {
                 if(this.dataArr[params.index].company){
-                  return `${this.dataArr[params.index].company.name}`
+                  return h('div', this.dataArr[params.index].company.name)
                 }
               }
             },
@@ -363,9 +363,21 @@
               title: '是否结清',
               width: 150,
               render: (h, params) => {
-                if(this.dataArr[params.index].service_money){
-                  return `${this.dataArr[params.index].service_money.finish}`
-                }
+                let sm = this.dataArr[params.index].service_money
+                let selfProp = {}
+
+                true === !!sm
+                  ? sm.finish === '结清'
+                    ? selfProp = {type: 'success', word: sm.finish}
+                    : selfProp = {type: 'error', word: sm.finish}
+                  : selfProp = {type : "warning", word : "未填写"}
+
+                return h('Button',{
+                  props:{
+                    type: selfProp.type,
+                    size: 'small'
+                  }
+                }, selfProp.word)
               },
               filters:[
                 {
@@ -388,19 +400,21 @@
               key: 'type1',
               width: 100,
               render: (h, params) => {
+                  let retWord = ""
                   switch (this.dataArr[params.index].type1){
                     case "1":
-                        return `集成`
+                        retWord = `集成`
                         break
                     case "2":
-                        return `服务`
+                        retWord =  `服务`
                         break
                     case "3":
-                        return `综合`
+                        retWord =  `综合`
                         break
                     default:
                         break
                   }
+                  return h('div', retWord)
               }
             },
             {
