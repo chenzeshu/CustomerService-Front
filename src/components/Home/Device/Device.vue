@@ -57,6 +57,9 @@
           <FormItem label="安装时间" prop="built_at">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="createModel.built_at" @on-change="setCTime"></DatePicker>
           </FormItem>
+          <FormItem label="最后检查时间" prop="checked_at">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="createModel.checked_at" @on-change="setCheckTime"></DatePicker>
+          </FormItem>
           <FormItem label="S/N码">
             <Input v-model.trim="createModel.sn" placeholder="请输入"></Input>
           </FormItem>
@@ -113,6 +116,9 @@
           </FormItem>
           <FormItem label="安装时间" prop="built_at">
             <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.built_at" @on-change="setCTime"></DatePicker>
+          </FormItem>
+          <FormItem label="最后检查时间" prop="checked_at">
+            <DatePicker type="date" placeholder="选择日期" style="width: 200px" :value="updateModel.checked_at" @on-change="setCheckTime"></DatePicker>
           </FormItem>
           <FormItem label="S/N码">
             <Input v-model.trim="updateModel.sn" placeholder="请输入"></Input>
@@ -357,7 +363,8 @@
                 pa:null,
                 lnb:null,
                 built_at:null,
-                remark:null
+                remark:null,
+                chekced_at:null,
             },
             updateModel:{
                 company_id:null,
@@ -372,7 +379,8 @@
                 pa:null,
                 lnb:null,
                 built_at:null,
-                remark:null
+                remark:null,
+                checked_at: null
             },
             ruleValidate:{
               device_id:[
@@ -395,6 +403,9 @@
               ],
               built_at:[
                 {required: true, message: '请填写安装时间', trigger: 'blur'}
+              ],
+              checked_at:[
+                {required: true, message: '最后一次检查时间，第一次同安装时间', trigger: 'blur'}
               ]
             },
             problemFlag: false, //故障记录
@@ -483,10 +494,13 @@
             this.problemDataArr = this.dataArr[index].problems
           },
           setCTime(v){
-              this.createModel.built_at = v
+            this.createModel.built_at = v
+          },
+          setCheckTime(v){
+            this.createModel.checked_at = v
           },
           newSelectCompanyForC(v){
-              this.createModel.company_id = v
+            this.createModel.company_id = v
           },
           newSelectCompanyForU(v){
             this.updateModel.company_id = v
