@@ -1,6 +1,22 @@
 <template>
     <div class="front-page">
-      <Alert type="warning">提示: 尊敬的 {{ username }} ， 欢迎您的使用， 您上次的登陆时间为{{loginInfo.created_at}}， 登陆IP为{{ loginInfo.ip }}</Alert>
+
+      <Row :gutter="24">
+        <i-col span="6" class="report">
+          <span class="report-span">自动报警：</span>
+          <div class="report-switch">
+            <i-switch
+              v-model="switchReport"
+              @on-change="switchReportChange"
+              size="large"
+              :disabled="switchDisabled"
+            ></i-switch>
+          </div>
+        </i-col>
+        <i-col span="18">
+          <Alert type="warning">提示: 尊敬的 {{ username }} ， 欢迎您的使用， 您上次的登陆时间为{{loginInfo.created_at}}， 登陆IP为{{ loginInfo.ip }}</Alert>
+        </i-col>
+      </Row>
       <Row :gutter="24">
         <i-col span="8">
           <Card>
@@ -68,7 +84,9 @@
                 company_setting: {
                   label: '单位统计'
                 }
-              }
+              },
+              switchReport:false, //自动预警开关
+              switchDisabled: false
           }
         },
         computed:{
@@ -93,6 +111,17 @@
           setTimeout(this._getBasicData, 500)
         },
         methods:{
+          switchReportChange(status){
+            this.switchDisabled = true
+            let switch_int = status === true ? 1 : 0
+            let url = `allow/report/${switch_int}`
+
+            this.$http.get(url).then(res=>{
+              res = res.data
+              this.$Message.info(res.msg);
+              this.switchDisabled = false
+            })
+          },
           _getBasicData(){
               this.$http.get("/calculate/basic").then(res=>{
                   clearInterval(delayKeyFrame)
@@ -118,5 +147,16 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable.styl"
+
+  .front-page
+    .report
+      line-height:16px;
+      padding-top:6px;
+      .report-span
+        margin-top: 5px;
+        font-size: 1px;
+      .report-switch
+        display:inline-block
+
 
 </style>
