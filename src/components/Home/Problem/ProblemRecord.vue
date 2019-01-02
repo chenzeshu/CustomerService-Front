@@ -57,7 +57,10 @@
             width: 120,
             fixed: 'left',
             render: (h, params)=>{
-              return this.dataArr[params.index].device && this.dataArr[params.index].device.device_id
+              if(this.dataArr[params.index].device){
+                return  h('div', [this.dataArr[params.index].device.device_id])
+              }
+
             }
           },
           {
@@ -65,7 +68,9 @@
             key: 'precord_desc',
             width: 500,
             render: (h, params)=>{
-              return this.dataArr[params.index].problem && this.dataArr[params.index].problem.problem_desc
+              if(this.dataArr[params.index].problem){
+                return  h('div', [this.dataArr[params.index].problem.problem_desc])
+              }
             }
           },
           {
@@ -73,7 +78,9 @@
             key: 'precord_solution',
             width: 500,
             render: (h, params)=>{
-              return this.dataArr[params.index].problem && this.dataArr[params.index].problem.problem_solution
+              if(this.dataArr[params.index].problem){
+                return  h('div', [this.dataArr[params.index].problem.problem_solution])
+              }
             }
           },
           {

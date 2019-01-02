@@ -158,11 +158,6 @@
                 <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
               </Select>
             </FormItem>
-            <!--<FormItem label="频率">-->
-              <!--<Select v-model.number="stepModel.id4" style="width:200px" disabled>-->
-                <!--<Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>-->
-              <!--</Select>-->
-            <!--</FormItem>-->
             <FormItem label="申请时间">
               <DatePicker type="datetime" placeholder="选择日期" style="width: 200px" :value="stepModel.t1" readonly></DatePicker>
             </FormItem>
@@ -190,11 +185,6 @@
                 <Option v-for="item in jihuas" :value="item.id" :key="item.id">{{ item.name }}</Option>
               </Select>
             </FormItem>
-            <!--<FormItem label="频率" prop="pinlv">-->
-              <!--<Select v-model.number="stepModel.channel_operative.id4" style="width:200px">-->
-                <!--<Option v-for="item in pinlvs" :value="item.id" :key="item.id">{{ item.name }}</Option>-->
-              <!--</Select>-->
-            <!--</FormItem>-->
             <FormItem label="开始时间" prop="t1">
               <DatePicker type="datetime" placeholder="选择日期" style="width: 200px"
                           :value="stepModel.channel_operative.t1" @on-change="setOTime1"></DatePicker>
@@ -206,9 +196,9 @@
             <FormItem label="备注">
               <Input type="textarea" v-model="stepModel.channel_operative.remark"></Input>
             </FormItem>
-
           </Form>
         </div>
+
         <div class="third" v-show="current === 2"
              v-if="stepModel.channel_real">
           <Form :model="stepModel" :label-width="80" :rules="ruleValidate3" ref="thirdForm">
@@ -395,12 +385,12 @@
                               style: {margin:'3px'},
                           }, cus.name))
                     }
-                    return h('div', [
-                      dom
-                    ])
                   }else {
-                    return "未填写"
+                    dom = "未选择"
                   }
+                  return h('div', [
+                    dom
+                  ])
                 }
               },
               {
@@ -409,7 +399,7 @@
                 render: (h, params) => {
                     let info = this.dataArr[params.index].source_info
                     if(typeof info !== "undefined" && typeof info[0] !=='undefined'){
-                      return this.dataArr[params.index].source_info[0].name
+                      return h('div', this.dataArr[params.index].source_info[0].name)
                     }
                 }
               },
@@ -427,6 +417,9 @@
                   if(typeof params.row.channel_applys === 'undefined'){
                       return
                   }
+                  if(typeof params.row.channel_applys[0] === 'undefined'){
+                    return
+                  }
                   return h('div', [
                     h('Button', {
                       props: {
@@ -441,7 +434,7 @@
                           this._toggleRelations(params.index)
                         }
                       }
-                    }, `${params.row.channel_applys[0].channel_relations.length}个节点`),
+                    }, params.row.channel_applys[0].channel_relations && `${params.row.channel_applys[0].channel_relations.length}个节点`),
                     h('Button', {
                       props: {
                         type: 'default',
@@ -689,7 +682,7 @@
                 break
             default:
                 this.stepFlag = !this.stepFlag
-                alert("不必展开")
+                alert("暂无详情")
                 break
           }
         },
@@ -698,9 +691,6 @@
             case 1:
                 //更新运营调配表
                 let obj = this.stepModel.channel_operative
-//              console.log(obj)
-//              return
-//                this.$http.post(`/apply/operative/${this.stepModel.id}`, obj)
                 this.$http.post(`/apply/operative`, obj)
                   .then(res=>{
                     res = res.data
@@ -720,8 +710,6 @@
             case 2:
                 //更新实际表
                 let obj2 = this.stepModel.channel_real
-//              console.log(obj2)
-//              return
                 this.$http.post(`/apply/real`, obj2)
                   .then(res=>{
                     res = res.data
@@ -807,7 +795,7 @@
 
               //utils
               this.sources = res.service_sources
-              this.plans = res.plans
+              // this.plans = res.plans
               this.jihuas = res.jihuas
               this.tongxins = res.tongxins
               this.zhanTypes = res.zhantypes

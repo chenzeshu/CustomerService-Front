@@ -119,9 +119,9 @@
                   title: '所属单位',
                   width: this.curWidth < 1200 ? 200 : 350,
                   render: (h, params) => {
-                        if(this.dataArr[params.index].company){
-                          return `${this.dataArr[params.index].company.name}`
-                        }
+                      if(this.dataArr[params.index].company){
+                        return h('div', this.dataArr[params.index].company.name)
+                      }
                   }
                 },
                 {
@@ -142,7 +142,11 @@
                 {
                   title: '审核时间',
                   key: 'changed_at',
-                  width: 100
+                  width: 100,
+                  render: (h, params) => {
+                    let time = this.dataArr[params.index].changed_at
+                    return h('div', !time ? '未审核' : time)
+                  }
                 },
                 {
                   title:"操作",

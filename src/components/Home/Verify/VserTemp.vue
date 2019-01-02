@@ -4,6 +4,7 @@
       <div class="vser-empty" v-if="total === 0">
         <span class="no-verify">{{ serverRes}}</span>
       </div>
+
       <div class="vser-wrapper" v-else>
         <!--title-->
         <div class="title">
@@ -29,19 +30,19 @@
                        @mouseover="showManDetail(key, $event)"
                        @mouseleave="closeDetail">
                   <p class="name1">提交人</p>
-                  <p class="name2">{{ item.refer_man[0].name }}</p>
+                  <p class="name2">{{item.refer_man && item.refer_man[0].name }}</p>
                   <div v-if="item.updated_at">
                     <p class="name2">{{ item.updated_at.substr(0, 10) }}</p>
                     <p class="name2">{{ item.updated_at.substr(11) }}</p>
                   </div>
                 </div>
-                <div class="info1" v-if="item.customer[0]">
-                  <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
+                <div class="info1" v-if="item.customer">
+                  <span class="name" >客户联系人:{{item.customer && item.customer[0].name }}</span>
                   <span>
                     <div class="icon">
                       <Icon type="iphone"></Icon>
                     </div>
-                    联系方式: {{ item.customer[0].phone }}</span>
+                    联系方式: {{ item.customer && item.customer[0].phone }}</span>
                   <span>
                     <div class="icon">
                       <Icon type="android-document"></Icon>
@@ -52,16 +53,16 @@
                       <Icon type="man"></Icon>
                     </div>
                     项目经理: <span v-for="pm in item.project_manager">{{pm.name}}　</span></span>
-                  <span v-if="item.source[0]">
+                  <span v-if="item.source.length > 0">
                     <div class="icon">
                       <Icon type="location"></Icon>
                     </div>
-                    来源:{{ item.source[0].name }}</span>
-                  <span v-if="item.type[0]">
+                    来源:{{ item.source && item.source[0].name }}</span>
+                  <span v-if="item.type && item.type[0]">
                     <div class="icon">
                       <Icon type="flag"></Icon>
                     </div>
-                    类型:{{ item.type[0].name }}</span>
+                    类型:{{ item.type &&item.type[0].name }}</span>
                 </div>
               </div>
               <div class="info2">
@@ -75,23 +76,27 @@
             <Split type="xi" v-show="key !== dataArr.length - 1"></Split>
           </div>
         </div>
-      </div>
 
-      <ShowDetail class="show-man-detail" ref="showDetail">
+
+
+        <ShowDetail class="show-man-detail" ref="showDetail">
          <span class="name">
                 <div class="icon">
                   <Icon type="person"></Icon>
                 </div>
             姓名: {{ curDetail.name }}</span>
-        <span><div class="icon">
+          <span><div class="icon">
                   <Icon type="home"></Icon>
                 </div>
             单位: <span>{{ curDetail.company.name }}</span></span>
-        <span><div class="icon">
+          <span><div class="icon">
                   <Icon type="iphone"></Icon>
                 </div>
             手机: <span>{{ curDetail.phone }}</span></span>
-      </ShowDetail>
+        </ShowDetail>
+      </div>
+
+
     </div>
 </template>
 
@@ -115,7 +120,7 @@
               },
           }
         },
-        created(){
+        mounted(){
           this._getData()
         },
         methods:{
@@ -157,7 +162,7 @@
               .get(`/${this.url}/temp/verify/`)
               .then( res => {
                 res = res.data.data
-                this.$nextTick(()=>{
+                setTimeout(()=>{
                   if(parseInt(res.code) === -4001){
                     this.setTotal(0)
                     this.serverRes = "你没有权限"
@@ -172,8 +177,7 @@
                     this.dataCount = this.dataArr.length
                     this.loading = false
                   }
-                }, err=>{
-                })
+                }, 200)
               })
           }
         },

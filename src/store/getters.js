@@ -15,3 +15,5 @@ export const fileList = state => state.fileList
 
 export const visitObj = state => state.visitObj
 
+export const logoName = state => state.logoName
+

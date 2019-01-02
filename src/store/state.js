@@ -11,6 +11,7 @@ const state = {
   fileList:[], //上传的文件列表
   visitObj:{
   },  //回访对象副本, 用于初始化(而不是用于提交, 因为`do not change value outside mutation`)
+  logoName: "运营管理平台"
 }
 
 export default state

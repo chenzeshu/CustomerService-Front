@@ -36,15 +36,15 @@
                   @mouseleave="closeDetail"
                   >
                 </div>
-                <div class="info1">
-                  <span class="name">申请人:{{ item.employee.name }}</span>
-                  <span>信息来源:{{ item.source.name }}</span>
-                  <span v-if="item.contractc">所属合同:{{ item.contractc.name }}</span>
-                  <span>所选套餐:{{ item.plans[0].name }}</span>
-                  <span><div class="icon">
-                    <Icon type="clock"></Icon>
-                  </div>开始时间:{{ item.channel_applys[0].t1 }}</span>
-                </div>
+                <!--<div class="info1">-->
+                  <!--<span class="name">申请人:{{ item.employee.name }}</span>-->
+                  <!--<span>信息来源:{{ item.source.name }}</span>-->
+                  <!--<span v-if="item.contractc">所属合同:{{item.contractc.name }}</span>-->
+                  <!--<span>所选套餐:{{ item.plans[0].name }}</span>-->
+                  <!--<span><div class="icon">-->
+                    <!--<Icon type="clock"></Icon>-->
+                  <!--</div>开始时间:{{item.channel_applys[0].t1 }}</span>-->
+                <!--</div>-->
                 <div class="info2">
                   <span>通信卫星: <span v-if="item.tongxin[0]">{{ item.tongxin[0].name }}</span> <span style="color:red" v-else>未选择</span></span>
                   <span>极化: <span v-if="item.jihua[0]">{{ item.jihua[0].name }}</span> <span style="color:red" v-else>未选择</span></span>
@@ -98,58 +98,62 @@
             <Split type="xi" v-show="key !== dataArr.length - 1"></Split>
           </div>
         </div>
-      </div>
 
-      <ShowDetail class="show-man-detail" ref="showDetail">
+
+        <ShowDetail class="show-man-detail" ref="showDetail">
          <span class="name">
                 <div class="icon">
                   <Icon type="person"></Icon>
                 </div>
             姓名: {{ curDetail.name }}</span>
-        <span><div class="icon">
+          <span><div class="icon">
                   <Icon type="home"></Icon>
                 </div>
             单位: <span>{{ curDetail.company.name }}</span></span>
-        <span><div class="icon">
+          <span><div class="icon">
                   <Icon type="iphone"></Icon>
                 </div>
             手机: <span>{{ curDetail.phone }}</span></span>
-      </ShowDetail>
+        </ShowDetail>
 
-      <br>
-      <div class="page-wrapper" v-if="total !== 0">
-        <div class="page">
-          <Page :current="page" :total="total" simple @on-change="onChange"></Page>
+        <br>
+        <div class="page-wrapper" v-if="total !== 0">
+          <div class="page">
+            <Page :current="page" :total="total" simple @on-change="onChange"></Page>
+          </div>
         </div>
+
+        <Loading :loading="loading"></Loading>
+
+        <!--update-->
+        <Modal
+          v-model="PFlag"
+          title="补充并通过审核"
+          width="400"
+          @on-ok="passUpdate">
+          <!--@on-cancel="cancel"-->
+          <Form :model="channel_apply" :rules="ruleValidate" ref="updateForm" :label-width="80">
+            <FormItem label="通信卫星" prop="id2">
+              <RadioGroup v-model="channel_apply.id2" type="button">
+                <Radio :label="t.id" v-for="(t, tk) in tongxin" :key="tk">{{t.name}}</Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="极化" prop="id3">
+              <RadioGroup v-model="channel_apply.id3" type="button">
+                <Radio :label="t.id" v-for="(t, tk) in jihua" :key="tk">{{t.name}}</Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="带宽" prop="id4">
+              <RadioGroup v-model="channel_apply.id4" type="button">
+                <Radio :label="t.id" v-for="(t, tk) in daikuan" :key="tk">{{t.name}}</Radio>
+              </RadioGroup>
+            </FormItem>
+          </Form>
+        </Modal>
+
       </div>
 
-      <Loading :loading="loading"></Loading>
 
-      <!--update-->
-      <Modal
-        v-model="PFlag"
-        title="补充并通过审核"
-        width="400"
-        @on-ok="passUpdate">
-        <!--@on-cancel="cancel"-->
-        <Form :model="channel_apply" :rules="ruleValidate" ref="updateForm" :label-width="80">
-          <FormItem label="通信卫星" prop="id2">
-            <RadioGroup v-model="channel_apply.id2" type="button">
-              <Radio :label="t.id" v-for="(t, tk) in tongxin" :key="tk">{{t.name}}</Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem label="极化" prop="id3">
-            <RadioGroup v-model="channel_apply.id3" type="button">
-              <Radio :label="t.id" v-for="(t, tk) in jihua" :key="tk">{{t.name}}</Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem label="带宽" prop="id4">
-            <RadioGroup v-model="channel_apply.id4" type="button">
-              <Radio :label="t.id" v-for="(t, tk) in daikuan" :key="tk">{{t.name}}</Radio>
-            </RadioGroup>
-          </FormItem>
-        </Form>
-      </Modal>
     </div>
 </template>
 
@@ -192,6 +196,34 @@
       }
     },
     created(){
+      this.setDataArr([
+        {
+          employee: {
+            name: "",
+          },
+          source: {
+            name: "",
+          },
+          contractc:{
+            name: "",
+          },
+          plans: [],
+          channel_applys:[{
+            t1: "",
+            t2:""
+          }],
+          tongxin:[{
+            name: "",
+          }],
+          jihua:[{
+            name: "",
+          }],
+          daikuan:[{
+            name: "",
+          }],
+          type:""
+        }
+      ])
       this._getData()
     },
     methods: {
@@ -205,8 +237,7 @@
           this.$refs.showDetail.closeDetail()
         },
         passUpdate(){
-            this.passModel.channel_applys[0] = this.channel_apply
-            console.log(this.passModel)
+          this.passModel.channel_applys[0] = this.channel_apply
 
           this.$refs['updateForm'].validate((valid) => {
             if (!valid) {
@@ -254,20 +285,18 @@
             })
         },
         _getData(){
-          this.loading = !this.loading
+          this._setLoading(true)
           this.$http
             .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
             .then( res => {
               res = res.data.data
-              this.$nextTick(()=>{
                 if(parseInt(res.code) === -4001){
                   this.setTotal(0)
                   this.serverRes = "你没有权限"
-                }else if(parseInt(res.total) === 0){
+                } else if(parseInt(res.total) === 0){
                   this.setTotal(0)
                   this.serverRes = "暂时没有新申请"
-                }
-                else{
+                } else{
                   this.$Message.info(`有${res.total}条数据`);
                   this.setTotal(res.total)
                   this.setDataArr(res.data)
@@ -276,9 +305,6 @@
                   this.daikuan = res.daikuan
                   this.dataCount = this.dataArr.length
                 }
-                this.loading = !this.loading
-              }, err=>{
-              })
             })
         }
     },

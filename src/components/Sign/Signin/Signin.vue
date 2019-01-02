@@ -1,6 +1,6 @@
 <template>
   <div class="signin" id="particles"  @keyup.enter="login">
-    <span class="logo">中网客服管理平台</span>
+    <span class="logo">{{logoName}}</span>
     <div class="signin-wrapper" ref="signinWrapper">
       <div autocomplete="off" class="input" onsubmit="login">
         <div class="icon">
@@ -115,7 +115,7 @@
   },
   computed:{
     ...mapGetters([
-        'logined'
+        'logined', "logoName"
     ])
   },
   methods:{
@@ -185,21 +185,15 @@
     width 100%
     .logo
       display block
-      position fixed
-      left 41.5vw
-      top 0
-      margin-top 6vh
-      font-size 32px
+      margin 8vh auto
+      font-size 40px
       letter-spacing 8px
       color #ffffff
     .signin-wrapper
       display flex
-      position fixed
-      left 40vw
-      top 15vh
+      margin 8vh auto
       width 360px
       height 357px
-      margin 0 auto
       flex-flow column wrap
       justify-content center
       align-items center

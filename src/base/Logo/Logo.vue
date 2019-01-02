@@ -1,6 +1,6 @@
 <template>
     <div class="base-logo">
-      <span class="logo" v-show="!logined">{{name}}</span>
+      <span class="logo" v-show="!logined">{{logoName}}</span>
 
       <transition name="normal"
                   @enter="enter"
@@ -8,7 +8,7 @@
                   @leave="leave"
                   @after-leave="afterLeave">
         <div v-show="logined">
-          <span class="logo2" ref="logo">{{name}}</span>
+          <span class="logo2" ref="logo">{{logoName}}</span>
         </div>
       </transition>
     </div>
@@ -22,14 +22,9 @@
   const transform = prefixStyle('transform');
   const transitionDuration = prefixStyle('transitionDuration');
     export default {
-        data(){
-            return {
-                name : "中网客服管理后台"
-            }
-        },
         computed:{
           ...mapGetters([
-              'logined'
+              'logined', 'logoName'
           ])
         },
         mounted(){

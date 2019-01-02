@@ -472,7 +472,7 @@
             fixed: 'left',
             render: (h, params) => {
               if (this.dataArr[params.index].contract) {
-                return `${this.dataArr[params.index].contract.company.name}`
+                return h('div', this.dataArr[params.index].contract.company.name)
               }
             }
           },
@@ -482,7 +482,7 @@
             width: 150,
             render : (h, params)=>{
               if(this.dataArr[params.index].contract){
-                return `${this.dataArr[params.index].contract.contract_id}`
+                return h('div', this.dataArr[params.index].contract.contract_id)
               }
             }
           },
@@ -524,7 +524,8 @@
             width: 100,
             render: (h, params) => {
               let index = params.row.source
-              return typeof this.sources[index] !== 'undefined' ? this.sources[index].name : '其他'
+              let value =  typeof this.sources[index] !== 'undefined' ? this.sources[index].name : '其他'
+              return h('div', value)
             }
           },
           {
@@ -533,7 +534,8 @@
             width: 100,
             render: (h, params) => {
               let index = params.row.type
-              return typeof this.types[index] !== 'undefined' ? this.types[index].name : '其他'
+              let value =  typeof this.types[index] !== 'undefined' ? this.types[index].name : '其他'
+              return h('div', value)
             }
           },
           {
@@ -554,12 +556,12 @@
                     }
                   }, props: {size: 'small'}, style: {margin: '3px'},}, man.name))
                 }
-                return h('div', [
-                  dom
-                ])
               } else {
-                return "未填写"
+                dom = "未选择"
               }
+              return h('div', [
+                dom
+              ])
             }
           },
           {
@@ -573,12 +575,12 @@
                 for (let man of data) {
                   dom.push(h('Button', {props: {size: 'small'}, style: {margin: '3px'},}, man.name))
                 }
-                return h('div', [
-                  dom
-                ])
               } else {
-                return "未填写"
+                dom = '未派单'
               }
+              return h('div', [
+                dom
+              ])
             }
           },
           {
@@ -592,38 +594,58 @@
                 for (let customer of data) {
                   dom.push(h('Button', {props: {size: 'small'}, style: {margin: '3px'},}, customer.name))
                 }
-                return h('div', [
-                  dom
-                ])
               } else {
-                return "未填写"
+                dom = "未选择"
               }
+              return h('div', [
+                dom
+              ])
             }
           },
           {
             title: '派单时间',
             key: 'time1',
-            width: 120
+            width: 120,
+            render: (h, params) => {
+              let time = this.dataArr[params.index].time1
+              return h('div', !time ? '未填写' : time)
+            }
           },
           {
             title: '解决时间',
             key: 'time2',
-            width: 120
+            width: 120,
+            render: (h, params) => {
+              let time = this.dataArr[params.index].time2
+              return h('div', !time ? '未填写' : time)
+            }
           },
           {
             title: '占用工时',
             key: 'day_sum',
-            width: 120
+            width: 120,
+            render: (h, params) => {
+              let time = this.dataArr[params.index].day_sum
+              return h('div', !time ? '未填写' : time)
+            }
           },
           {
             title: '问题描述',
             key: 'desc1',
-            width: 200
+            width: 200,
+            render: (h, params) => {
+              let time = this.dataArr[params.index].desc1
+              return h('div', !time ? '未填写' : time)
+            }
           },
           {
             title: '处理描述',
             key: 'desc2',
-            width: 200
+            width: 200,
+            render: (h, params) => {
+              let time = this.dataArr[params.index].desc2
+              return h('div', !time ? '未填写' : time)
+            }
           },
           {
             "title":"回访记录",
@@ -667,7 +689,7 @@
               if(params.row.charge_if === '收费'){
                 return params.row.charge
               }else{
-                return '无'
+                return h('div', '不收费')
               }
             }
           },
@@ -679,7 +701,7 @@
               if(params.row.charge_if === '收费'){
                 return params.row.charge_flag
               }else{
-                return '无'
+                return h('div', '不收费')
               }
             },
             filters:[
@@ -704,7 +726,11 @@
           {
             title: '到款时间',
             key: 'time4',
-            width: 120
+            width: 120,
+            render: (h, params) => {
+              let time = this.dataArr[params.index].time4
+              return h('div', !time ? '未填写' : time)
+            }
           },
           {
             title: '备注',
@@ -726,7 +752,7 @@
                   dom
                 ])
               } else {
-                return "未填写"
+                return h('div', '无文件')
               }
             }
           },

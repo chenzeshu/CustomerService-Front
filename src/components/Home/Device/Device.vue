@@ -213,7 +213,7 @@
                 width: 200,
                 render: (h, params) => {
                   if(this.dataArr[params.index].company){
-                    return `${this.dataArr[params.index].company.name}`
+                    return h('div', this.dataArr[params.index].company.name)
                   }
                 }
               },
@@ -233,7 +233,7 @@
                 width: 120,
                 render: (h, params) => {
                   if(this.dataArr[params.index].profession){
-                    return `${this.dataArr[params.index].profession.name}`
+                    return h('div', this.dataArr[params.index].profession.name)
                   }
                 }
               },
@@ -263,7 +263,7 @@
                 width: 130,
                 render: (h, params) => {
                   if(this.dataArr[params.index].channel_info2){
-                    return `${this.dataArr[params.index].channel_info2.name}`
+                    return h('div', this.dataArr[params.index].channel_info2.name)
                   }
                 }
               },
@@ -422,7 +422,9 @@
                 width: 100,
                 fixed: 'left',
                 render: (h, params) => {
-                  return this.problemDataArr[params.index].problem_type && this.problemDataArr[params.index].problem_type.ptype_name
+                  if(this.problemDataArr[params.index].problem_type){
+                    return h('div', this.problemDataArr[params.index].problem_type.ptype_name)
+                  }
                 }
               },
               {

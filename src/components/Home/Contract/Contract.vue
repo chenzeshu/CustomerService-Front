@@ -357,7 +357,14 @@
             {
               title: '合同金额(元)',
               width: 150,
-              key: 'money'
+              key: 'money',
+              render: (h, params) => {
+                let money = this.dataArr[params.index].money
+                if(!money){
+                  money = '未填写'
+                }
+                return h('div', money)
+              }
             },
             {
               title: '是否结清',
@@ -433,12 +440,12 @@
                       for(let pm of data){
                           dom.push(h('Button', {props:{size:'small'}, style: {margin:'3px'},}, pm.name))
                       }
-                      return h('div', [
-                          dom
-                      ])
                   }else {
-                      return "未填写"
+
                   }
+                  return h('div', [
+                    dom
+                  ])
               }
             },
             {
@@ -452,12 +459,12 @@
                   for(let tm of data){
                     dom.push(h('Button', {props:{size:'small'}, style: {margin: '3px'},}, tm.name))
                   }
-                  return h('div', [
-                    dom
-                  ])
                 }else {
-                  return "未填写"
+                  dom = "未选择"
                 }
+                return h('div', [
+                  dom
+                ])
               }
             },
             {
@@ -468,12 +475,26 @@
             {
               title: '验收日期',
               key: 'time2',
-              width: 120
+              width: 120,
+              render: (h, params) => {
+                let time2 = this.dataArr[params.index].time2
+                if(!time2){
+                  time2 = '未填写'
+                }
+                return h('div', time2)
+              }
             },
             {
               title: '失效日期',
               key: 'time3',
-              width: 120
+              width: 120,
+              render: (h, params) => {
+                let time3 = this.dataArr[params.index].time3
+                if(!time3){
+                  time3 = '未填写'
+                }
+                return h('div', time3)
+              }
             },
             {
               title: '文件',
@@ -486,18 +507,18 @@
                   for(let doc of data){
                     dom.push(h('Button', {props:{size:'small'}, style: {marginRight: '3px'},}, doc.name))
                   }
-                  return h('div', [
-                    dom
-                  ])
                 }else {
-                  return "未填写"
+                  dom = "未上传"
                 }
+                return h('div', [
+                  dom
+                ])
               }
             },
             {
               title:"操作",
               align: "center",
-              width: 240,
+              width: 280,
               fixed:'right',
               render: (h, params) => {
                   let planNum = params.row.contract_plans && params.row.contract_plans.length

@@ -37,7 +37,7 @@ router.push('/signin')
 router.beforeEach((to, from, next) => {
   // Change doc title
   // document.title = to.meta.title || 'Unknow title'
-  document.title ='中网客服管理平台'
+  document.title ='运营管理平台'
   // document.querySelector('meta[name="keywords"]').setAttribute('content', 'keywords')
   // document.querySelector('meta[name="description"]').setAttribute('content', 'description')
   next()

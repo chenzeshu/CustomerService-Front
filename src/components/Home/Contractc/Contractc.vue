@@ -337,12 +337,12 @@
                      for(let pm of data){
                        dom.push(h('Button', {props:{size:'small'}, style: {margin:'3px'},}, pm.name))
                      }
-                     return h('div', [
-                       dom
-                     ])
                    }else {
-                     return "未填写"
+                     dom = "未选择"
                    }
+                   return h('div', [
+                     dom
+                   ])
                  }
                },
                {
@@ -376,18 +376,19 @@
                      for(let doc of data){
                        dom.push(h('Button', {props:{size:'small'}, style: {marginRight: '3px'},}, doc.name))
                      }
-                     return h('div', [
-                       dom
-                     ])
+
                    }else {
-                     return "未填写"
+                     dom = "未上传"
                    }
+                   return h('div', [
+                     dom
+                   ])
                  }
                },
                {
                  title:"操作",
                  align: "center",
-                 width: 250,
+                 width: 280,
                  fixed:'right',
                  render: (h, params) => {
                    let planNum = 0

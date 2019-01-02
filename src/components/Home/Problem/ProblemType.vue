@@ -109,7 +109,7 @@
             render: (h, params) => {
               let p = this.dataArr[params.index]
 
-              return p.problems_count
+              return h('div', [p.problems_count])
             }
           },
           {
@@ -123,7 +123,7 @@
               p.problems.forEach(problem => {
                 sum += problem.devices_count
               })
-              return sum
+              return h('div', [sum])
             }
           },
           {
@@ -133,7 +133,7 @@
             render: (h, params) => {
               let p = this.dataArr[params.index]
 
-              return Math.round(p.problems_count/this.problem_count * 100)  + '%'
+              return h('div', [Math.round(p.problems_count/this.problem_count * 100)  + '%'])
             }
           },
           {
@@ -143,7 +143,8 @@
             render: (h, params) => {
               //解决数占本类问题的总数
               let p = this.dataArr[params.index]
-              return Math.round(p.problems_finished_count/p.problems_count * 100)  + '%'
+
+              return h('div', [Math.round(p.problems_finished_count/p.problems_count * 100)  + '%'])
             }
           },
           {

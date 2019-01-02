@@ -195,7 +195,10 @@
             width: 100,
             fixed: 'left',
             render: (h, params) => {
-              return this.dataArr[params.index].problem_type && this.dataArr[params.index].problem_type.ptype_name
+              if(this.dataArr[params.index].problem_type){
+                return h('div', [this.dataArr[params.index].problem_type.ptype_name])
+              }
+
             }
           },
           {
