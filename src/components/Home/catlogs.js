@@ -13,7 +13,7 @@ export const catlogs = [
       {title:"注册申请", path:'/home/vcus', name:"注册申请"},
       {title:"服务申请", path:'/home/vser', name:"服务申请"},
       {title:"信道申请", path:'/home/vchan', name:"信道申请"},
-      {title:"临时服务申请", path:'/home/vserTemp', name:"临时服务申请"},
+      // {title:"临时服务申请", path:'/home/vserTemp', name:"临时服务申请"},
       {title:"临时信道申请", path:'/home/vchanTemp', name:"临时信道申请"},
       {title:"普通服务单", path:'/home/service', name:"普通服务单"},
       {title:"信道服务单", path:'/home/channel', name:"信道服务单"},

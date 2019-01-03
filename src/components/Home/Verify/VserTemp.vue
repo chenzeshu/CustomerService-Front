@@ -37,7 +37,7 @@
                   </div>
                 </div>
                 <div class="info1" v-if="item.customer">
-                  <span class="name" >客户联系人:{{item.customer && item.customer[0].name }}</span>
+                  <span class="name" >客户联系人：{{item.customer && item.customer[0].name }}</span>
                   <span>
                     <div class="icon">
                       <Icon type="iphone"></Icon>
@@ -47,27 +47,30 @@
                     <div class="icon">
                       <Icon type="android-document"></Icon>
                     </div>
-                    所属合同: {{ item.contract && item.contract.name }}</span>
+                    所属合同：{{ item.contract && item.contract.name }}</span>
                   <span>
                     <div class="icon">
                       <Icon type="man"></Icon>
                     </div>
-                    项目经理: <span v-for="pm in item.project_manager">{{pm.name}}　</span></span>
+                    项目经理：<span v-for="pm in item.project_manager">{{pm.name}}　</span></span>
                   <span v-if="item.source.length > 0">
                     <div class="icon">
                       <Icon type="location"></Icon>
                     </div>
-                    来源:{{ item.source && item.source[0].name }}</span>
-                  <span v-if="item.type && item.type[0]">
+                    来源：{{ item.source && item.source[0].name }}</span>
+
+                </div>
+                <div class="info2">
+                  <span v-if="item.type">
                     <div class="icon">
                       <Icon type="flag"></Icon>
                     </div>
-                    类型:{{ item.type &&item.type[0].name }}</span>
+                    类型：{{ item.type.name }}</span>
+                  <span v-if="item.question"><div class="icon"><Icon type="help"></Icon>
+                    </div>问题描述：{{ item.question }}</span>
                 </div>
               </div>
-              <div class="info2">
 
-              </div>
               <div class="verify">
                 <i-button type="primary" size="large" @click="_pass(item.id)">通过审核</i-button>
                 <i-button type="error" size="large" @click="_rej(item.id)">拒绝</i-button>
@@ -76,8 +79,6 @@
             <Split type="xi" v-show="key !== dataArr.length - 1"></Split>
           </div>
         </div>
-
-
 
         <ShowDetail class="show-man-detail" ref="showDetail">
          <span class="name">
@@ -242,20 +243,24 @@
               .name2
                 margin-top 6px
             .info1, .info2
-              flex 0 0 500px
+              flex 0 0 224px
               display flex
               flex-direction column
               flex-wrap: wrap
-              justify-content space-around
-              align-items flex-start
               font-size 14px
               .name
                 font-weight 700
               .icon
                 display inline-block
                 width 20px
+            .info1
+              justify-content space-around
+              align-items flex-start
             .info2
-              flex 0 0 300px
+              justify-content initial
+              align-items flex-start
+              margin-top: 30px
+              line-height:32px
           .verify
             flex 0 0 160px
             width 105px

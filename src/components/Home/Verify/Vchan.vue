@@ -65,14 +65,14 @@
 
             </div>
             <div class="control-item" @click="showContent(key)" v-if="contentIndex !==key">
-              --------------------------------展开更多信息---------------------------------
+              --------------------------------展开设备列表---------------------------------
             </div>
             <div class="control-item" @click="hiddenContent()" v-else>
-              --------------------------------隐藏展开信息---------------------------------
+              --------------------------------隐藏设备列表---------------------------------
             </div>
 
             <transition name="slide-fade">
-              <table class="ivu-table ivu-table-border" style="width:50vw;min-width:700px; margin-top:10px"
+              <table class="ivu-table ivu-table-border" style="width:50vw;min-width:700px; margin:10px auto"
                      cellspacing="0" cellpadding="0" v-if="contentIndex === key">
                 <thead class="ivu-table-header">
                 <tr>

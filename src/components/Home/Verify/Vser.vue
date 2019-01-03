@@ -42,37 +42,45 @@
                   </div>
                 </div>
                 <div class="info1" v-if="item.type && item.customer[0]">
-                  <span class="name">服务类型： {{item.type.name}} </span>
-                  <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
+                  <span class="name" >客户联系人：{{item.customer && item.customer[0].name }}</span>
                   <span>
                     <div class="icon">
                       <Icon type="iphone"></Icon>
                     </div>
-                    联系方式: {{ item.customer[0].phone }}</span>
+                    联系方式: {{ item.customer && item.customer[0].phone }}</span>
                   <span>
                     <div class="icon">
                       <Icon type="android-document"></Icon>
                     </div>
-                    所属合同: {{ item.contract && item.contract.name }}</span>
+                    所属合同：{{ item.contract && item.contract.name }}</span>
+                  <span>
+                    <div class="icon">
+                      <Icon type="android-document"></Icon>
+                    </div>
+                    合同编号：<span style="color:#2d8cf0">{{item.contract.contract_id}}</span></span>
                   <span>
                     <div class="icon">
                       <Icon type="man"></Icon>
                     </div>
-                    项目经理: <span v-for="pm in item.project_manager">{{pm.name}}　</span></span>
-                  <span v-if="item.source[0]">
+                    项目经理：<span v-for="pm in item.project_manager">{{pm.name}}　</span></span>
+                  <span v-if="item.source.length > 0">
                     <div class="icon">
                       <Icon type="location"></Icon>
                     </div>
-                    来源:{{ item.source[0].name }}</span>
-                  <span v-if="item.type[0]">
+                    来源：{{ item.source && item.source[0].name }}</span>
+                </div>
+                <div class="info2">
+                  <span v-if="item.type">
                     <div class="icon">
                       <Icon type="flag"></Icon>
                     </div>
-                    类型:{{ item.type[0].name }}</span>
-                </div>
-              </div>
-              <div class="info2">
+                    类型：{{ item.type.name }}
+                  </span>
 
+                  <span v-if="item.question" class="question"><div class="icon"><Icon type="help"></Icon>
+                    </div>问题描述：{{ item.question }}
+                  </span>
+                </div>
               </div>
               <div class="verify">
                 <!--<i-button type="primary" size="large" @click="_pass(item.id)">通过审核</i-button>-->
@@ -102,35 +110,39 @@
                   </div>
                   <div class="info1" v-if="item.customer[0] && item.type">
                     <span class="name">服务类型： {{item.type.name}} </span>
-                    <span class="name" >客户联系人:{{ item.customer[0].name }}</span>
+                    <span class="name" >客户联系人：{{item.customer && item.customer[0].name }}</span>
                     <span>
-                      <div class="icon">
-                        <Icon type="iphone"></Icon>
-                      </div>
-                      联系方式: {{ item.customer[0].phone }}</span>
+                    <div class="icon">
+                      <Icon type="iphone"></Icon>
+                    </div>
+                    联系方式: {{ item.customer && item.customer[0].phone }}</span>
                     <span>
-                      <div class="icon">
-                        <Icon type="android-document"></Icon>
-                      </div>
-                      所属合同: {{ item.contract && item.contract.name }}</span>
+                    <div class="icon">
+                      <Icon type="android-document"></Icon>
+                    </div>
+                    所属合同：{{ item.contract && item.contract.name }}</span>
                     <span>
-                      <div class="icon">
-                        <Icon type="man"></Icon>
-                      </div>
-                      项目经理: <span v-for="pm in item.project_manager">{{pm.name}}　</span></span>
-                    <span v-if="item.source[0]">
-                      <div class="icon">
-                        <Icon type="location"></Icon>
-                      </div>
-                      来源:{{ item.source[0].name }}</span>
-                    <span v-if="item.type[0]">
+                    <div class="icon">
+                      <Icon type="man"></Icon>
+                    </div>
+                    项目经理：<span v-for="pm in item.project_manager">{{pm.name}}　</span></span>
+                    <span v-if="item.source.length > 0">
+                    <div class="icon">
+                      <Icon type="location"></Icon>
+                    </div>
+                    来源：{{ item.source && item.source[0].name }}</span>
+                  </div>
+                  <div class="info2">
+                    <span v-if="item.type">
                       <div class="icon">
                         <Icon type="flag"></Icon>
                       </div>
-                      类型:{{ item.type[0].name }}</span>
-                  </div>
-                  <div class="info2">
-
+                    类型：{{ item.type.name }}</span>
+                    <span v-if="item.question" class="question">
+                      <div class="icon">
+                        <Icon type="help"></Icon>
+                      </div>
+                      问题描述：{{ item.question }}</span>
                   </div>
                 </div>
 
@@ -189,7 +201,14 @@
                       类型:{{ item.type[0].name }}</span>
                   </div>
                   <div class="info2">
-
+                      <span v-if="item.type">
+                        <div class="icon">
+                          <Icon type="flag"></Icon>
+                        </div>
+                        类型：{{ item.type.name }}</span>
+                      <span v-if="item.question" class="question">
+                        <div class="icon"><Icon type="help"></Icon></div>
+                        问题描述：{{ item.question }}</span>
                   </div>
                 </div>
 
@@ -238,6 +257,7 @@
             </Select>
           </FormItem>
         </Form>
+        <Button v-show="curPlans.length === 0" type="error" @click="goContract">去合同页面编辑套餐</Button>
       </Modal>
 
       <!--显示申请完成详情-->
@@ -326,6 +346,9 @@
           this._getData()
         },
         methods:{
+          goContract(){
+            this.$router.push('/home/contract')
+          },
           //弹出套餐选择
           _toggleVerify(key){
             this.veriFlag = !this.veriFlag
@@ -516,23 +539,31 @@
                 font-weight 500
               .name2
                 margin-top 6px
-            .info1, .info2
-              flex 0 0 500px
-              display flex
-              flex-direction column
-              flex-wrap: wrap
-              justify-content space-around
-              align-items flex-start
-              font-size 14px
-              .name
-                font-weight 700
-              .icon
-                display inline-block
-                width 20px
-            .info2
-              flex 0 0 300px
+          .info1, .info2
+            flex 0 0 264px
+            display flex
+            flex-direction column
+            flex-wrap: wrap
+            font-size 14px
+            .name
+              font-weight 700
+            .icon
+              display inline-block
+              width 20px
+          .info1
+            justify-content space-around
+            align-items flex-start
+          .info2
+            justify-content initial
+            align-items flex-start
+            margin-top: 30px
+            line-height:32px
+            word-wrap: break-word;
+            word-break: break-all;
+            .question
+              font-weight:700
           .verify
-            flex 1 0 260px
+            flex 0 0 260px
             width 105px
             margin-top 10px
     .show-man-detail
