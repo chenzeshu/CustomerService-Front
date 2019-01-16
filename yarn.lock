@@ -1566,11 +1566,6 @@ core-js@^2.4.0, core-js@^2.5.0:
   resolved "http://registry.npm.taobao.org/core-js/download/core-js-2.6.0.tgz#1e30793e9ee5782b307e37ffa22da0eacddd84d4"
   integrity sha1-HjB5Pp7leCswfjf/oi2g6s3dhNQ=
 
-core-js@^2.5.3:
-  version "2.6.2"
-  resolved "http://registry.npm.taobao.org/core-js/download/core-js-2.6.2.tgz#267988d7268323b349e20b4588211655f0e83944"
-  integrity sha1-JnmI1yaDI7NJ4gtFiCEWVfDoOUQ=
-
 core-util-is@~1.0.0:
   version "1.0.2"
   resolved "http://registry.npm.taobao.org/core-util-is/download/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
@@ -1823,10 +1818,10 @@ deep-extend@^0.6.0:
   resolved "http://registry.npm.taobao.org/deep-extend/download/deep-extend-0.6.0.tgz#c4fa7c95404a17a9c3e8ca7e1537312b736330ac"
   integrity sha1-xPp8lUBKF6nD6Mp+FTcxK3NjMKw=
 
-deepmerge@^1.5.2:
-  version "1.5.2"
-  resolved "http://registry.npm.taobao.org/deepmerge/download/deepmerge-1.5.2.tgz#10499d868844cdad4fee0842df8c7f6f0c95a753"
-  integrity sha1-EEmdhohEza1P7ghC34x/bwyVp1M=
+deepmerge@^2.1.0:
+  version "2.2.1"
+  resolved "http://registry.npm.taobao.org/deepmerge/download/deepmerge-2.2.1.tgz#5d3ff22a01c00f645405a2fbc17d0778a1801170"
+  integrity sha1-XT/yKgHAD2RUBaL7wX0HeKGAEXA=
 
 define-property@^0.2.5:
   version "0.2.5"
@@ -2011,7 +2006,7 @@ electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.30, electron-to-chromium@
   resolved "http://registry.npm.taobao.org/electron-to-chromium/download/electron-to-chromium-1.3.88.tgz#f36ab32634f49ef2b0fdc1e82e2d1cc17feb29e7"
   integrity sha1-82qzJjT0nvKw/cHoLi0cwX/rKec=
 
-element-resize-detector@^1.1.12:
+element-resize-detector@^1.1.14:
   version "1.2.0"
   resolved "http://registry.npm.taobao.org/element-resize-detector/download/element-resize-detector-1.2.0.tgz#63344fd6f4e5ecff6f018d027e17b281fd4fa338"
   integrity sha1-YzRP1vTl7P9vAY0Cfheygf1Pozg=
@@ -3113,23 +3108,28 @@ isobject@^3.0.0, isobject@^3.0.1:
   resolved "http://registry.npm.taobao.org/isobject/download/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
   integrity sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
 
-iview@2.8.0:
-  version "2.8.0"
-  resolved "http://registry.npm.taobao.org/iview/download/iview-2.8.0.tgz#4f5ebfe493f1697c87022739ca27ddd8797a661c"
-  integrity sha1-T16/5JPxaXyHAic5yifd2Hl6Zhw=
+iview@2.13.0:
+  version "2.13.0"
+  resolved "http://registry.npm.taobao.org/iview/download/iview-2.13.0.tgz#34cab55267e1f9a3bde4cbf8bd35ceff2f41b7fb"
+  integrity sha1-NMq1Umfh+aO95Mv4vTXO/y9Bt/s=
   dependencies:
     async-validator "^1.8.2"
-    core-js "^2.5.3"
-    deepmerge "^1.5.2"
-    element-resize-detector "^1.1.12"
+    deepmerge "^2.1.0"
+    element-resize-detector "^1.1.14"
+    js-calendar "^1.2.3"
     lodash.throttle "^4.1.1"
-    popper.js "^0.6.4"
+    popper.js "^1.14.1"
     tinycolor2 "^1.4.1"
 
 js-base64@^2.1.9:
   version "2.4.9"
   resolved "http://registry.npm.taobao.org/js-base64/download/js-base64-2.4.9.tgz#748911fb04f48a60c4771b375cac45a80df11c03"
   integrity sha1-dIkR+wT0imDEdxs3XKxFqA3xHAM=
+
+js-calendar@^1.2.3:
+  version "1.2.3"
+  resolved "http://registry.npm.taobao.org/js-calendar/download/js-calendar-1.2.3.tgz#a583b0644b4e695ba394f344d103dbcc7a7a7d3e"
+  integrity sha1-pYOwZEtOaVujlPNE0QPbzHp6fT4=
 
 "js-tokens@^3.0.0 || ^4.0.0":
   version "4.0.0"
@@ -4190,10 +4190,10 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
-popper.js@^0.6.4:
-  version "0.6.4"
-  resolved "http://registry.npm.taobao.org/popper.js/download/popper.js-0.6.4.tgz#1837c4760af54d2bb20b66f9c09b92993d84c629"
-  integrity sha1-GDfEdgr1TSuyC2b5wJuSmT2Exik=
+popper.js@^1.14.1:
+  version "1.14.6"
+  resolved "http://registry.npm.taobao.org/popper.js/download/popper.js-1.14.6.tgz#ab20dd4edf9288b8b3b6531c47c361107b60b4b0"
+  integrity sha1-qyDdTt+SiLiztlMcR8NhEHtgtLA=
 
 posix-character-classes@^0.1.0:
   version "0.1.1"

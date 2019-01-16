@@ -287,7 +287,7 @@
         _getData(){
           this._setLoading(true)
           this.$http
-            .get(`/${this.url}/page/${this.page}/${this.pageSize}`)
+            .post(`/${this.url}/page/${this.page}/${this.pageSize}`)
             .then( res => {
               res = res.data.data
                 if(parseInt(res.code) === -4001){
